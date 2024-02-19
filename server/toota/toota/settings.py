@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-aov%#o5ft#6c85j_3&vghmb^m(vri==)4r0sfxlk6sz%r-mqrt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
 
 
 # Application definition
@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    ''
     'trips'
 ]
 
@@ -133,7 +132,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
+REDIS_URL = os.getenv('REDIS_URL', 'redis-18315.c323.us-east-1-2.ec2.cloud.redislabs.com:18315')
 
 CHANNEL_LAYERS = {
     'default': {
