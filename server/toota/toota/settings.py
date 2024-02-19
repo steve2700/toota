@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
+import datetime
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-aov%#o5ft#6c85j_3&vghmb^m(vri==)4r0sfxlk6sz%r-mqrt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
+ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1  ']
 
 
 # Application definition
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'trips'
 ]
 
@@ -141,4 +143,17 @@ CHANNEL_LAYERS = {
             'hosts': [REDIS_URL],
         },
     },
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    )
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
+    'USER_ID_CLAIM': 'id',
 }
