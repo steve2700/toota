@@ -77,14 +77,15 @@ ASGI_APPLICATION = 'toota.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PGDATABASE'),
-        'USER': os.getenv('PGUSER'),
-        'PASSWORD': os.getenv('PGPASSWORD'),
-        'HOST': os.getenv('PGHOST', 'localhost'),
-        'PORT': os.getenv('PGPORT', '5432'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'HOST': 'aws-0-us-west-1.pooler.supabase.com',
+        'NAME': 'postgres',
+        'USER': 'postgres.afjlgckcyumlpuppqslz',
+        'PASSWORD': 'vMhjFBMVIb5WDSt5',
+        'PORT': '5432',
     }
 }
 
