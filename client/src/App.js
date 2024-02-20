@@ -1,20 +1,25 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import DriverSignup from './components/DriverSignup';
-import DriverLogin from './components/DriverLogin';
+import './App.css';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+import SignupPage from './pages/Signup';
+import LoginPage from './pages/Login';
 
 function App() {
   return (
-    <Router>
-      <div>
+    <div className="min-h-full h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-md w-full space-y-8">
+     <BrowserRouter>
         <Routes>
-          <Route path="/driver/signup" component={DriverSignup} />
-          <Route path="/driver/login" component={DriverLogin} />
+            <Route path="/" element={<LoginPage/>} />
+            <Route path="/signup" element={<SignupPage/>} />
         </Routes>
-      </div>
-    </Router>
+      </BrowserRouter>
+    </div>
+  </div>
   );
 }
 
 export default App;
-
