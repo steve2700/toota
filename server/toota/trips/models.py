@@ -1,7 +1,13 @@
+import datetime
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.shortcuts import reverse
+
+
+
 from toota import settings
-import uuid
+
 
 # Create your models here.
 class User(AbstractUser):
@@ -11,9 +17,12 @@ class User(AbstractUser):
     email = models.EmailField(max_length=255, null=False, blank=False, unique=True)
     profile_picture = models.ImageField(upload_to='profile_pictures', blank=True, null=True, default='profile_pictures/default.jpg')
     address = models.CharField(max_length=255, blank=True, null=True)
+    is_email_confirmed = models.BooleanField(default=False)
+    
     
     def __str__(self):
         return self.username
+    
     
     
 class Driver(User):
@@ -56,15 +65,30 @@ class Trip(models.Model):
         ('truck_4', '4 ton Truck'),
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     pickup_location = models.CharField(max_length=300, null=False, blank=False)
-    dropoff_location = models.ManyToManyField(PickupLocation)
-    # user_requested = models.ForeignKey(User, on_delete=models.CASCADE)  
-    driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    dropoff_location = models.ManyToManyField(PickupLocation, related_name='dropoff_location', blank=True)
+    number_of_helpers = models.IntegerField(default=0)
+    pickup_time = models.DateTimeField(default=datetime.datetime.now)
+    load_description = models.TextField(blank=True, null=True, default='', max_length=500)
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE )
     vehicle_type = models.CharField(max_length=100, choices=VEHICLE_TYPES, null=False, blank=False)
     status = models.CharField(max_length=100, choices=TRIP_STATUS, default=REQUESTED)
     rating = models.IntegerField(default=0)
+    bid = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False, default=0.00)
+    is_accepted = models.BooleanField(default=False)
     
     
     
+    def __str__(self):
+        return f'{self.id}'
+    
+    def get_absolute_url(self):
+        return reverse('trip:trip_detail', kwargs={'trip_id': self.id})
+    
+    
+class EmailVerificationToken(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)

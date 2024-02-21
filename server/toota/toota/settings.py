@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-aov%#o5ft#6c85j_3&vghmb^m(vri==)4r0sfxlk6sz%r-mqrt
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -79,14 +79,21 @@ ASGI_APPLICATION = 'toota.asgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'HOST': 'aws-0-us-west-1.pooler.supabase.com',
+#         'NAME': 'postgres',
+#         'USER': 'postgres.afjlgckcyumlpuppqslz',
+#         'PASSWORD': 'vMhjFBMVIb5WDSt5',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': 'aws-0-us-west-1.pooler.supabase.com',
-        'NAME': 'postgres',
-        'USER': 'postgres.afjlgckcyumlpuppqslz',
-        'PASSWORD': 'vMhjFBMVIb5WDSt5',
-        'PORT': '5432',
+       'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
