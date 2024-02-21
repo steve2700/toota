@@ -1,20 +1,21 @@
 // DriverRegistrationForm.js
 
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import './DriverRegistrationForm.css';
+// eslint-disable-next-line no-unused-vars
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./DriverRegistrationForm.css";
 
 const DriverRegistrationForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    address: '',
-    vehicleRegistrationNo: '',
-    license: '',
-    city: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    address: "",
+    vehicleRegistrationNo: "",
+    license: "",
+    city: "",
   });
 
   const handleChange = (e) => {
@@ -25,8 +26,8 @@ const DriverRegistrationForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Send data to Django backend (implement this part)
-    console.log('Form submitted:', formData);
-    navigate('/login/driver'); // redirect to the login page after successful registration
+    console.log("Form submitted:", formData);
+    navigate("/login/driver"); // redirect to the login page after successful registration
   };
 
   return (
@@ -73,15 +74,15 @@ const DriverRegistrationForm = () => {
             onChange={handleChange}
             required
           />
-	  <label htmlFor="phoneNumber">Phone Number</label>
-        <input
-          type="tel"
-          id="phoneNumber"
-          name="phoneNumber"
-          value={formData.phoneNumber}
-          onChange={handleChange}
-          required
-        />
+          <label htmlFor="phoneNumber">Phone Number</label>
+          <input
+            type="tel"
+            id="phoneNumber"
+            name="phoneNumber"
+            value={formData.phoneNumber}
+            onChange={handleChange}
+            required
+          />
 
           <label htmlFor="vehicleRegistrationNo">Vehicle Registration No</label>
           <input
@@ -135,4 +136,3 @@ const DriverRegistrationForm = () => {
 };
 
 export default DriverRegistrationForm;
-

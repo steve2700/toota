@@ -1,14 +1,15 @@
 // DriverLoginForm.js
 
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import './DriverLoginForm.css';
+// eslint-disable-next-line no-unused-vars
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./DriverLoginForm.css";
 
 const DriverLoginForm = () => {
   const navigate = useNavigate();
   const [loginData, setLoginData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const handleChange = (e) => {
@@ -19,15 +20,16 @@ const DriverLoginForm = () => {
   const handleLogin = (e) => {
     e.preventDefault();
     // Send login data to Django backend (implement this part)
-    console.log('Login data:', loginData);
+    console.log("Login data:", loginData);
     // Redirect to driver dashboard or appropriate page
-    navigate('/driver-dashboard');
+    navigate("/driver-dashboard");
   };
 
   return (
     <div className="driver-login-form">
       <h1 className="driver-heading">
-        <span className="green-text">TOOTA</span> <span className="black-text">DRIVER</span>
+        <span className="text-red-500">TOOTA</span>{" "}
+        <span className="black-text">DRIVER</span>
       </h1>
       <div className="login-card">
         <h2 className="login-header">-- LOGIN IN --</h2>
@@ -56,17 +58,13 @@ const DriverLoginForm = () => {
             <Link to="/forgot-password">Forgot Password?</Link>
           </div>
 
-          <button
-            type="submit"
-            className="driver-login-button"
-          >
+          <button type="submit" className="driver-login-button">
             Login as Driver
           </button>
         </form>
 
         <div className="signup-link">
-          Not a Toata driver?{' '}
-          <Link to="/signup/driver">Sign up here</Link>
+          Not a Toata driver? <Link to="/signup/driver">Sign up here</Link>
         </div>
       </div>
     </div>
@@ -74,4 +72,3 @@ const DriverLoginForm = () => {
 };
 
 export default DriverLoginForm;
-
