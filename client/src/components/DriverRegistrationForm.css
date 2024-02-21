@@ -1,0 +1,55 @@
+/* DriverRegistrationForm.css */
+
+.driver-registration-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.form-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.driver-signup-button {
+  background-color: #28a745;
+  color: #fff;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 auto; /* Center the button horizontally */
+}
+
+.terms-of-contact {
+  margin-top: 20px;
+  font-size: 14px;
+  text-align: center;
+}
+.green-heading {
+  color: #28a745; /* Green color */
+  font-size: 28px; /* Adjust the font size */
+}
+
+.login-link {
+  margin-top: 20px;
+  text-align: center;
+}

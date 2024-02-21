@@ -1,25 +1,25 @@
-import './App.css';
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
-import SignupPage from './pages/Signup';
-import LoginPage from './pages/Login';
+// App.js
 
-function App() {
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import DriverRegistrationForm from './components/DriverRegistrationForm';
+
+const NotFound = () => <h1>404 Not Found</h1>;
+
+const App = () => {
   return (
-    <div className="min-h-full h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div className="max-w-md w-full space-y-8">
-     <BrowserRouter>
+    <Router>
+      <div>
+        {/* Other components or content */}
         <Routes>
-            <Route path="/" element={<LoginPage/>} />
-            <Route path="/signup" element={<SignupPage/>} />
+          <Route path="/signup/driver" element={<DriverRegistrationForm />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </div>
-  </div>
+        {/* Other components or content */}
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
+
