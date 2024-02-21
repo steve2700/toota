@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './DriverRegistrationForm.css';
 
 const DriverRegistrationForm = () => {
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -24,9 +24,9 @@ const DriverRegistrationForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Send data to Django backend  to implement this part)
+    // Send data to Django backend (implement this part)
     console.log('Form submitted:', formData);
-    navigate('/login'); //redirect to the login page after successful registra
+    navigate('/login/driver'); // redirect to the login page after successful registration
   };
 
   return (
@@ -127,13 +127,8 @@ const DriverRegistrationForm = () => {
         </div>
       </form>
 
-      <div className="terms-of-contact">
-        {/* Add your terms of contact here */}
-        <p>Terms of Contact: Your terms go here.</p>
-      </div>
-    </div>
-     <div className="login-link">
-        Already have an account? <Link to="/login">Log in</Link>
+      <div className="login-link">
+        Already have an account? <Link to="/login/driver">Log in</Link>
       </div>
     </div>
   );
