@@ -20,6 +20,7 @@ const UserLoginForm = () => {
     // Add your form submission logic here
   };
 
+
   return (
     <div className="bg-white rounded shadow-md p-6 w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit}>
@@ -79,6 +80,11 @@ const UserLoginForm = () => {
     </div>
   );
 };
+
+function UserLoginForm() {
+  return <div className=""></div>;
+}
+
 
 export default UserLoginForm;
 
