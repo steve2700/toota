@@ -11,8 +11,7 @@ from toota import settings
 
 # Create your models here.
 class User(AbstractUser):
-    first_name = models.CharField(max_length=100, null=False, blank=False)
-    last_name = models.CharField(max_length=100, null=False, blank=False)
+    full_name = models.CharField(max_length=255, null=False, blank=False, default='Enter your full name')
     phone_number = models.CharField(max_length=20, null=False, blank=False, unique=True)
     email = models.EmailField(max_length=255, null=False, blank=False, unique=True)
     profile_picture = models.ImageField(upload_to='profile_pictures', blank=True, null=True, default='profile_pictures/default.jpg')
@@ -36,6 +35,8 @@ class Driver(User):
     
 class PickupLocation(models.Model):
     location = models.CharField(max_length=300, null=False, blank=False)
+    phone_number = models.CharField(max_length=20, null=True, blank=False, unique=True)
+    
     
     def __str__(self):
         return self.location
@@ -77,6 +78,7 @@ class Trip(models.Model):
     status = models.CharField(max_length=100, choices=TRIP_STATUS, default=REQUESTED)
     rating = models.IntegerField(default=0)
     bid = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False, default=0.00)
+    number_floors = models.IntegerField(default=0)
     is_accepted = models.BooleanField(default=False)
     
     
