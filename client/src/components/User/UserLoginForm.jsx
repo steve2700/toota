@@ -2,13 +2,7 @@
 import React from "react";
 
 function UserLoginForm() {
-  return (
-    <div>
-      <h1 className="text-3xl font-bold underline text-green-600 text-center">
-        Hello world!
-      </h1>
-    </div>
-  );
+  return <div className=""></div>;
 }
 
 export default UserLoginForm;
