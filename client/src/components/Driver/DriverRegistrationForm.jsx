@@ -1,138 +1,93 @@
-// DriverRegistrationForm.js
+import React from 'react';
+import {
+  Card,
+  CardContent,
+  TextField,
+  Button,
+  Grid,
+  Typography,
+  Link,
+  FormControlLabel,
+  Checkbox,
+} from '@mui/material';
 
-// eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "./DriverRegistrationForm.css";
-
-const DriverRegistrationForm = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    address: "",
-    vehicleRegistrationNo: "",
-    license: "",
-    city: "",
+function RegistrationForm() {
+  const [formData, setFormData] = React.useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    acceptTerms: false,
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Send data to Django backend (implement this part)
-    console.log("Form submitted:", formData);
-    navigate("/login/driver"); // redirect to the login page after successful registration
-  };
+  // ... form handling logic
 
   return (
-    <div className="driver-registration-form">
-      <h1 className="green-heading">Become a Toota Driver</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="form-card">
-          <label htmlFor="firstName">First Name</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-          />
-
-          <label htmlFor="lastName">Last Name</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            required
-          />
-
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-
-          <label htmlFor="address">Address</label>
-          <input
-            type="text"
-            id="address"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            required
-          />
-          <label htmlFor="phoneNumber">Phone Number</label>
-          <input
-            type="tel"
-            id="phoneNumber"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            required
-          />
-
-          <label htmlFor="vehicleRegistrationNo">Vehicle Registration No</label>
-          <input
-            type="text"
-            id="vehicleRegistrationNo"
-            name="vehicleRegistrationNo"
-            value={formData.vehicleRegistrationNo}
-            onChange={handleChange}
-            required
-          />
-
-          <label htmlFor="license">License</label>
-          <input
-            type="text"
-            id="license"
-            name="license"
-            value={formData.license}
-            onChange={handleChange}
-            required
-          />
-
-          <label htmlFor="city">City</label>
-          <select
-            id="city"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select City</option>
-            <option value="Cape Town">Cape Town</option>
-            <option value="Johannesburg">Johannesburg</option>
-            {/* Add more cities as needed */}
-          </select>
-
-          <button
-            type="submit"
-            data-testid="submitButton"
-            className="driver-signup-button"
-          >
-            Sign up as a Driver
-          </button>
-        </div>
-      </form>
-
-      <div className="login-link">
-        Already have an account? <Link to="/login/driver">Log in</Link>
-      </div>
-    </div>
+    <Card>
+      <CardContent>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="h5" component="h2">
+              Registration
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Password"
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Confirm Password"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) =>
+                setFormData({ ...formData, confirmPassword: e.target.value })
+              }
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <FormControlLabel
+              control={<Checkbox value="acceptTerms" checked={formData.acceptTerms} />}
+              label="I agree to the terms and conditions."
+              onChange={(e) =>
+                setFormData({ ...formData, acceptTerms: e.checked })
+              }
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Button variant="contained" color="primary" onClick={handleRegistration}>
+              Register
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body2" align="center">
+              Already have an account? <Link href="/login">Login</Link>.
+            </Typography>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
   );
-};
+}
 
-export default DriverRegistrationForm;
+export default RegistrationForm;
+

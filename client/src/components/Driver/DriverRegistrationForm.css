@@ -1,72 +1,98 @@
-/* DriverRegistrationForm.css */
-
-.driver-registration-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 50px;
+/* Basic styles */
+body {
+  background-color: #fff; /* White background */
+  font-family: sans-serif;
 }
 
-.form-card {
-    background-color: #28a745;
-    /* Green background color */
-    color: #fff;
-    /* White text color */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
+.MuiCard-root { /* Apply to all MUI cards */
+  background-color: #fff; /* White background */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  border-radius: 4px; /* Rounded corners */
+  padding: 24px; /* Padding for content */
+}
+
+.MuiCardContent-root { /* Apply to card content */
+  color: #000; /* Black text */
+}
+
+/* Typography */
+h2 {
+  font-size: 24px;
+  margin-bottom: 16px;
 }
 
 label {
-    display: block;
-    margin-bottom: 8px;
-    color: #fff;
-    /* White text color for labels */
+  font-size: 16px;
+  margin-bottom: 8px;
+  display: block;
 }
 
-input,
-select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    color: #333;
-    /* Darker text color for input fields */
+/* Form fields */
+.MuiTextField-root {
+  margin-bottom: 16px;
 }
 
-.driver-signup-button {
-    background-color: #fff;
-    /* White background color for the button */
-    color: #28a745;
-    /* Green text color for the button */
-    padding: 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 0 auto;
-    /* Center the button horizontally */
+.MuiInputBase-root .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(0, 0, 0, 0.2); /* Light border */
 }
 
-.terms-of-contact {
-    margin-top: 20px;
-    font-size: 14px;
-    text-align: center;
+.Mui-focused .MuiInputBase-root .MuiOutlinedInput-notchedOutline {
+  border-color: #000; /* Darker border on focus */
 }
 
-.green-heading {
-    color: black;
-    /* BLACK color */
-    font-size: 35px;
-    /* Adjust the font size */
-    font-weight: bold;
-    /* Add bold font weight */
+.Mui-error .Mui-helperText {
+  color: #d32f2f; /* Red error messages */
 }
 
-.login-link {
-    margin-top: 20px;
-    text-align: center;
-    color: black;
-    /* White text color for login link */
+/* Buttons */
+.MuiButton-root {
+  margin-top: 16px;
+  background-color: #000; /* Black button */
+  color: #fff; /* White text */
 }
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .MuiGrid-container { /* Responsive grid for smaller screens */
+    flex-direction: column;
+  }
+}
+
+/* Visual polish (optional) */
+h2 {
+  text-align: center; /* Centered title */
+}
+
+.MuiButton-root {
+  border-radius: 4px; /* Rounded button corners */
+}
+
+/* Accessibility */
+.MuiInputLabel-root.Mui-focused {
+  color: #000; /* Darker label on focus for better contrast */
+}
+
+/* Validation (implement logic for your specific validation rules) */
+.Mui-error .Mui-helperText {
+  padding-left: 16px; /* Align error message with input */
+}
+
+/* Checkbox */
+.MuiCheckbox-root {
+  margin-bottom: 8px;
+}
+
+.MuiFormControlLabel-label {
+  color: #000;
+}
+
+/* Link */
+a {
+  color: #000; /* Black link color */
+  text-decoration: none; /* Remove underline */
+}
+
+a:hover {
+  text-decoration: underline; /* Add underline on hover */
+}
+
