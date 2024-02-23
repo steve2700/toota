@@ -81,9 +81,6 @@ const UserLoginForm = () => {
   );
 };
 
-function UserLoginForm() {
-  return <div className=""></div>;
-}
 
 
 export default UserLoginForm;
