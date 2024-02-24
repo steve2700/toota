@@ -7,7 +7,8 @@ import UserLoginForm from "./components/User/UserLoginForm";
 import UserRegistrationForm from "./components/User/UserRegistrationForm";
 import ForgotPasswordForm from "./components/User/ForgotPasswordForm";
 import NotFound from "./pages/NotFound";
-
+import Header from './components/navigation/header';
+import HomePage from './pages/HomePage';
 export const AuthContext = createContext();
 
 function App() {
@@ -17,13 +18,14 @@ function App() {
     <Router>
       <AuthContext.Provider value={{ auth: [jwt, setJWT] }}>
         <div>
+          <Header />
           <Routes>
             <Route path="/signup/driver" element={<DriverRegistrationForm />} />
             <Route path="/login/driver" element={<DriverLoginForm />} />
             <Route path="/signup/user" element={<UserRegistrationForm />} />
             <Route path="/login/user" element={<UserLoginForm />} />
             <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-            <Route path="/" element={<UserLoginForm />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
