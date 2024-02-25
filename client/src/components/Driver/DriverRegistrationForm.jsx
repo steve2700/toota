@@ -27,7 +27,7 @@ const DriverRegistrationForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex items-center justify-center h-screen mt-40 px-4">
       <div className="max-w-md w-full px-6">
         <div className="bg-white rounded shadow-md p-6">
           <h2 className="text-2xl font-bold mb-6">Driver Registration</h2>
