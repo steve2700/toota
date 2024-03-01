@@ -85,24 +85,25 @@ ASGI_APPLICATION = 'toota.asgi.application'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'HOST': 'aws-0-us-west-1.pooler.supabase.com',
+#         'HOST': 'https://fxlyaplialhfxllbbssl.supabase.co',
 #         'NAME': 'postgres',
-#         'USER': 'postgres.afjlgckcyumlpuppqslz',
-#         'PASSWORD': 'vMhjFBMVIb5WDSt5',
+#         'USER': 'postgres.fxlyaplialhfxllbbssl',
+#         'PASSWORD': 'kyar5zK2zJKOdY73',
 #         'PORT': '5432',
 #     }
 # }
 
-# DATABASES = {
-#     'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 DATABASES = {
-    "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
+    'default': {
+       'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
+# DATABASES = {
+#     "default": dj_database_url.parse(os.environ.get("DATABASE_URL", "postgres://toota:Qfr45VR0PGWEs4BkLqMGNHFz3gQ8KT9f@dpg-cng6j3un7f5s73fd6hvg-a.oregon-postgres.render.com/toota_728p"))
+# }
 
 AUTH_USER_MODEL = 'trips.User'
 AUTH_DRIVER_MODEL = 'trips.Driver'
@@ -131,7 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Johannesburg'
 
 USE_I18N = True
 
@@ -145,7 +146,7 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = Path(BASE_DIR / 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

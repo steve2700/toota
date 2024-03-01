@@ -10,21 +10,18 @@ admin.site.index_title = 'Welcome to Toota Admin Area'
 @admin.register(User)
 class UserAdmin(DefaultUserAdmin):
     
-    list_display = ('email', 'full_name', 'phone_number', 'is_staff', 'is_active')
+    list_display = ('id','email', 'full_name', 'phone_number', 'is_staff', 'is_active')
     ordering = ('email',)
     
 
 
 @admin.register(Driver)
-class DriverAdmin(admin.ModelAdmin):
-    list_display = ('email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration', 'vehicle_type', 'licence_no', 'is_staff', 'is_active')
+class DriverAdmin(DefaultUserAdmin):
+    list_display = ('id', 'email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration', 'vehicle_type', 'licence_no', 'is_staff', 'is_active')
     ordering = ('email',)
     
 
 
-@admin.register(PickupLocation)
-class PickupLocationAdmin(admin.ModelAdmin):
-    pass
 
 @admin.register(Trip)
 class TripAdmin(admin.ModelAdmin):
@@ -33,10 +30,10 @@ class TripAdmin(admin.ModelAdmin):
         'pickup_location', 
         'dropoff_location', 
         'driver',
+        'user',
         'vehicle_type', 
-        'pickup_time', 
-        'number_of_helpers',
-        'load_description ',
+        'pickup_time',
+        'load_description',
         'status',
         'created',
         'updated', 
@@ -44,7 +41,19 @@ class TripAdmin(admin.ModelAdmin):
         'bid'
     )
     list_display = (
-        'id', 'pickup_location','driver', 'status' , 'created', 'updated'
+        'id', 
+        'pickup_location', 
+        'dropoff_location', 
+        'driver',
+        'user',
+        'vehicle_type', 
+        'pickup_time', 
+        'load_description',
+        'status',
+        'created',
+        'updated', 
+        'rating',
+        'bid'
     
     )
     

@@ -46,10 +46,10 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('admin/', admin.site.urls),
-    path('api/user/sign_up/', UserSignUpView.as_view(), name='sign_up'),
-    path('api/user/login/', LoginView.as_view(), name='login'),
-    path('api/driver/sign_up/', DriverSignUpView.as_view(), name='sign_up'),
-    path('api/driver/login', LoginView.as_view(), name='login'),
+    path('api/user/sign_up/', UserSignUpView.as_view(), name='api/user/sign_up'),
+    path('api/user/login/', LoginView.as_view(), name='api/user/login'),
+    path('api/driver/sign_up/', DriverSignUpView.as_view(), name='api/driver/sign_up'),
+    path('api/driver/login', LoginView.as_view(), name='api/driver/login'),
     path('api/token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/trip', include('trips.urls', 'trip',))
     

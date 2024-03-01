@@ -24,7 +24,7 @@ class UserManager(BaseUserManager):
     
     
 class DriverUserManager(BaseUserManager):
-    def create_user(self, email, phone_number, full_name, physical_address, vehicle_registration, vehicle_type, licence_no, password=None, **extra_fields):
+    def create_driver(self, email, phone_number, full_name, physical_address, vehicle_registration, vehicle_type, licence_no, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email must be set')
         email = self.normalize_email(email)
@@ -32,7 +32,7 @@ class DriverUserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-
+    
     def create_superuser(self, email, phone_number, full_name, physical_address, vehicle_registration, vehicle_type, licence_no, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -42,4 +42,7 @@ class DriverUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self.create_user(email, phone_number, full_name, physical_address, vehicle_registration, vehicle_type, licence_no, password, **extra_fields)
+        return self.create_driver(email, phone_number, full_name, physical_address, vehicle_registration, vehicle_type, licence_no, password, **extra_fields)
+    
+    
+

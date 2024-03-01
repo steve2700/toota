@@ -3,13 +3,15 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.shortcuts import reverse
-from toota import settings
+from django.conf import settings
 from .utils import VEHICLE_TYPES
 from .manager import UserManager, DriverUserManager
 from django.utils.translation import gettext_lazy as _
 
+
 class User(AbstractBaseUser, PermissionsMixin):
     username= None
+    
     email = models.EmailField(unique=True, null=False, blank=False, max_length=255)
     phone_number = models.CharField(max_length=20, unique=True)
     full_name = models.CharField(max_length=255, null=False, blank=False)
@@ -75,20 +77,34 @@ class Trip(models.Model):
         (IN_PROGRESS, 'IN_PROGRESS')
     )
    
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)     
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     pickup_location = models.CharField(max_length=300, null=False, blank=False)
-    dropoff_location = models.ManyToManyField(PickupLocation, related_name='dropoff_location', blank=True)
-    number_of_helpers = models.IntegerField(default=0)
+    dropoff_location = models.CharField(max_length=300, null=False, blank=False)
     pickup_time = models.DateTimeField(default=datetime.datetime.now)
-    load_description = models.TextField(blank=True, null=True, default='', max_length=500)
-    driver = models.ForeignKey(Driver, on_delete=models.CASCADE )
+    load_description = models.TextField(blank=False, null=False, default='', max_length=500)
+    driver = models.ForeignKey(
+        settings.AUTH_DRIVER_MODEL, 
+        on_delete=models.DO_NOTHING, 
+        null=True,
+        blank=True,
+        related_name='trip_as_driver',
+        default=''
+        )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.DO_NOTHING,
+        null=True,
+        blank=True,
+        related_name='trip_as_user',
+        default=''
+    )
     vehicle_type = models.CharField(max_length=100, choices=VEHICLE_TYPES, null=False, blank=False)
     status = models.CharField(max_length=100, choices=TRIP_STATUS, default=REQUESTED)
     rating = models.IntegerField(default=0)
     bid = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False, default=0.00)
-    number_floors = models.IntegerField(default=0)
+    number_of_floors = models.IntegerField(default=0)
     is_accepted = models.BooleanField(default=False)
     
     
@@ -100,8 +116,24 @@ class Trip(models.Model):
     
     
 class EmailVerificationToken(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    
+class Test(models.Model):
+    name = models.CharField(max_length=255, null=False, blank=False)
+    email = models.EmailField(max_length=255, null=False, blank=False)
+    phone_number = models.CharField(max_length=20, null=False, blank=False)
+    message = models.TextField(max_length=500, null=False, blank=False)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+    
+    def __str__(self):
+        return self.name
+    
+    def get_absolute_url(self):
+        return reverse('trip:trip_detail', kwargs={'trip_id': self.id})
     
 
     

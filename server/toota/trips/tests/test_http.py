@@ -1,88 +1,54 @@
-import base64
 import json
-import datetime
-from django.contrib.auth import get_user_model
-from rest_framework import status
-from rest_framework.reverse import reverse
+from django.contrib.auth.models import User
+from django.urls import reverse
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
+from rest_framework import status
+from trips.serializers import UserSerializer, DriverSerializer, TripSerializer
+from trips.utils import VEHICLE_TYPES
 
 
-from trips.models import User, EmailVerificationToken, Trip, PickupLocation
-
-PASSWORD = 'pAssw0rd!'
-
-
-def create_user(username='user', password=PASSWORD):
-    return get_user_model().objects.create_user(
-        username=username,
-        first_name='Test',
-        last_name='User',
-        password=password
-    )
-
-class AuthenticationTest(APITestCase):
+class AuthenticationTestCase(APITestCase):
     def test_user_can_sign_up(self):
-        response = self.client.post(reverse('sign_up'), data={
-            'username': 'user123',
-            'first_name': 'Test',
-            'last_name': 'User',
-            'email': 'testuser@gmail.com',
-            'password1': PASSWORD,
-            'password2': PASSWORD,
-        })
-        user = get_user_model().objects.last()
-        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
-        self.assertEqual(response.data['id'], user.id)
-        self.assertEqual(response.data['username'], user.username)
-        self.assertEqual(response.data['first_name'], user.first_name)
-        self.assertEqual(response.data['last_name'], user.last_name)
-        self.assertEqual(response.data['email'], user.email)
+        data = {
+            "full_name": "John Doe",
+            "email": "testuser@gmail.com",
+            "phone_number": "0712345678",
+            "password1": "@Thingo11",
+            "password2": "@Thingo11"
+        }
+        response = self.client.post('/api/user/sign_up/', data)
         
-    def test_user_login(self):
-        user = create_user()
-        response = self.client.post(reverse('login'), data={
-            'username': user.username,
-            'password': PASSWORD
-        })
-        access = response.data['access']
-        header, payload, signature = access.split('.')
-        decoded_payload = base64.b64decode(f'{payload}==')
-        payload_data = json.loads(decoded_payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['email'], data['email'])
+        self.assertEqual(response.data['full_name'], data['full_name'])
+        self.assertEqual(response.data['phone_number'], data['phone_number'])
+        self.assertFalse('password1' in response.data)
         
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertIsNotNone(response.data['access'])
-        self.assertEqual(payload_data['id'], user.id)
-        self.assertEqual(payload_data['username'], user.username)
-        self.assertEqual(payload_data['email'], user.email)
-        self.assertEqual(payload_data['first_name'], user.first_name)
-        self.assertEqual(payload_data['last_name'], user.last_name)
+    def test_driver_can_sign_up(self):
+        data = {
+            "full_name": "Jane Doe",
+            "email": "jane@test.com",
+            "phone_number": "071234578",
+            "physical_address": "Nairobi",
+            "vehicle_registration": "KCA 123X",
+            "vehicle_type": VEHICLE_TYPES[0][0],
+            "licence_no": "123456",
+            "password1": "@Thingo11",
+            "password2": "@Thingo11"
+        }
+        response = self.client.post('/api/driver/sign_up/', data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['email'], data['email'])
+        self.assertEqual(response.data['full_name'], data['full_name'])
+        self.assertEqual(response.data['phone_number'], data['phone_number'])
+        self.assertEqual(response.data['physical_address'], data['physical_address'])
+        self.assertEqual(response.data['vehicle_registration'], data['vehicle_registration'])
+        self.assertEqual(response.data['vehicle_type'], data['vehicle_type'])
+        self.assertEqual(response.data['licence_no'], data['licence_no'])
+        self.assertFalse('password1' in response.data)
+            
         
-
+      
     
-class HttpTripTest(APITestCase):
-    def setUp(self):
-        user = create_user()
-        response = self.client.post(reverse('login'), data={
-            'username': user.username,
-            'password': PASSWORD,
-        })
-        self.access = response.data['access']
-
-    def test_user_can_list_trips(self):
-        dropoff_location1 = PickupLocation.objects.create(location='C')
-        dropoff_location2 = PickupLocation.objects.create(location='C')
-        driver = 
-
-        trip1 = Trip.objects.create(pickup_location='A', number_of_helpers=2, pickup_time=datetime.datetime.now(), load_description='Fridge', bid=250)
-        trip1.dropoff_location.add(dropoff_location1)
-
-        trip2 = Trip.objects.create(pickup_location='B', number_of_helpers=3, pickup_time=datetime.datetime.now(), load_description='Computer', bid=500)
-        trip2.dropoff_location.add(dropoff_location2)
-
-        response = self.client.get(reverse('trip:trip_list'),
-            HTTP_AUTHORIZATION=f'Bearer {self.access}'
-        )
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
-        exp_trip_ids = [str(trip.id) for trip in [trip1, trip2]]
-        act_trip_ids = [trip.get('id') for trip in response.data]
-        self.assertCountEqual(exp_trip_ids, act_trip_ids)
+ 

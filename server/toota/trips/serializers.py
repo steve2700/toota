@@ -49,7 +49,7 @@ class DriverSerializer(serializers.ModelSerializer):
             if key not in ['password1', 'password2']
         }
         data['password'] = validated_data['password1']
-        return Driver.objects.create_user(**data)
+        return Driver.objects.create_driver(**data)
     
             
 class LoginSerializer(TokenObtainPairSerializer):
@@ -67,6 +67,12 @@ class TripSerializer(serializers.ModelSerializer):
         model = Trip
         fields = '__all__'
         read_only_fields = ('id', 'created', 'updated')
+        
+class NestedTripSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trip
+        fields = '__all__'
+        depth = 1
         
         
 

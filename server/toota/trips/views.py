@@ -4,15 +4,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView as Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
 from .serializers import UserSerializer, LoginSerializer, TripSerializer, DriverSerializer
-from .models import EmailVerificationToken, Trip, Driver
-from .utils import send_confirmation_email
+from .models import Trip, Driver, User
 from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework.response import Response
 
 class UserSignUpView(generics.CreateAPIView):
-    queryset = get_user_model().objects.all()
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     
 class LoginView(Token):
@@ -31,22 +30,3 @@ class TripView(viewsets.ReadOnlyModelViewSet):
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
     
-class UserInformationAPIView(APIView):
-    permission_classes = [IsAuthenticated,]
-    
-    def get(self, request):
-        user = request.user
-        email = request.email
-        is_email_confirmed = user.is_email_confirmed
-        payload = {'email': email, 'is_email_confirmed': is_email_confirmed}
-        return Response(payload, status=200)
-    
-    
-class SendEmailConfirmationAPIView(APIView):
-    permission_classes = [IsAuthenticated,] 
-    def post(self, request, format=None):
-        user = request.user
-        token = EmailVerificationToken.objects.create(user=user)
-        send_confirmation_email(email=user.email, token_id=token.id, user_id=user.id)
-        return Response(data=None, status=201)
-
