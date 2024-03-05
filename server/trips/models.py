@@ -7,17 +7,19 @@ from django.conf import settings
 from .utils import VEHICLE_TYPES
 from .managers import UserManager, DriverUserManager
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 
 class User(AbstractBaseUser, PermissionsMixin):
     username= None
-    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4,  editable=False, unique=True)   
     email = models.EmailField(unique=True, null=False, blank=False, max_length=255)
     phone_number = models.CharField(max_length=20, unique=True)
     full_name = models.CharField(max_length=255, null=False, blank=False)
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    is_email_confirmed = models.BooleanField(default=False)
 
     
 
@@ -79,7 +81,7 @@ class Trip(models.Model):
         (IN_PROGRESS, 'IN_PROGRESS')
     )
    
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4,  editable=False)     
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4,  editable=False, unique=True)     
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     pickup_location = models.CharField(max_length=300, null=False, blank=False)
@@ -92,7 +94,7 @@ class Trip(models.Model):
         null=True,
         blank=True,
         related_name='trip_as_driver',
-        default=''
+        
         )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -100,13 +102,13 @@ class Trip(models.Model):
         null=True,
         blank=True,
         related_name='trip_as_user',
-        default=''
+       
     )
     vehicle_type = models.CharField(max_length=100, choices=VEHICLE_TYPES, null=False, blank=False)
     status = models.CharField(max_length=100, choices=TRIP_STATUS, default=REQUESTED)
     rating = models.IntegerField(default=0)
     bid = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False, default=0.00)
-    number_of_floors = models.IntegerField(default=0)
+    number_of_floors = models.IntegerField(default=0, null=False)
     is_accepted = models.BooleanField(default=False)
     
     
@@ -120,6 +122,8 @@ class Trip(models.Model):
 class EmailVerificationToken(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    # user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
     
     
     def __str__(self):

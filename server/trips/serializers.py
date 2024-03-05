@@ -36,7 +36,7 @@ class DriverSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Driver
-        fields = ['full_name', 'email', 'phone_number', 'physical_address', 'vehicle_registration', 'vehicle_type', 'licence_no', 'password1', 'password2']
+        fields = ['id','full_name', 'email', 'phone_number', 'physical_address', 'vehicle_registration', 'vehicle_type', 'licence_no', 'password1', 'password2']
 
     def validate(self, data):
         if data['password1'] != data['password2']:

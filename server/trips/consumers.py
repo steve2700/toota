@@ -53,21 +53,23 @@ class TootaConsumer(AsyncJsonWebsocketConsumer):
             await self.create_trip(content)
         elif message_type == 'echo.message':
             await self.echo_message(content)
-            
+
     async def create_trip(self, message):
         data = message.get('data')
         trip = await self._create_trip(data)
-        
         trip_data = NestedTripSerializer(trip).data
-        
-        await self.channel_layer.group_send(group='driver', message={
+       
+       # Send rider requests to all drivers.
+        await self.channel_layer.group_send(group='drivers', message={
             'type': 'echo.message',
-            'data': trip_data,
+            'data': trip_data
         })
-        
+
         await self.send_json({
             'type': 'echo.message',
-            'data': trip_data,
+            'data': trip_data
         })
+            
+    
         
         
