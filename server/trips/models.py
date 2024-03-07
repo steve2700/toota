@@ -12,7 +12,7 @@ from django.utils import timezone
 
 class User(AbstractBaseUser, PermissionsMixin):
     username= None
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4,  editable=False, unique=True)   
+    # id = models.UUIDField(primary_key=True, default=uuid.uuid4,  editable=False, unique=True)   
     email = models.EmailField(unique=True, null=False, blank=False, max_length=255)
     phone_number = models.CharField(max_length=20, unique=True)
     full_name = models.CharField(max_length=255, null=False, blank=False)
@@ -86,7 +86,7 @@ class Trip(models.Model):
     updated = models.DateTimeField(auto_now=True)
     pickup_location = models.CharField(max_length=300, null=False, blank=False)
     dropoff_location = models.CharField(max_length=300, null=False, blank=False)
-    pickup_time = models.DateTimeField(default=datetime.datetime.now)
+    pickup_time = models.DateTimeField(default=datetime.date.today())
     load_description = models.TextField(blank=False, null=False, default='', max_length=500)
     driver = models.ForeignKey(
         settings.AUTH_DRIVER_MODEL, 

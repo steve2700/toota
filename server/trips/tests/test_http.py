@@ -98,7 +98,7 @@ class TripViewTest(TestCase):
                 vehicle_type=VEHICLE_TYPES[0][0],
                 number_of_floors=2,
                 load_description='This is a test load description.',
-                pickup_time=f'{datetime.datetime.now().isoformat()}',
+                pickup_time=f'{datetime.date.today()}',
                 bid=500,
                 )
         res = self.client.get('/api/trip', HTTP_AUTHORIZATION=f'Bearer {self.access}')

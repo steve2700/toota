@@ -20,7 +20,7 @@ TEST_CHANNEL_LAYERS = {
 
 @database_sync_to_async
 def create_user(email, full_name, phone_number, password, group='user'):
-    user = User.objects.create_user(
+    user = get_user_model().objects.create_user(
         email=email,
         full_name=full_name,
         phone_number=phone_number,
@@ -166,7 +166,22 @@ class TestWebSocket:
         
     async def test_request_trip(self, settings):
         settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
-        user, access = await create_user(
+
+        @database_sync_to_async
+        def create_async_user(email, full_name, phone_number, password, group='user'):
+            user = User.objects.create_user(
+                email=email,
+                full_name=full_name,
+                phone_number=phone_number,
+                password=password
+            )
+            user_group, _ = Group.objects.get_or_create(name=group)
+            user.groups.add(user_group)
+            user.save()
+            access = AccessToken.for_user(user)
+            return user, access
+
+        user, access = await create_async_user(
             'vinny@test.com',
             'Vinny User',
             '0718567890',
@@ -182,10 +197,10 @@ class TestWebSocket:
         trip_data = {
             'pickup_location': '23 Main Avenue',
             'dropoff_location': '100 Malibongwe Drive',
-            'pickup_time': f'{datetime.datetime.now().isoformat()}',  # Ensure ISO format
+            'pickup_time': f'{datetime.date.today()}',  # E
             'load_description': 'Fridge',
             'vehicle_type': VEHICLE_TYPES[0][0],
-            'user': str(user.id),
+            'user': user.id,
             'bid': 200
         }
 
@@ -204,47 +219,47 @@ class TestWebSocket:
         await communicator.disconnect()
 
 
-    # async def test_driver_alerted_on_request(self, settings):
-    #     settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
-    #     channel_layer = get_channel_layer()
-    #     await channel_layer.group_add(
-    #         group='drivers',
-    #         channel='test_channel'
-    #     )
-    #     user, access = await create_user(
-    #         'vinny@test.com',
-    #         'Vinny User',
-    #         '0718567890',
-    #         '@Thingo11',
-    #     )
-    #     communicator = WebsocketCommunicator(
-    #         application=application,
-    #         path=f'/toota/?f{access}'
-    #     )
-    #     connected, _ = await communicator.connect()
+    async def test_driver_alerted_on_request(self, settings):
+        settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
+        channel_layer = get_channel_layer()
+        await channel_layer.group_add(
+            group='drivers',
+            channel='test_channel'
+        )
+        user, access = await create_user(
+            'vinny@test.com',
+            'Vinny User',
+            '0718567890',
+            '@Thingo11',
+        )
+        communicator = WebsocketCommunicator(
+            application=application,
+            path=f'/toota/?f{access}'
+        )
+        connected, _ = await communicator.connect()
 
-    #     trip_data = {
-    #         'pickup_location': '23 Main Avenue',
-    #         'dropoff_location': '100 Malibongwe Drive',
-    #         'pickup_time': f'{datetime.datetime.now().isoformat()}',  # Ensure ISO format
-    #         'load_description': 'Fridge',
-    #         'vehicle_type': VEHICLE_TYPES[0][0],
-    #         'user': str(user.id),
-    #         'bid': 200
-    #     }
+        trip_data = {
+            'pickup_location': '23 Main Avenue',
+            'dropoff_location': '100 Malibongwe Drive',
+            'pickup_time': f'{datetime.datetime.date.today()}',  # Ensure ISO format
+            'load_description': 'Fridge',
+            'vehicle_type': VEHICLE_TYPES[0][0],
+            'user': user.id,
+            'bid': 200
+        }
 
-    #     await communicator.send_json_to({
-    #         'type': 'create.trip',
-    #         'data': trip_data
-    #         })
+        await communicator.send_json_to({
+            'type': 'create.trip',
+            'data': trip_data
+            })
 
-    #     response = await channel_layer.receive('test_channel')
-    #     response_data = response.data.get('data')
-    #     assert 'id' in response_data
-    #     assert response_data['pickup_location'] == '23 Main Avenue'
-    #     assert response_data['dropoff_location'] == '100 Malibongwe Drive'
-    #     assert response_data['status'] == 'REQUESTED'
-    #     await communicator.disconnect()
+        response = await channel_layer.receive('test_channel')
+        response_data = response.data.get('data')
+        assert 'id' in response_data
+        assert response_data['pickup_location'] == '23 Main Avenue'
+        assert response_data['dropoff_location'] == '100 Malibongwe Drive'
+        assert response_data['status'] == 'REQUESTED'
+        await communicator.disconnect()
 
 
        
