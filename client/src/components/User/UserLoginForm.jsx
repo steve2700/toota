@@ -45,17 +45,17 @@ const UserLoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validateForm()) {
-      try {
+    try {
+      if (validateForm()) {
         const response = await fetch('http://127.0.0.1:8000/api/user/login/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formData({
-		  email: formData.email,
-		  password1: formData.password,
-        }),
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
         });
 
         if (response.ok) {
@@ -72,10 +72,8 @@ const UserLoginForm = () => {
         } else {
           // Handle login errors
           const errorData = await response.json();
-          if (
-            errorData.non_field_errors &&
-            errorData.non_field_errors[0] === 'Unable to log in with provided credentials.'
-          ) {
+          if (response.status === 401) {
+            // Unauthorized error, display a clear message to the user
             setErrors({
               ...errors,
               invalidCredentials: 'Invalid email or password. Please try again.',
@@ -84,17 +82,21 @@ const UserLoginForm = () => {
             setErrors(errorData);
           }
         }
-      } catch (error) {
-        console.error('Error during login:', error);
-	// Show a clear error message to the user
-	setErrors({ generic: 'An error occurred. Please try again later.' });
       }
+    } catch (error) {
+      console.error('Error during login:', error);
+      // Show a clear error message to the user
+      setErrors({ generic: 'An error occurred. Please try again later.' });
     }
   };
 
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="bg-white rounded shadow-md p-6 w-full max-w-md mx-auto">
+        {successMessage && (
+          <p className="mt-4 text-center text-green-500 font-bold">{successMessage}</p>
+        )}
+
         <form onSubmit={handleSubmit}>
           <h2 className="text-3xl font-bold mb-4 text-center text-gray-900">Login To TOOTA</h2>
 
@@ -139,10 +141,9 @@ const UserLoginForm = () => {
           {errors.invalidCredentials && (
             <p className="text-red-500 text-lg font-bold mb-4">{errors.invalidCredentials}</p>
           )}
-	  {errors.generic && (
+          {errors.generic && (
             <p className="text-red-500 text-lg font-bold mb-4">{errors.generic}</p>
-           )}
-
+          )}
 
           <button
             type="submit"
@@ -151,10 +152,6 @@ const UserLoginForm = () => {
             Login
           </button>
         </form>
-
-        {successMessage && (
-          <p className="mt-4 text-center text-green-500 font-bold">{successMessage}</p>
-        )}
 
         <p className="mt-4 text-center text-sm text-gray-500">
           Forgot your password?{' '}
