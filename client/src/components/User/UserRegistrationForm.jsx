@@ -59,26 +59,22 @@ const UserRegistrationForm = () => {
     e.preventDefault();
 
     if (validateForm(formData)) {
-	    try {
-		    const response = await fetch('http://127.0.0.1:8000/api/user/sign_up/', {
-			    method: 'POST',
-			    headers: {
-				    'Content-Type': 'application/json',
-			    },
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/user/sign_up/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            full_name: formData.fullName,
+            phone_number: formData.phoneNumber,
+            email: formData.email,
+            password1: formData.password,
+            password2: formData.confirmPassword,
+          }),
+        });
 
-			    body: JSON.stringify({
-				    full_name: formData.fullName,
-				    phone_number: formData.phoneNumber,
-				    email: formData.email,
-				    password1: formData.password,
-				    password2: formData.confirmPassword,
-
-		          }),
-
-			   });
         if (response.ok) {
-          console.log('Registration successful');
-          setErrors({});
           setSuccessMessage('Registration successful! Redirecting to login page...');
 
           setTimeout(() => {
@@ -88,125 +84,109 @@ const UserRegistrationForm = () => {
           const errorData = await response.json();
           setErrors(errorData);
 
-          // Check if the email is already in use
           if (
             errorData.email &&
             errorData.email[0] === 'user with this email address already exists.'
           ) {
             setErrors({ ...errors, email: 'Email is already in use. Please try another.' });
           }
-
-          // Check if the full name is already in use
-          if (
-            errorData.full_name &&
-            errorData.full_name[0] === 'user with this full name already exists.'
-          ) {
-            setErrors({ ...errors, fullName: 'Full Name is already in use. Please try another.' });
-          }
-
-          // Check if the phone number is already in use
-          if (
-            errorData.phone_number &&
-            errorData.phone_number[0] === 'user with this phone number already exists.'
-          ) {
-            setErrors({
-              ...errors,
-              phoneNumber: 'Phone Number is already in use. Please try another.',
-            });
-          }
         }
       } catch (error) {
-        console.error('Error during registration:', error);
+        console.error('Registration error:', error);
       }
     }
   };
 
   return (
-    <div className="bg-white rounded shadow-md p-6 w-full max-w-md mx-auto">
-      <form onSubmit={handleSubmit}>
-        <h2 className="text-2xl font-bold mb-4">Join Toota Community</h2>
+    <div className="min-h-screen flex items-center justify-center">
+      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full md:w-2/3 lg:w-1/2 xl:w-1/3" onSubmit={handleSubmit} method="post">
+        <h2 className="text-2xl mb-6 font-bold text-center">Sign Up</h2>
+
+        {successMessage && <p className="text-green-600 text-lg italic mb-4">{successMessage}</p>}
+
+        {errors.generic && <p className="text-red-500 text-lg italic mb-4">{errors.generic}</p>}
 
         <div className="mb-4">
-          <label htmlFor="fullName" className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="fullName">
             Full Name
           </label>
           <input
-            type="text"
+            className={`appearance-none border rounded w-full py-2 px-3 ${errors.fullName && 'border-red-500'}`}
             id="fullName"
+            type="text"
+            placeholder="Full Name"
             name="fullName"
-            placeholder="Enter your full name"
             value={formData.fullName}
             onChange={handleChange}
-            autoComplete="fullName"
-            className="w-full px-3 py-2 border rounded shadow appearance-none"
+            autoComplete="current-fullName"
           />
           {errors.fullName && <p className="text-red-500 text-lg italic">{errors.fullName}</p>}
         </div>
 
         <div className="mb-4">
-          <label htmlFor="phoneNumber" className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phoneNumber">
             Phone Number
           </label>
           <input
-            type="text"
+            className={`appearance-none border rounded w-full py-2 px-3 ${errors.phoneNumber && 'border-red-500'}`}
             id="phoneNumber"
+            type="text"
+            placeholder="Phone Number"
             name="phoneNumber"
-            placeholder="Enter your phone number"
             value={formData.phoneNumber}
             onChange={handleChange}
-            autoComplete="phoneNumber"
-            className="w-full px-3 py-2 border rounded shadow appearance-none"
+            autoComplete="current-phoneNumber"
           />
           {errors.phoneNumber && <p className="text-red-500 text-lg italic">{errors.phoneNumber}</p>}
         </div>
 
         <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
             Email
           </label>
           <input
-            type="email"
+            className={`appearance-none border rounded w-full py-2 px-3 ${errors.email && 'border-red-500'}`}
             id="email"
+            type="email"
+            placeholder="Email"
             name="email"
-            placeholder="Enter your email"
             value={formData.email}
             onChange={handleChange}
             autoComplete="current-email"
-            className="w-full px-3 py-2 border rounded shadow appearance-none"
           />
           {errors.email && <p className="text-red-500 text-lg italic">{errors.email}</p>}
         </div>
 
         <div className="mb-4">
-          <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
             Password
           </label>
           <input
-            type="password"
+            className={`appearance-none border rounded w-full py-2 px-3 ${errors.password && 'border-red-500'}`}
             id="password"
+            type="password"
+            placeholder="Password"
             name="password"
-            placeholder="Enter your password"
             value={formData.password}
             onChange={handleChange}
             autoComplete="current-password"
-            className="w-full px-3 py-2 border rounded shadow appearance-none"
           />
           {errors.password && <p className="text-red-500 text-lg italic">{errors.password}</p>}
         </div>
 
         <div className="mb-4">
-          <label htmlFor="confirmPassword" className="block text-gray-700 text-sm font-bold mb-2">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">
             Confirm Password
           </label>
           <input
-            type="password"
+            className={`appearance-none border rounded w-full py-2 px-3 ${errors.confirmPassword && 'border-red-500'}`}
             id="confirmPassword"
+            type="password"
+            placeholder="Confirm Password"
             name="confirmPassword"
-            placeholder="Confirm your password"
             value={formData.confirmPassword}
             onChange={handleChange}
             autoComplete="current-confirmPassword"
-            className="w-full px-3 py-2 border rounded shadow appearance-none"
           />
           {errors.confirmPassword && (
             <p className="text-red-500 text-lg italic">{errors.confirmPassword}</p>
@@ -215,17 +195,19 @@ const UserRegistrationForm = () => {
 
         <button
           type="submit"
-          className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline-black"
+          className="w-full bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-black hover:bg-gray-800"
         >
           Register Your Account
         </button>
 
-        <p className="mt-4 text-sm text-gray-600">
-          Already have an account?{' '}
-          <Link to="/login/user" className="font-semibold text-indigo-600 hover:text-indigo-500">
-            Log in here
-          </Link>
-        </p>
+        <div className="text-center mt-4">
+          <p className="text-sm">
+            Already have an account?{' '}
+            <Link to="/login/user" className="text-blue-500 hover:underline">
+              Log in here
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );
