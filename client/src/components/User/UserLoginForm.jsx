@@ -11,6 +11,8 @@ const UserLoginForm = () => {
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -31,17 +33,29 @@ const UserLoginForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+
+    // Add a timeout to hide the password after 5 seconds (5000 milliseconds)
+    setTimeout(() => {
+      setShowPassword(false);
+    }, 5000);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
       try {
-        const response = await fetch('http://localhost:8000/api_login', {
+        const response = await fetch('http://127.0.0.1:8000/api/user/login/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(formData({
+		  email: formData.email,
+		  password1: formData.password,
+        }),
         });
 
         if (response.ok) {
@@ -52,17 +66,28 @@ const UserLoginForm = () => {
           setTimeout(() => {
             navigate('/dashboard/user');
           }, 3000);
+          // Reset the form after successful login
+          setFormData({ email: '', password: '' });
+          setErrors({});
         } else {
           // Handle login errors
           const errorData = await response.json();
-          if (errorData.non_field_errors && errorData.non_field_errors[0] === 'Unable to log in with provided credentials.') {
-            setErrors({ ...errors, invalidCredentials: 'Invalid email or password. Please try again.' });
+          if (
+            errorData.non_field_errors &&
+            errorData.non_field_errors[0] === 'Unable to log in with provided credentials.'
+          ) {
+            setErrors({
+              ...errors,
+              invalidCredentials: 'Invalid email or password. Please try again.',
+            });
           } else {
             setErrors(errorData);
           }
         }
       } catch (error) {
         console.error('Error during login:', error);
+	// Show a clear error message to the user
+	setErrors({ generic: 'An error occurred. Please try again later.' });
       }
     }
   };
@@ -89,12 +114,12 @@ const UserLoginForm = () => {
             {errors.email && <p className="text-red-500 text-lg italic">{errors.email}</p>}
           </div>
 
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               id="password"
               name="password"
               placeholder="Enter your password"
@@ -102,12 +127,22 @@ const UserLoginForm = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded shadow appearance-none"
             />
+            <span
+              className="absolute right-0 bottom-1.5 mr-3 cursor-pointer"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? '👁️' : '👁️‍🗨️'}
+            </span>
             {errors.password && <p className="text-red-500 text-lg italic">{errors.password}</p>}
           </div>
 
           {errors.invalidCredentials && (
             <p className="text-red-500 text-lg font-bold mb-4">{errors.invalidCredentials}</p>
           )}
+	  {errors.generic && (
+            <p className="text-red-500 text-lg font-bold mb-4">{errors.generic}</p>
+           )}
+
 
           <button
             type="submit"

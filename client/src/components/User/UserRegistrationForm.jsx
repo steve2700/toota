@@ -14,6 +14,27 @@ const UserRegistrationForm = () => {
 
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const resetForm = () => {
+    setFormData({
+      fullName: '',
+      phoneNumber: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    });
+    setSuccessMessage('');
+    setErrors({});
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+    // Add a timeout to hide the password after 5 seconds
+    setTimeout(() => {
+	    setShowPassword(false);
+    }, 5000);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,6 +100,7 @@ const UserRegistrationForm = () => {
 
           setTimeout(() => {
             navigate('/login/user');
+            resetForm(); // Clear the form after successful registration
           }, 3000);
         } else {
           const errorData = await response.json();
@@ -157,20 +179,26 @@ const UserRegistrationForm = () => {
           {errors.email && <p className="text-red-500 text-lg italic">{errors.email}</p>}
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 relative">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
             Password
           </label>
           <input
             className={`appearance-none border rounded w-full py-2 px-3 ${errors.password && 'border-red-500'}`}
             id="password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="Password"
             name="password"
             value={formData.password}
             onChange={handleChange}
             autoComplete="current-password"
           />
+          <span
+            className="absolute right-0 bottom-1.5 mr-3 cursor-pointer"
+            onClick={togglePasswordVisibility}
+          >
+            {showPassword ? '👁️' : '👁️‍🗨️'}
+          </span>
           {errors.password && <p className="text-red-500 text-lg italic">{errors.password}</p>}
         </div>
 
@@ -206,6 +234,7 @@ const UserRegistrationForm = () => {
             <Link to="/login/user" className="text-blue-500 hover:underline">
               Log in here
             </Link>
+
           </p>
         </div>
       </form>
