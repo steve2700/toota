@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'corsheaders',
+    'djoser',
     'trips'
 ]
 
@@ -63,7 +64,7 @@ ROOT_URLCONF = 'toota.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,7 +83,8 @@ ASGI_APPLICATION = 'toota.asgi.application'
 CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
-   'https://locahost:5173'
+   'https://locahost:5173',
+   'http://localhost:8000'
 ]
 
 CORS_ALLOW_METHODS = (
@@ -104,7 +106,8 @@ CORS_ALLOW_HEADERS = (
 )
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://locahost:5173'
+    'https://locahost:5173',
+    'http://localhost:8000'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -123,18 +126,18 @@ CORS_ALLOW_CREDENTIALS = True
 #         'PASSWORD': 'vMhjFBMVIb5WDSt5',
 #         'PORT': '5432',
 #     }
+# # }
+
+# DATABASES = {
+#     'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
 # }
 
 DATABASES = {
-    'default': {
-       'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
 }
-
-# DATABASES = {
-#     "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
-# }
 
 AUTH_USER_MODEL = 'trips.User'
 AUTH_DRIVER_MODEL = 'trips.Driver'
@@ -173,8 +176,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'build/static')
+    ]
 MEDIA_URL = '/media/'
-MEDIA_ROOT = Path(BASE_DIR / 'media')
+MEDIA_ROOT = Path(BASE_DIR / 'static')
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -182,6 +188,9 @@ STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
 
 
 REDIS_URL = os.getenv('REDIS_URL', 'redis-18315.c323.us-east-1-2.ec2.cloud.redislabs.com:18315')
@@ -195,17 +204,53 @@ CHANNEL_LAYERS = {
     },
 }
 
+
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    )
+        )
 }
 
 SIMPLE_JWT = {
+    'AUTH_HEADER': ('JWT'),
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
     'USER_ID_CLAIM': 'id',
 }
 
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SEND_CONFIRMATION_EMAIL': True,
+    'SET_USERNAME_RETYPE': True,
+    'SET_PASSWORD_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SERIALIZERS': {
+        'user_create': 'trips.serializers.UserSerializer',
+        'user': 'trips.serializers.UserSerializer',
+        'user_delete': 'djoser.serializers.UserDeleteSerializer',
+        'driver_create': 'trips.serializers.DriverSerializer',
+        'driver': 'trips.serializers.DriverSerializer',
+        
+    }
+}
+
 APPEND_SLASH=False
+
+#Email
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'incvestec@gmail.com'
+EMAIL_HOST_PASSWORD = 'akdb clua fzlf iypm'
+EMAIL_USE_TLS = True
