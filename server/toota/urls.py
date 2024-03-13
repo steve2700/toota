@@ -23,9 +23,8 @@ from drf_yasg import openapi
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
 
- 
-from trips.views import UserSignUpView, DriverSignUpView, LoginView
 
+from trips.views import UserSignUpView, DriverSignUpView, LoginView, VerifyEmailUser, VerifyEmailDriver
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -46,7 +45,14 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('admin/', admin.site.urls),
-    path('api/', include('trips.urls'))
+    path('api/user/sign_up/', UserSignUpView.as_view(), name='sign-up-user'),
+    path('api/user/login/', LoginView.as_view(), name='login-user'),
+    path('api/user/email-verify/', VerifyEmailUser.as_view(), name='email-verify-user'),
+    path('api/driver/sign_up/', DriverSignUpView.as_view(), name='sign-up-driver'),
+    path('api/driver/login', LoginView.as_view(), name='login-driver'),
+    path('api/driver/email-verify/', VerifyEmailDriver.as_view(), name='email-verify-driver'),
+    path('api/token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/trip', include('trips.urls', 'trip',))
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

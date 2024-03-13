@@ -20,7 +20,7 @@ class UserSignUpViewTest(TestCase):
             'password': '@Thingo11',
             're_password': '@Thingo11',
         }
-        response = client.post(reverse('/auth/users/'), data=data)
+        response = client.post(reverse('sign_up'), data=data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(User.objects.filter(email=data['email']).exists())
 

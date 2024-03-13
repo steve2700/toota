@@ -12,14 +12,17 @@ from django.utils import timezone
 
 class User(AbstractBaseUser, PermissionsMixin):
     username= None
-    # id = models.UUIDField(primary_key=True, default=uuid.uuid4,  editable=False, unique=True)   
-    email = models.EmailField(unique=True, null=False, blank=False, max_length=255)
-    phone_number = models.CharField(max_length=20, unique=True)
+    
+    email = models.EmailField(unique=True, null=False, blank=False, max_length=255, db_index=True)
+    phone_number = models.CharField(max_length=12, unique=True)
     full_name = models.CharField(max_length=255, null=False, blank=False)
     profile_picture = models.ImageField(upload_to='static/media/profile_pictures', null=True, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now_add=True)
     is_email_confirmed = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
 
     
 
@@ -33,6 +36,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self):
         return self.full_name
     
+    def get_phone_number(self):
+        return self.phone_number
+    
+    def token(self):
+        return ''
+    
     
 class Driver(User):
     username = None
@@ -45,15 +54,11 @@ class Driver(User):
     criminal_record_check = models.ImageField(upload_to='static/media/criminal_record_check', null=True, blank=True)
 
 
-    
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name', 'phone_number', 'physical_address', 'vehicle_registration', 'vehicle_type', 'licence_no']
 
     objects = DriverUserManager()
-    class Meta:
-        verbose_name = 'Driver'
-        verbose_name_plural = 'Drivers'
+    
         
     def save(self, *args, **kwargs):
         self.is_staff = True  # Drivers are staff
