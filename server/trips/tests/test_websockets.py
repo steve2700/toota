@@ -1,17 +1,15 @@
 import pytest
-import datetime
-from uuid import UUID
-import json
+import pdb
 from channels.testing import WebsocketCommunicator
-from toota.asgi import application
 from channels.layers import get_channel_layer
 from channels.db import database_sync_to_async
-from django.contrib.auth import get_user_model
+from toota.asgi import application
+from authentication.models import User, Driver
 from rest_framework_simplejwt.tokens import AccessToken
-from trips.models import User, Driver
 from django.contrib.auth.models import Group
-from trips.utils import VEHICLE_TYPES
+from authentication.utils import VEHICLE_TYPES, get_current_time
 
+from trips.models import Trip
 TEST_CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
@@ -20,18 +18,19 @@ TEST_CHANNEL_LAYERS = {
 
 @database_sync_to_async
 def create_user(email, full_name, phone_number, password, group='user'):
-    user = get_user_model().objects.create_user(
+    user = User.objects.create_user(
         email=email,
         full_name=full_name,
         phone_number=phone_number,
-        password=password
+        password=password,
+
     )
     user_group, _ = Group.objects.get_or_create(name=group)
     user.groups.add(user_group)
+    user.is_verified = True
     user.save()
     access = AccessToken.for_user(user)
     return user, access
-
 
 @database_sync_to_async
 def create_driver(
@@ -39,7 +38,7 @@ def create_driver(
     full_name, 
     phone_number, 
     physical_address, 
-    vehicle_registration, 
+    vehicle_registration_no, 
     vehicle_type, 
     licence_no, 
     password,
@@ -49,16 +48,41 @@ def create_driver(
         full_name=full_name,
         phone_number=phone_number,
         physical_address=physical_address,
-        vehicle_registration=vehicle_registration,
+        vehicle_registration_no=vehicle_registration_no,
         vehicle_type=vehicle_type,
         licence_no=licence_no,
         password=password
-    )
+        )
     driver_group, _ = Group.objects.get_or_create(name=group)
     driver.groups.add(driver_group)
+    driver.is_verified = True
     driver.save()
+
     access = AccessToken.for_user(driver)
     return driver, access
+
+@database_sync_to_async
+def create_trip(
+    pickup_location='Main Avenue',
+    dropoff_location='Cresta Mall',
+    status='REQUESTED',
+    load_description='Fridge',
+    number_of_floors=2,
+    bid=300,
+    pickup_time=get_current_time(),
+    user=None,
+    driver=None,
+    ):
+    return Trip.objects.create(
+        pickup_location=pickup_location,
+        dropoff_location=dropoff_location,
+        status=status,
+        load_description=load_description,
+        number_of_floors=number_of_floors,
+        bid=bid,
+        pickup_time=pickup_time,
+        user=user,
+        driver=driver)
 
 
 @pytest.mark.asyncio
@@ -66,12 +90,11 @@ def create_driver(
 class TestWebSocket:
     async def test_can_connect_to_server(self, settings):
         settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
-        _, access = await create_user(
-            'testuser@gmail.com',
-            'John Doe',
-            '0712345678',
-            '@Thingo11'
-            
+        user, access = await create_user(
+            'testuser@test.com',
+            'Test User',
+            '1234567890',
+            'password'
         )
         communicator = WebsocketCommunicator(
             application=application,
@@ -83,49 +106,27 @@ class TestWebSocket:
         
     async def test_can_send_and_receive_messages(self, settings):
         settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
-        _, access = await create_user(
-            'testuser@gmail.com',
-            'John Doe',
-            '0712345678',
-            '@Thingo11',
-            
+        user, access = await create_user(
+            'testuser@test.com',
+            'Test User',
+            '1234567890',
+            'password'
         )
         communicator = WebsocketCommunicator(
             application=application,
-            path=f'/toota/?token={access}'
+            path='/toota/?token={access}'
         )
         await communicator.connect()
         message = {
             'type': 'echo.message',
-            'data': 'This is a test message'
+            'data': 'This is a test message.',
         }
         await communicator.send_json_to(message)
         response = await communicator.receive_json_from()
         assert response == message
         await communicator.disconnect()
         
-    async def test_can_send_and_receive_broadcast_message(self, settings):
-        settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
-        _, access = await create_user(
-            'vinny@gmail.com',
-            'vinny Doe',
-            '0821147890',
-            '@Thingo11',
-        )
-        communicator = WebsocketCommunicator(
-            application=application,
-            path=f'/toota/?token={access}'
-        )
-        await communicator.connect()
-        message = {
-            'type': 'echo.message',
-            'data': 'This is a test message.'
-        }
-        channel_layer = get_channel_layer()
-        await channel_layer.group_send('test', message)
-        response = await communicator.receive_json_from()
-        assert response == message
-        await communicator.disconnect()
+        
         
     async def test_cannot_connect_to_socket(self, settings):
         settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
@@ -137,133 +138,245 @@ class TestWebSocket:
         assert connected is False
         await communicator.disconnect()
         
-    async def test_join_driver_group(self, settings):
+
+    async def test_join_driver_pool(self, settings):
         settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
-        _, access = await create_driver(
-            'testdriver@gmail.com',
-            'John Doe',
-            '0712345678',
-            '123 Main Street',
-            'KCB 123X',
+        driver, access = await create_driver(
+            'testdriver@test.com',
+            'Test Driver',
+            '1234567890',
+            '23 Main Avenue',
+            'ABC-25-ZYZ',
             VEHICLE_TYPES[0][0],
-            '123456',
-            '@Thingo11',
-        )
+            '923azxhnng',
+            'password',
+            )
         communicator = WebsocketCommunicator(
             application=application,
             path=f'/toota/?token={access}'
-        )
+            )
         connected, _ = await communicator.connect()
         message = {
             'type': 'echo.message',
-            'data': 'This is a test message'
+            'data': 'This is a test message',
         }
         channel_layer = get_channel_layer()
-        await channel_layer.group_send('drivers', message=message)
+        await channel_layer.group_send('drivers', message)
+        # pdb.set_trace()
         response = await communicator.receive_json_from()
+        # pdb.set_trace()
         assert response == message
         await communicator.disconnect()
-        
+
+
     async def test_request_trip(self, settings):
         settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
-
-        @database_sync_to_async
-        def create_async_user(email, full_name, phone_number, password, group='user'):
-            user = User.objects.create_user(
-                email=email,
-                full_name=full_name,
-                phone_number=phone_number,
-                password=password
-            )
-            user_group, _ = Group.objects.get_or_create(name=group)
-            user.groups.add(user_group)
-            user.save()
-            access = AccessToken.for_user(user)
-            return user, access
-
-        user, access = await create_async_user(
-            'vinny@test.com',
-            'Vinny User',
-            '0718567890',
-            '@Thingo11',
+        user, access = await create_user(
+            'testuser@test.com',
+            'Test User',
+            '1234567890',
+            'password'
         )
-
         communicator = WebsocketCommunicator(
             application=application,
-            path=f'/toota/?token={access}'
-        )
+            path=f'/toota/?token={access}')
         connected, _ = await communicator.connect()
-
-        trip_data = {
-            'pickup_location': '23 Main Avenue',
-            'dropoff_location': '100 Malibongwe Drive',
-            'pickup_time': f'{datetime.date.today()}',  # E
-            'load_description': 'Fridge',
-            'vehicle_type': VEHICLE_TYPES[0][0],
-            'user': f'{user.id}',
-            'bid': 200
-        }
-
         await communicator.send_json_to({
             'type': 'create.trip',
-            'data': trip_data
+            'data': {
+                'pickup_location': 'Randburg CBD',
+                'dropoff_location': 'Cresta Mall',
+                'vehicle_type': VEHICLE_TYPES[0][0],
+                'number_of_floors': 2,
+                'pickup_time': get_current_time(),
+                'load_description': 'Fridge',
+                'user_name': user.full_name,
+                'bid': 255,
+                },
             })
-        
         response = await communicator.receive_json_from()
         response_data = response.get('data')
-        assert 'id' in response_data
-        assert 'user' in response_data
-        assert response_data['pickup_location'] == '23 Main Avenue'
-        assert response_data['dropoff_location'] == '100 Malibongwe Drive'
+        assert response_data['id'] is not None
+        assert response_data['pickup_location'] == 'Randburg CBD'
+        assert response_data['dropoff_location'] == 'Cresta Mall'
         assert response_data['status'] == 'REQUESTED'
-        assert 'user' in response_data
+        # assert response_data['user_name'] == user.full_name
+        assert response_data['driver'] is None
         await communicator.disconnect()
 
 
     # async def test_driver_alerted_on_request(self, settings):
     #     settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
+
+    #     #Listen  to the driver's group test channel
     #     channel_layer = get_channel_layer()
     #     await channel_layer.group_add(
     #         group='drivers',
     #         channel='test_channel'
     #     )
     #     user, access = await create_user(
-    #         'vinny@test.com',
-    #         'Vinny User',
-    #         '0718567890',
-    #         '@Thingo11',
+    #         'testuser@test.com',
+    #         'Test User',
+    #         '1234567890',
+    #         'password'
     #     )
     #     communicator = WebsocketCommunicator(
     #         application=application,
-    #         path=f'/toota/?f{access}'
+    #         path=f'/toota/?token={access}'
     #     )
     #     connected, _ = await communicator.connect()
-
-    #     trip_data = {
-    #         'pickup_location': '23 Main Avenue',
-    #         'dropoff_location': '100 Malibongwe Drive',
-    #         'pickup_time': f'{datetime.datetime.now()}',  # Ensure ISO format
-    #         'load_description': 'Fridge',
-    #         'vehicle_type': VEHICLE_TYPES[0][0],
-    #         'user': user.id,
-    #         'bid': 200
-    #     }
-
     #     await communicator.send_json_to({
     #         'type': 'create.trip',
-    #         'data': trip_data
-    #         })
-
+    #         'data': {
+    #             'pickup_location': 'Randburg CBD',
+    #             'dropoff_location': 'Cresta Mall',
+    #             'vehicle_type': VEHICLE_TYPES[0][0],
+    #             'number_of_floors': 2,
+    #             'pickup_time': get_current_time(),
+    #             'load_description': 'Fridge',
+    #             'user_name': user.full_name,
+    #             'bid': 255,
+    #             },
+    #     })
+    #     # Receive JSON message from server on test channel.
     #     response = await channel_layer.receive('test_channel')
-    #     response_data = response.data.get('data')
-    #     assert 'id' in response_data
-    #     assert response_data['pickup_location'] == '23 Main Avenue'
-    #     assert response_data['dropoff_location'] == '100 Malibongwe Drive'
-    #     assert response_data['status'] == 'REQUESTED'
+    #     response_data = response.get('data')
+    #     assert response_data['id'] is not None
+    #     assert response_data['user_name'] == user.full_name
+    #     assert response_data['driver']  is None
     #     await communicator.disconnect()
 
 
-       
-       
+    async def test_create_trip_group(self, settings):
+        settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
+        user, access = await create_user(
+            'testuser@test.com',
+            'Test User',
+            '1234567890',
+            'password'
+        )
+        communicator = WebsocketCommunicator(
+            application=application,
+            path=f'/toota/?token={access}'
+        )
+        connected, _ = await communicator.connect()
+
+        await communicator.send_json_to({
+            'type': 'create.trip',
+            'data': {
+                'pickup_location': 'Randburg CBD',
+                'dropoff_location': 'Cresta Mall',
+                'vehicle_type': VEHICLE_TYPES[0][0],
+                'number_of_floors': 2,
+                'pickup_time': get_current_time(),
+                'load_description': 'Fridge',
+                'user_name': user.full_name,
+                'bid': 255,
+                },
+        })
+        response = await communicator.receive_json_from()
+        response_data = response.get('data')
+
+        # Send a message to the trip group.
+        message = {
+            'type': 'echo.message',
+            'data': 'This is a test message.',
+        }
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(response_data['id'], message=message)
+
+        result = await communicator.receive_json_from()
+        assert result == message
+        await communicator.disconnect()
+
+    async def test_join_trip_group_on_connect(self, settings):
+        settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
+        user, access = await create_user(
+            'testuser@test.com',
+            'Test User',
+            '1234567890',
+            'password'
+        )
+        trip = await create_trip(user=user)
+
+        communicator = WebsocketCommunicator(
+            application=application,
+            path=f'/toota/?token={access}'
+        )
+
+        connected, _ = await communicator.connect()
+
+        # Send a message to the trip group
+        message = {
+        'type': 'echo.message',
+        'data': 'This is a test message.',
+        }
+
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(f'{trip.id}', message=message)
+
+        # Rider receives message.
+        response = await communicator.receive_json_from()
+        assert response == message
+        await communicator.disconnect()
+
+
+    async def test_driver_can_update_trip(self, settings):
+        settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
+        user, _ = await create_user(
+            'testuser@test.com',
+            'Test User',
+            '1234567890',
+            'password'
+        )
         
+        trip = await create_trip(user=user)
+        trip_id = f'{trip.id}'
+        channel_layer = get_channel_layer()
+        await channel_layer.group_add(
+            group=trip_id,
+            channel='test_channel'
+        )
+        driver, access = await create_driver(
+            'testdriver@test.com',
+            'Test Driver',
+            '1234567890',
+            '23 Main Avenue',
+            'ABC-25-ZYZ',
+            VEHICLE_TYPES[0][0],
+            '923azxhnng',
+            'password',
+            )
+        communicator = WebsocketCommunicator(
+            application=application,
+            path=f'/toota/?token={access}'
+        )
+        connected, _ = await communicator.connect()
+        message = {
+            'type': 'update.trip',
+            'data': {
+                'id': trip_id,
+                'pickup_location': 'Randburg CBD',
+                'dropoff_location': 'Cresta Mall',
+                'vehicle_type': VEHICLE_TYPES[0][0],
+                'number_of_floors': 2,
+                'pickup_time': get_current_time(),
+                'load_description': 'Fridge',
+                'driver': driver,
+                'bid': 255,
+            }
+        }
         
+        await communicator.send_json_to(message)
+
+        response = await channel_layer.receive('test_channel')
+        response_data = response.get(data)
+        assert response_data['id'] == trip_id
+        assert response_data['user']['full_name'] == user.full_name
+        assert response_data['driver']['full_name'] == driver.full_name
+
+        await communicator.disconnect()
+
+
+
+

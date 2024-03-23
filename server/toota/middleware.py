@@ -17,8 +17,8 @@ def get_user(scope):
     if not token:
         return AnonymousUser()
     try:
-        acces_token = AccessToken(token[0])
-        user = User.objects.get(id=acces_token['id'])
+        access_token = AccessToken(token[0])
+        user = User.objects.get(id=access_token['user_id'])
     except Exception as e:
         return AnonymousUser()
     
