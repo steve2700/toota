@@ -13,30 +13,30 @@ class TootaConsumer(AsyncJsonWebsocketConsumer):
         return serializer.create(serializer.validated_data)
 
     @database_sync_to_async
-    def _create_trip(self, data):
-        instance = Trip.objects.get(id=data.get('id'))
-        serializer = TripSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        return serializer.update(instance, serializer.validated_data)
-
+    def _get_trip_ids(self, user):
+        user_groups = user.groups.values_list('name', flat=True)
+        if 'driver' in user_groups:
+            trip_ids = user.trip_as_driver.exclude(
+                status=Trip.COMPLETED
+                ).only('id').values_list('id', flat=True)
+        else:
+            trip_ids = user.trip_as_user.exclude(
+                status=Trip.COMPLETED
+                ).only('id').values_list('id', flat=True)
+        return map(str, trip_ids)
 
     @database_sync_to_async
     def _get_user_group(self, user):
         first_group = user.groups.first()
         return first_group.name if first_group else None
 
+
     @database_sync_to_async
-    def _get_trip_ids(self, user):
-        user_groups = user.groups.values_list('name', flat=True)
-        if 'driver' in user_groups:
-            trip_ids = user.trips_as_driver.exclude(
-                status=Trip.COMPLETED
-                ).only('id').values_list('id', flat=True)
-        else:
-            trip_ids = user.trips_as_user.exclude(
-                status=Trip.COMPLETED
-                ).only('id').values_list('id', flat=True)
-        return map(str, trip_ids)
+    def _update_trip(self, data):
+        instance = Trip.objects.get(id=data.get('id'))
+        serializer = TripSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        return serializer.update(instance, serializer.validated_data)
 
     async def connect(self):
         user = self.scope['user']
@@ -90,6 +90,20 @@ class TootaConsumer(AsyncJsonWebsocketConsumer):
             'data': trip_data,
             })
 
+    
+    async def echo_message(self, message):
+        await self.send_json(message)
+
+    async def receive_json(self, content, **kwargs):
+        message_type = content.get('type')
+        if message_type == 'create.trip':
+            await self.create_trip(content)
+        elif message_type == 'echo.message':
+            await self.echo_message(content)
+        elif message_type == 'update.trip':
+            await self.update_trip(content)
+
+
     async def update_trip(self, message):
         data = message.get('data')
         trip = await self._update_trip(data)
@@ -115,15 +129,4 @@ class TootaConsumer(AsyncJsonWebsocketConsumer):
             'data': trip_data,
         })
 
-    async def echo_message(self, message):
-        await self.send_json(message)
-
-    async def receive_json(self, content, **kwargs):
-        message_type = content.get('type')
-        if message_type == 'create.trip':
-            await self.create_trip(content)
-        elif message_type == 'echo.message':
-            await self.echo_message(content)
-        elif message_type == 'update.trip':
-            await self.update_trip(content)
 

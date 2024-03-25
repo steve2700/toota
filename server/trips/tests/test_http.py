@@ -10,7 +10,6 @@ from trips.models import Trip
 from rest_framework_simplejwt.tokens import RefreshToken
 from authentication.utils import VEHICLE_TYPES
 
-
 class UserSignUpViewTest(TestCase):
     def test_user_signup_view(self):
         client = Client()

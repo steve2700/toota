@@ -1,11 +1,10 @@
-import datetime
 import uuid
 from django.db import models
 from django.urls import reverse
 from authentication.models import Driver, User
 from django.utils import timezone
 from django.conf import settings
-
+from datetime import datetime
 VEHICLE_TYPES = (
         ('bike', 'Bike'),
         ('car', 'Car'),
@@ -35,23 +34,23 @@ class Trip(models.Model):
     updated = models.DateTimeField(auto_now=True)
     pickup_location = models.CharField(max_length=255)
     dropoff_location = models.CharField(max_length=255)
-    pickup_time = models.DateTimeField(default=timezone.now)
+    pickup_time = models.DateTimeField(auto_now=True)
     dropoff_contact_number = models.CharField(max_length=20, null=True)
     load_description = models.TextField(blank=False, null=False, default='', max_length=500)
     driver = models.ForeignKey(
-        Driver,
+        settings.AUTH_DRIVER_MODEL,
         on_delete=models.DO_NOTHING,
         null=True,
         blank=True,
-        related_name='trips_as_driver',
+        related_name='trip_as_driver'
         
         )
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.DO_NOTHING,
         null=True,
         blank=True,
-        related_name='trips_as_user',
+        related_name='trip_as_user'
        
     )
     vehicle_type = models.CharField(max_length=100, choices=VEHICLE_TYPES, null=False, blank=False)

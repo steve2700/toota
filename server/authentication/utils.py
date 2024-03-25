@@ -1,6 +1,8 @@
 from django.core.mail import EmailMessage
 from datetime import datetime
+from django.utils import timezone
 import threading
+
 
 VEHICLE_TYPES = (
         ('bike', 'Bike'),

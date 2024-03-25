@@ -64,7 +64,7 @@ class DriverSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Driver
-        fields = ['id','email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'driver_licence', 'vehicle_registration','criminal_record_check','password1', 'password2']
+        fields = ['id','email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'identity_document', 'driver_licence', 'vehicle_registration','criminal_record_check','password1', 'password2']
         
     def validate(self, attrs):
         
@@ -206,3 +206,9 @@ class SetNewPasswordSerializer(serializers.Serializer):
              raise AuthenticationFailed('The reset link is invalid', 401)
         return super().validate(attrs)
     
+
+class CheckDriverVerificationSerializer(serializers.Serializer):
+    token=serializers.CharField(min_length=1, write_only=True)
+
+    class Meta:
+        fields = ['token']

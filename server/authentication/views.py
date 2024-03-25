@@ -3,7 +3,7 @@ import os
 from rest_framework import generics, status, views, permissions
 from rest_framework_simplejwt.views import TokenObtainPairView as Token, TokenVerifyView
 from rest_framework.response import Response
-from .serializers import UserSerializer, LoginUserSerializer, DriverSerializer, VerifyUserEmailSerializer, VerifyDriverEmailSerializer, LoginDriverSerializer, ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer
+from .serializers import UserSerializer, LoginUserSerializer, DriverSerializer, VerifyUserEmailSerializer, VerifyDriverEmailSerializer, LoginDriverSerializer, ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, CheckDriverVerificationSerializer
 from .models import  Driver, User
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -20,6 +20,7 @@ from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnico
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.shortcuts import redirect
 from django.http import HttpResponsePermanentRedirect
+
 
 
 class CustomRedirect(HttpResponsePermanentRedirect):
@@ -245,6 +246,33 @@ class PasswordDriverTokenCheck(generics.GenericAPIView):
 
         except DjangoUnicodeDecodeError as identifier:
            return CustomRedirect(f'{redirect_url}?token_valid=False')
+
+
+class CheckDriverVerification(generics.GenericAPIView):
+    serializer_class = CheckDriverVerificationSerializer
+
+    token_param_config=openapi.Parameter(
+        'token', 
+        in_=openapi.IN_QUERY, 
+        description='Description',
+        type=openapi.TYPE_STRING)
+    @swagger_auto_schema(manual_parameters=[token_param_config])
+    def post(self, request):
+        token = request.data['token']
+        try:
+            payload = AccessToken(token)
+            driver = Driver.objects.get(id=payload['user_id'])
+
+            if driver:
+                if driver.identity_document and driver.drivers_license and driver.vehicle_registration and driver.criminal_record_check:
+                    return Response({"verified": True})
+                else:
+                    return Response({"verified:": False})
+        except jwt.ExpiredSignatureError:
+            return Response({'error': "link expired"}, status=status.HTTP_400_BAD_REQUEST)
+        except jwt.exceptions.DecodeError:
+            return Response({'error': "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class SetNewPasswordAPIVIew(generics.GenericAPIView):

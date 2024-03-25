@@ -6,8 +6,9 @@ from channels.auth import AuthMiddleware
 from channels.db import database_sync_to_async
 from channels.sessions import CookieMiddleware, SessionMiddleware
 from rest_framework_simplejwt.tokens import AccessToken
+from authentication.models import User
 
-User = get_user_model()
+
 
 @database_sync_to_async
 def get_user(scope):
