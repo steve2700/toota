@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaEnvelope, FaLock } from 'react-icons/fa';
 
 const UserLoginForm = () => {
   const navigate = useNavigate();
@@ -10,7 +11,6 @@ const UserLoginForm = () => {
 
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
-
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
@@ -18,25 +18,8 @@ const UserLoginForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    }
-
-    if (!formData.password.trim()) {
-      newErrors.password = 'Password is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
-
-    // Add a timeout to hide the password after 5 seconds (5000 milliseconds)
     setTimeout(() => {
       setShowPassword(false);
     }, 5000);
@@ -46,46 +29,38 @@ const UserLoginForm = () => {
     e.preventDefault();
 
     try {
-      if (validateForm()) {
-        const response = await fetch('http://127.0.0.1:8000/api/user/login/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-        });
+      const response = await fetch('http://127.0.0.1:8000/api/user/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
-        if (response.ok) {
-          // Handle successful login, e.g., redirect to dashboard
-          console.log('Login successful');
-          setSuccessMessage('Login successful! Redirecting to the dashboard...');
-          // Redirect to dashboard after a delay
-          setTimeout(() => {
-            navigate('/dashboard/user');
-          }, 3000);
-          // Reset the form after successful login
-          setFormData({ email: '', password: '' });
-          setErrors({});
+      if (response.ok) {
+        console.log('Login successful');
+        setSuccessMessage('Login successful! Redirecting to the dashboard...');
+        setTimeout(() => {
+          navigate('/dashboard/user');
+        }, 3000);
+        setFormData({ email: '', password: '' });
+        setErrors({});
+      } else {
+        const errorData = await response.json();
+        if (response.status === 401) {
+          setErrors({
+            ...errors,
+            invalidCredentials: 'Invalid email or password. Please try again.',
+          });
         } else {
-          // Handle login errors
-          const errorData = await response.json();
-          if (response.status === 401) {
-            // Unauthorized error, display a clear message to the user
-            setErrors({
-              ...errors,
-              invalidCredentials: 'Invalid email or password. Please try again.',
-            });
-          } else {
-            setErrors(errorData);
-          }
+          setErrors(errorData);
         }
       }
     } catch (error) {
       console.error('Error during login:', error);
-      // Show a clear error message to the user
       setErrors({ generic: 'An error occurred. Please try again later.' });
     }
   };
@@ -98,12 +73,10 @@ const UserLoginForm = () => {
         )}
 
         <form onSubmit={handleSubmit}>
-          <h2 className="text-3xl font-bold mb-4 text-center text-gray-900">Login To TOOTA</h2>
+          <h2 className="text-3xl font-bold mb-4 text-center text-gray-900">Login To Toota</h2>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-              Email Address
-            </label>
+          <div className="mb-4 flex items-center">
+            <FaEnvelope className="text-gray-500 mr-2" />
             <input
               type="email"
               id="email"
@@ -113,13 +86,11 @@ const UserLoginForm = () => {
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded shadow appearance-none"
             />
-            {errors.email && <p className="text-red-500 text-lg italic">{errors.email}</p>}
           </div>
+          {errors.email && <p className="text-red-500 text-lg italic ml-7">{errors.email}</p>}
 
-          <div className="mb-4 relative">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-              Password
-            </label>
+          <div className="mb-4 relative flex items-center">
+            <FaLock className="text-gray-500 mr-2" />
             <input
               type={showPassword ? 'text' : 'password'}
               id="password"
@@ -135,14 +106,13 @@ const UserLoginForm = () => {
             >
               {showPassword ? '👁️' : '👁️‍🗨️'}
             </span>
-            {errors.password && <p className="text-red-500 text-lg italic">{errors.password}</p>}
           </div>
-
+          {errors.password && <p className="text-red-500 text-lg italic ml-7">{errors.password}</p>}
           {errors.invalidCredentials && (
-            <p className="text-red-500 text-lg font-bold mb-4">{errors.invalidCredentials}</p>
+            <p className="text-red-500 text-lg italic ml-7">{errors.invalidCredentials}</p>
           )}
           {errors.generic && (
-            <p className="text-red-500 text-lg font-bold mb-4">{errors.generic}</p>
+            <p className="text-red-500 text-lg italic ml-7">{errors.generic}</p>
           )}
 
           <button

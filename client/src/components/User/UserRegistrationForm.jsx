@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaUser, FaPhone, FaEnvelope, FaLock } from 'react-icons/fa'; // Importing required icons
 
 const UserRegistrationForm = () => {
   const navigate = useNavigate();
@@ -30,9 +31,8 @@ const UserRegistrationForm = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
-    // Add a timeout to hide the password after 5 seconds
     setTimeout(() => {
-	    setShowPassword(false);
+      setShowPassword(false);
     }, 5000);
   };
 
@@ -128,10 +128,8 @@ const UserRegistrationForm = () => {
 
         {errors.generic && <p className="text-red-500 text-lg italic mb-4">{errors.generic}</p>}
 
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="fullName">
-            Full Name
-          </label>
+        <div className="mb-4 flex items-center">
+          <FaUser className="text-gray-500 mr-2" />
           <input
             className={`appearance-none border rounded w-full py-2 px-3 ${errors.fullName && 'border-red-500'}`}
             id="fullName"
@@ -142,13 +140,11 @@ const UserRegistrationForm = () => {
             onChange={handleChange}
             autoComplete="current-fullName"
           />
-          {errors.fullName && <p className="text-red-500 text-lg italic">{errors.fullName}</p>}
         </div>
+        {errors.fullName && <p className="text-red-500 text-lg italic ml-7">{errors.fullName}</p>}
 
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phoneNumber">
-            Phone Number
-          </label>
+        <div className="mb-4 flex items-center">
+          <FaPhone className="text-gray-500 mr-2" />
           <input
             className={`appearance-none border rounded w-full py-2 px-3 ${errors.phoneNumber && 'border-red-500'}`}
             id="phoneNumber"
@@ -159,13 +155,11 @@ const UserRegistrationForm = () => {
             onChange={handleChange}
             autoComplete="current-phoneNumber"
           />
-          {errors.phoneNumber && <p className="text-red-500 text-lg italic">{errors.phoneNumber}</p>}
         </div>
+        {errors.phoneNumber && <p className="text-red-500 text-lg italic ml-7">{errors.phoneNumber}</p>}
 
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-            Email
-          </label>
+        <div className="mb-4 flex items-center">
+          <FaEnvelope className="text-gray-500 mr-2" />
           <input
             className={`appearance-none border rounded w-full py-2 px-3 ${errors.email && 'border-red-500'}`}
             id="email"
@@ -176,13 +170,11 @@ const UserRegistrationForm = () => {
             onChange={handleChange}
             autoComplete="current-email"
           />
-          {errors.email && <p className="text-red-500 text-lg italic">{errors.email}</p>}
         </div>
+        {errors.email && <p className="text-red-500 text-lg italic ml-7">{errors.email}</p>}
 
-        <div className="mb-4 relative">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-            Password
-          </label>
+        <div className="mb-4 relative flex items-center">
+          <FaLock className="text-gray-500 mr-2" />
           <input
             className={`appearance-none border rounded w-full py-2 px-3 ${errors.password && 'border-red-500'}`}
             id="password"
@@ -199,13 +191,11 @@ const UserRegistrationForm = () => {
           >
             {showPassword ? '👁️' : '👁️‍🗨️'}
           </span>
-          {errors.password && <p className="text-red-500 text-lg italic">{errors.password}</p>}
         </div>
+        {errors.password && <p className="text-red-500 text-lg italic ml-7">{errors.password}</p>}
 
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">
-            Confirm Password
-          </label>
+        <div className="mb-4 relative flex items-center">
+          <FaLock className="text-gray-500 mr-2" />
           <input
             className={`appearance-none border rounded w-full py-2 px-3 ${errors.confirmPassword && 'border-red-500'}`}
             id="confirmPassword"
@@ -216,14 +206,12 @@ const UserRegistrationForm = () => {
             onChange={handleChange}
             autoComplete="current-confirmPassword"
           />
-          {errors.confirmPassword && (
-            <p className="text-red-500 text-lg italic">{errors.confirmPassword}</p>
-          )}
         </div>
+        {errors.confirmPassword && <p className="text-red-500 text-lg italic ml-7">{errors.confirmPassword}</p>}
 
         <button
           type="submit"
-          className="w-full bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-black hover:bg-gray-800"
+          className="w-full bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-black hover:bg-gray-800 mt-6"
         >
           Register Your Account
         </button>
@@ -234,7 +222,6 @@ const UserRegistrationForm = () => {
             <Link to="/login/user" className="text-blue-500 hover:underline">
               Log in here
             </Link>
-
           </p>
         </div>
       </form>

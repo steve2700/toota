@@ -1,4 +1,3 @@
-import "./App.css";
 import React, { createContext, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import DriverRegistrationForm from "./components/Driver/DriverRegistrationForm";
@@ -8,9 +7,10 @@ import UserRegistrationForm from "./components/User/UserRegistrationForm";
 import ForgotPasswordForm from "./components/User/ForgotPasswordForm";
 import ResetPasswordForm from "./components/User/ResetPasswordForm";
 import NotFound from "./pages/NotFound";
-import Header from './components/navigation/header';
-import BecomeDriver from './components/navigation/BecomeDriver';
-import HomePage from './pages/HomePage';
+import Dashboard from './components/User/Dashboard';
+import DriverDashboard from './components/Driver/DriverDashboard';
+import DocumentUploadForm from "./components/Driver/DocumentUploadForm"; // Import the DocumentUploadForm component
+
 export const AuthContext = createContext();
 
 function App() {
@@ -19,21 +19,25 @@ function App() {
   return (
     <Router>
       <AuthContext.Provider value={{ auth: [jwt, setJWT] }}>
-        <div>
-          <Header />
-          <Routes>
-            <Route path="/signup/driver" element={<DriverRegistrationForm />} />
-            <Route path="/login/driver" element={<DriverLoginForm />} />
-            <Route path="/signup/user" element={<UserRegistrationForm />} />
-            <Route path="/login/user" element={<UserLoginForm />} />
-            <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-	    <Route path="/reset-password/:token" element={<ResetPasswordForm />} />
-	     <Route path="/become-driver" element={<BecomeDriver />} />
-	    
-            <Route path="/" element={<HomePage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
+        <Routes>
+          <Route path="/signup/driver" element={<DriverRegistrationForm />} />
+          <Route path="/login/driver" element={<DriverLoginForm />} />
+          <Route path="/signup/user" element={<UserRegistrationForm />} />
+          <Route path="/login/user" element={<UserLoginForm />} />
+          <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+          <Route path="/reset-password/:token" element={<ResetPasswordForm />} />
+
+          {/* Route for user dashboard */}
+          <Route path="/dashboard/user" element={<Dashboard />} />
+
+          {/* Route for driver dashboard */}
+          <Route path="/dashboard/driver" element={<DriverDashboard />} />
+
+          {/* Route for document upload form */}
+          <Route path="/upload-document" element={<DocumentUploadForm />} />
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </AuthContext.Provider>
     </Router>
   );
