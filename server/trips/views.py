@@ -1,32 +1,24 @@
-from django.shortcuts import render
+from rest_framework import generics, status, views, permissions, viewsets
+from .models import Trip, TripPayment
+from .serializers import TripSerializer, TripPaymentSerializer
 
-# Create your views here.
 
-from django.contrib.auth import get_user_model
-from rest_framework import generics
-from rest_framework_simplejwt.views import TokenObtainPairView as Token
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from .serializers import UserSerializer, LoginSerializer, TripSerializer, DriverSerializer
-from .models import Trip, Driver, User
-from rest_framework import viewsets
-from rest_framework import permissions
-from rest_framework.response import Response
+class IsDriverOnActiveTrip(permissions.BasePermission):
+    def has_permission(self, request, view):
+        # Check if the user is authenticated and is a driver on an active trip
+        return request.user.is_authenticated and request.user.is_driver and request.user.active_trip
 
-class UserSignUpView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    
-class LoginView(Token):
-    serializer_class = LoginSerializer
-    
-class DriverSignUpView(generics.CreateAPIView):
-    queryset = Driver.objects.all()
-    serializer_class = DriverSerializer
-    
-    
-    
+class TripPaymentListCreateAPIView(generics.ListCreateAPIView):
+    queryset = TripPayment.objects.all()
+    serializer_class = TripPaymentSerializer
+    permission_classes = [permissions.IsAuthenticated, IsDriverOnActiveTrip]
+
+class TripPaymentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = TripPayment.objects.all()
+    serializer_class = TripPaymentSerializer
+    permission_classes = [permissions.IsAuthenticated, IsDriverOnActiveTrip]
+
+
 class TripView(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'id'
     lookup_url_kwarg = 'trip_id'

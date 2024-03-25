@@ -13,10 +13,12 @@ import os
 import datetime
 from pathlib import Path
 import dj_database_url
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -43,7 +45,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'corsheaders',
-    'trips'
+    'rest_framework_simplejwt',
+    'authentication',
+    'trips',
 ]
 
 MIDDLEWARE = [
@@ -63,7 +67,7 @@ ROOT_URLCONF = 'toota.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'build/static')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,7 +86,8 @@ ASGI_APPLICATION = 'toota.asgi.application'
 CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
-   'https://locahost:5173'
+   'https://locahost:5173',
+   'http://localhost:8000'
 ]
 
 CORS_ALLOW_METHODS = (
@@ -94,17 +99,11 @@ CORS_ALLOW_METHODS = (
     "PUT",
 )
 
-CORS_ALLOW_HEADERS = (
-    "accept",
-    "authorization",
-    "content-type",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-)
+
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://locahost:5173'
+    'https://locahost:5173',
+    'http://localhost:8000'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -123,7 +122,7 @@ CORS_ALLOW_CREDENTIALS = True
 #         'PASSWORD': 'vMhjFBMVIb5WDSt5',
 #         'PORT': '5432',
 #     }
-# }
+# # }
 
 DATABASES = {
     'default': {
@@ -136,8 +135,8 @@ DATABASES = {
 #     "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
 # }
 
-AUTH_USER_MODEL = 'trips.User'
-AUTH_DRIVER_MODEL = 'trips.Driver'
+AUTH_USER_MODEL = 'authentication.User'
+AUTH_DRIVER_MODEL = 'authentication.Driver'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -158,33 +157,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.1/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = Path(BASE_DIR / 'media')
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
 REDIS_URL = os.getenv('REDIS_URL', 'redis-18315.c323.us-east-1-2.ec2.cloud.redislabs.com:18315')
 
 CHANNEL_LAYERS = {
@@ -196,7 +168,9 @@ CHANNEL_LAYERS = {
     },
 }
 
+
 REST_FRAMEWORK = {
+    'NON_FIELD_ERRORS_KEY': 'error',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -206,7 +180,48 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
-    'USER_ID_CLAIM': 'id',
 }
 
-APPEND_SLASH=False
+
+# Internationalization
+# https://docs.djangoproject.com/en/4.1/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'Africa/Johannesburg'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.1/howto/static-files/
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'build/static')
+    ]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = Path(BASE_DIR / 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+
+
+
+
+#Email
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'incvestec@gmail.com'
+EMAIL_HOST_PASSWORD = 'akdb clua fzlf iypm'

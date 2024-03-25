@@ -1,54 +1,133 @@
 import json
-from django.contrib.auth.models import User
+import pdb
+import base64
+import datetime
+from django.test import TestCase, Client
 from django.urls import reverse
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase
 from rest_framework import status
-from trips.serializers import UserSerializer, DriverSerializer, TripSerializer
-from trips.utils import VEHICLE_TYPES
+from authentication.models import User, Driver
+from trips.models import Trip
+from rest_framework_simplejwt.tokens import RefreshToken
+from authentication.utils import VEHICLE_TYPES
+
+class UserSignUpViewTest(TestCase):
+    def test_user_signup_view(self):
+        client = Client()
+        data = {
+            'full_name': 'Test User',
+            'phone_number': '1234567890',
+            'email': 'test@example.com',
+            'password1': '@Thingo11',
+            'password2': '@Thingo11',
+        }
+        response = client.post(reverse('user-sign_up'), data=data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(User.objects.filter(email=data['email']).exists())
+
+class UserLoginViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(full_name='Test User', email='test@example.com', password='testpassword', phone_number='0834568900')
+        self.user.is_verified = True
+        self.user.save()
+        return super().setUp()
+
+    def tearDown(self):
+        return super().tearDown()
+
+    def test_login_view(self):
+        client = Client()
+        data = {'email': 'test@example.com', 'password': 'testpassword'}
+        response = client.post(reverse('user-login'), data=data)
+        # 
+        # pdb.set_trace()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+
+class DriverSignUpViewTest(TestCase):
+    def test_driver_signup_view(self):
+        client = Client()
+        data = {
+            'full_name': 'Test Driver',
+            'phone_number': '1234567890',
+            'email': 'driver@example.com',
+            'password1': 'testpassword',
+            'password2': 'testpassword',
+            'physical_address': '123 Main St',
+            'vehicle_registration_no': 'ABC123',
+            'vehicle_type': VEHICLE_TYPES[0][0],
+            'licence_no': '123456',
+        }
+        response = client.post(reverse('driver-sign_up'), data=data)
+        # pdb.set_trace()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Driver.objects.filter(email=data['email']).exists())
+
+class DriverLoginViewTest(TestCase):
+    def setUp(self):
+        self.driver = Driver.objects.create_driver(
+            full_name='Test Driver',
+            phone_number='1234567890',
+            email='driver@example.com',
+            password='testpassword',
+            physical_address='123 Main St',
+            vehicle_registration_no='ABC123',
+            vehicle_type=VEHICLE_TYPES[0][0],
+            licence_no='123456',
+            )
+        self.driver.is_verified = True
+        self.driver.save()
+        return super().setUp()
+
+    def tearDown(self):
+        return super().tearDown()
+
+    def test_login_view(self):
+        client = Client()
+        data = {'email': 'driver@example.com', 'password': 'testpassword'}
+        response = client.post(reverse('driver-login'), data=data)
+        access = response.data['access']
+        header, payload, signature = access.split('.')
+        decoded_payload = base64.b64decode(f'{payload}==')
+        payload_data = json.loads(decoded_payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+        
 
 
-class AuthenticationTestCase(APITestCase):
-    def test_user_can_sign_up(self):
-        data = {
-            "full_name": "John Doe",
-            "email": "testuser@gmail.com",
-            "phone_number": "0712345678",
-            "password1": "@Thingo11",
-            "password2": "@Thingo11"
-        }
-        response = self.client.post('/api/user/sign_up/', data)
+class TripViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(full_name='Test User', email='test@example.com', password='testpassword', phone_number='0834568900')
+        self.user.is_verified = True
+        return super().setUp()
+
+    def tearDown(self):
+        return super().tearDown()
+
+
+    def test_trip_view(self):
+        client = Client()
+        data = {'email': 'test@example.com', 'password': 'testpassword'}
+        response = client.post(reverse('user-login'), data=data)
+        self.access = response.data['access']
+        trip = Trip.objects.create(
+                pickup_location='23 Main avenue',
+                dropoff_location='100 Kent Avenue',
+                vehicle_type=VEHICLE_TYPES[0][0],
+                number_of_floors=2,
+                load_description='This is a test load description.',
+                pickup_time=f'{datetime.date.today()}',
+                bid=500,
+                )
+        res = self.client.get('/api/trip/', HTTP_AUTHORIZATION=f'Bearer {self.access}')
+        self.assertEqual(status.HTTP_200_OK, res.status_code)
+        self.assertTrue(Trip.objects.filter(id=res.data[0]['id']).exists())
+        self.assertEqual(res.data[0]['id'], str(trip.id))
+        self.assertEqual(res.data[0]['pickup_location'], trip.pickup_location)
+        self.assertEqual(res.data[0]['dropoff_location'], trip.dropoff_location)
+        self.assertEqual(res.data[0]['load_description'], trip.load_description)
         
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['email'], data['email'])
-        self.assertEqual(response.data['full_name'], data['full_name'])
-        self.assertEqual(response.data['phone_number'], data['phone_number'])
-        self.assertFalse('password1' in response.data)
-        
-    def test_driver_can_sign_up(self):
-        data = {
-            "full_name": "Jane Doe",
-            "email": "jane@test.com",
-            "phone_number": "071234578",
-            "physical_address": "Nairobi",
-            "vehicle_registration": "KCA 123X",
-            "vehicle_type": VEHICLE_TYPES[0][0],
-            "licence_no": "123456",
-            "password1": "@Thingo11",
-            "password2": "@Thingo11"
-        }
-        response = self.client.post('/api/driver/sign_up/', data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['email'], data['email'])
-        self.assertEqual(response.data['full_name'], data['full_name'])
-        self.assertEqual(response.data['phone_number'], data['phone_number'])
-        self.assertEqual(response.data['physical_address'], data['physical_address'])
-        self.assertEqual(response.data['vehicle_registration'], data['vehicle_registration'])
-        self.assertEqual(response.data['vehicle_type'], data['vehicle_type'])
-        self.assertEqual(response.data['licence_no'], data['licence_no'])
-        self.assertFalse('password1' in response.data)
-            
-        
-      
+
+
     
- 
