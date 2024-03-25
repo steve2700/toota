@@ -7,6 +7,7 @@ const DocumentUploadForm = () => {
     idDocument: null,
     passport: null,
     license: null,
+    criminalRecordCheck: null, // Add criminalRecordCheck to the state
   });
 
   const [submissionSuccess, setSubmissionSuccess] = useState(false);
@@ -23,8 +24,8 @@ const DocumentUploadForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Check if driver's license is uploaded
-    if (!formData.license) {
-      alert('Driver license is required');
+    if (!formData.license || !formData.criminalRecordCheck) { // Check if license and criminalRecordCheck are uploaded
+      alert('Driver license and Criminal Record Check are required'); // Update error message
       return;
     }
     // Handle form submission logic here
@@ -52,7 +53,7 @@ const DocumentUploadForm = () => {
                 <div className="mb-4">
                   <label className="block text-sm font-semibold mb-2" htmlFor="idDocument">
                     <FaIdCard className="inline-block mr-2" />
-                    National ID Card
+                    National ID Card or Passport <span className="text-red-500">*</span>
                   </label>
                   <div className="flex items-center">
                     {formData.idDocument ? (
@@ -67,31 +68,6 @@ const DocumentUploadForm = () => {
                         id="idDocument"
                         name="idDocument"
                         onChange={(e) => handleFileChange(e, 'idDocument')}
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        className="w-full px-3 py-2 border rounded"
-                        required
-                      />
-                    )}
-                  </div>
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-semibold mb-2" htmlFor="passport">
-                    <FaPassport className="inline-block mr-2" />
-                    Passport
-                  </label>
-                  <div className="flex items-center">
-                    {formData.passport ? (
-                      <div className="flex items-center">
-                        <FaCheck className="text-green-500 mr-2" />
-                        <span className="text-gray-700">{formData.passport.name}</span>
-                        <FaTimes className="text-red-500 ml-2 cursor-pointer" onClick={() => handleRemoveFile('passport')} />
-                      </div>
-                    ) : (
-                      <input
-                        type="file"
-                        id="passport"
-                        name="passport"
-                        onChange={(e) => handleFileChange(e, 'passport')}
                         accept=".pdf,.jpg,.jpeg,.png"
                         className="w-full px-3 py-2 border rounded"
                         required
@@ -121,6 +97,26 @@ const DocumentUploadForm = () => {
                         className="w-full px-3 py-2 border rounded"
                         required
                       />
+                    )}
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold mb-2" htmlFor="criminalRecordCheck">
+                    <FaFile className="inline-block mr-2" />
+                    Criminal Record Check <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex items-center">
+                    <input
+                      type="file"
+                      id="criminalRecordCheck"
+                      name="criminalRecordCheck"
+                      onChange={(e) => handleFileChange(e, 'criminalRecordCheck')}
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      className="w-full px-3 py-2 border rounded"
+                      required
+                    />
+                    {formData.criminalRecordCheck && (
+                      <FaCheck className="text-green-500 ml-2" />
                     )}
                   </div>
                 </div>
