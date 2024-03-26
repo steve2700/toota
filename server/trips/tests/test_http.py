@@ -39,7 +39,6 @@ class UserLoginViewTest(TestCase):
         data = {'email': 'test@example.com', 'password': 'testpassword'}
         response = client.post(reverse('user-login'), data=data)
         # 
-        # pdb.set_trace()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('access', response.data)
         self.assertIn('refresh', response.data)
@@ -100,6 +99,7 @@ class TripViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(full_name='Test User', email='test@example.com', password='testpassword', phone_number='0834568900')
         self.user.is_verified = True
+        self.user.save()
         return super().setUp()
 
     def tearDown(self):

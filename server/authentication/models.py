@@ -35,12 +35,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.phone_number
     def get_id(self):
         return self.id
-    def tokens(self):
-        refresh = RefreshToken.for_user(self)
-        return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token)
-        }
     
     
 
@@ -78,12 +72,7 @@ class Driver(User):
     def get_id(self):
         return self.id
 
-    def tokens(self):
-        refresh = RefreshToken.for_user(self)
-        return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token)
-        }
+    
 
    
     
