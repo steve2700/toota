@@ -146,7 +146,8 @@ class TestWebSocket:
 
     async def test_join_driver_pool(self, settings):
         settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
-        driver, access = await create_driver(
+        
+        _, access = await create_driver(
             'testdriver@test.com',
             'Test Driver',
             '0123456789',
@@ -166,7 +167,7 @@ class TestWebSocket:
             'data': 'This is a test message',
         }
         channel_layer = get_channel_layer()
-        await channel_layer.group_send('drivers', message)
+        await channel_layer.group_send('drivers', message=message)
         response = await communicator.receive_json_from()
         assert response == message
         await communicator.disconnect()
@@ -390,6 +391,7 @@ class TestWebSocket:
 
     async def test_driver_join_trip_group_on_connect(self, settings):
         settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
+        
         driver, access = await create_driver(
             'testdriver@test.com',
             'Test Driver',
@@ -411,8 +413,10 @@ class TestWebSocket:
             'type': 'echo.message',
             'data': 'This is a test message.'
         }
+        print(connected)
         channel_layer = get_channel_layer()
         await channel_layer.group_send(f'{trip.id}', message=message)
         response = await communicator.receive_json_from()
         assert response == messages
+        await communicator.disconnect()
 

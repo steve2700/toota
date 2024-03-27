@@ -117,6 +117,7 @@ class TripViewTest(TestCase):
                 vehicle_type=VEHICLE_TYPES[0][0],
                 number_of_floors=2,
                 load_description='This is a test load description.',
+                user=self.user,
                 pickup_time=f'{datetime.date.today()}',
                 bid=500,
                 )

@@ -158,7 +158,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-REDIS_URL = os.getenv('REDIS_URL', 'redis-18315.c323.us-east-1-2.ec2.cloud.redislabs.com:18315')
+REDIS_URL = os.getenv('REDIS_URL', 'redis://default:Tb6IaS9TgBvwFtJiwhb7Dw3RxoImm9LP@redis-12258.c14.us-east-1-2.ec2.cloud.redislabs.com:12258')
 
 CHANNEL_LAYERS = {
     'default': {        

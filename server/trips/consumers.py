@@ -33,7 +33,7 @@ class TootaConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def _get_user_group(self, user):
-        return user.groups.first().name
+        return user.groups.first().full_name
 
     @database_sync_to_async
     def _update_trip(self, data):
