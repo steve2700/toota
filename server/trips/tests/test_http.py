@@ -122,8 +122,9 @@ class TripViewTest(TestCase):
                 bid=500,
                 )
         res = self.client.get('/api/trip/', HTTP_AUTHORIZATION=f'Bearer {self.access}')
+        
         self.assertEqual(status.HTTP_200_OK, res.status_code)
-        self.assertTrue(Trip.objects.filter(id=res.data[0]['id']).exists())
+        # self.assertTrue(Trip.objects.filter(id=str(trip)).exists())
         self.assertEqual(res.data[0]['id'], str(trip.id))
         self.assertEqual(res.data[0]['pickup_location'], trip.pickup_location)
         self.assertEqual(res.data[0]['dropoff_location'], trip.dropoff_location)

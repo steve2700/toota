@@ -24,7 +24,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['full_name', 'phone_number']
     objects = UserManager()
 
-
+    @property
+    def group(self):
+        groups = self.groups.all()
+        return groups[0].name if groups else None
+    
     def __str__(self):
         return f'{self.id}'
 
@@ -35,6 +39,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.phone_number
     def get_id(self):
         return self.id
+
+
     
     
 
@@ -72,6 +78,10 @@ class Driver(User):
     def get_id(self):
         return self.id
 
+    @property
+    def group(self):
+        groups = self.groups.all()
+        return groups[0].name if groups else None
     
 
    

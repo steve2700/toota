@@ -248,7 +248,7 @@ class TestWebSocket:
         response = await channel_layer.receive('test_channel')
         response_data = response.get('data')
         assert response_data['id'] is not None
-        assert response_data['user_name'] == user.full_name
+        assert response_data['user']['full_name'] == user.full_name
         assert response_data['driver']  is None
         await communicator.disconnect()
 
