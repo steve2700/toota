@@ -101,6 +101,8 @@ const UserRegistrationForm = () => {
             password: '',
             confirmPassword: '',
           });
+        } else if (response.status === 500) {
+          setErrors({ generic: 'Internal Server Error. Please try again later.' });
         } else {
           const errorData = await response.json();
           if (response.status === 400) {
@@ -191,7 +193,7 @@ const UserRegistrationForm = () => {
             autoComplete="current-password"
           />
           <span
-            className="absolute right-0 bottom-1.5 mr-3 cursor-pointer"
+            className="text-gray-600 absolute right-0 mr-3 cursor-pointer"
             onClick={togglePasswordVisibility}
           >
             {showPassword ? 'Hide' : 'Show'}
