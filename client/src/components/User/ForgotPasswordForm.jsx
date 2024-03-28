@@ -1,37 +1,55 @@
-// src/components/User/ForgotPasswordForm.jsx
 import React, { useState } from 'react';
+import axios from 'axios';
+import Message from './Message';
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleResetPassword = async (e) => {
     e.preventDefault();
 
     try {
-      // Add your form submission logic here
-      // Example: const response = await submitForgotPasswordForm(email);
+      // Validation
+      if (!email.trim()) {
+        setMessage('Email is required.');
+        setMessageType('error');
+        return;
+      }
 
-      // If the submission fails, handle the error
-      // Example: if (response.error) throw new Error(response.error);
+      // Check for valid email format
+      const emailRegex = /^\S+@\S+\.\S+$/;
+      if (!emailRegex.test(email.trim())) {
+        setMessage('Email is invalid.');
+        setMessageType('error');
+        return;
+      }
 
-      // Display success message on successful submission
-      setSuccessMessage('Check your email for a password reset link.');
-      setError('');
+      const response = await axios.post('http://localhost:3001/auth/forgot-password', { email });
+
+      if (response.status === 200) {
+        setMessage(response.data.message);
+        setMessageType('success');
+      }
     } catch (error) {
-      // Handle the error and update the state with the error message
-      setError(error.message || 'An error occurred. Please try again.');
-      setSuccessMessage('');
+      if (error.response.status === 404) {
+        setMessage('User not found.');
+      } else {
+        setMessage(error.response.data.message || 'An unexpected error occurred.');
+      }
+      setMessageType('error');
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <form className="bg-white rounded shadow-md p-6 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4">Reset Your Password</h2>
+    <div className="min-h-screen flex flex-col items-center justify-center">
+      {message && <Message message={message} type={messageType} />}
 
-        <p className="text-gray-700 text-sm mb-4">
+      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full md:w-2/3 lg:w-1/2 xl:w-1/3" onSubmit={handleResetPassword}>
+        <h2 className="text-2xl mb-6 font-bold text-center">Forgot Password</h2>
+
+        <p className="text-gray-700 text-sm mb-4 text-center">
           Enter your email and we'll send you a link to reset your password.
         </p>
 
@@ -40,26 +58,24 @@ const ForgotPasswordForm = () => {
             Email
           </label>
           <input
-            type="email"
+            className="appearance-none border rounded w-full py-2 px-3"
             id="email"
+            type="email"
+            placeholder="Email"
             name="email"
-            placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-3 py-2 border rounded shadow appearance-none"
-            required
           />
         </div>
 
-        <div className="text-red-600">{error}</div>
-        <div className="text-green-600">{successMessage}</div>
-
-        <button
-          type="submit"
-          className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline-black"
-        >
-          Reset Password
-        </button>
+        <div className="mb-6">
+          <button
+            className="w-full bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-black hover:bg-gray-800"
+            type="submit"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     </div>
   );
