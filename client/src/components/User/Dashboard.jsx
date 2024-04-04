@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Disclosure, Transition } from '@headlessui/react';
 import { BellIcon, HomeIcon, UserIcon, MailIcon, CogIcon, LogoutIcon } from '@heroicons/react/outline';
 import { useNavigate } from 'react-router-dom';
-import * as jwt_decode from 'jwt-decode'; // Import jwt-decode library
+import decode from 'js-jwt';
 import SessionExpiredBanner from './SessionExpiredBanner'; // Import the SessionExpiredBanner component
 
 const user = {
@@ -37,34 +37,32 @@ export default function Dashboard() {
   const [isSessionExpired, setIsSessionExpired] = useState(false); // State to track session expiration
 
   useEffect(() => {
-  // Check if token has expired
-  const token = localStorage.getItem('access'); // Retrieve the token using 'access' key
-  console.log('Token:', token);
-  if (token) {
-    try {
-      const decodedToken = jwt_decode(token);
-      console.log('Decoded Token:', decodedToken);
-      const currentTime = Date.now() / 1000;
-      console.log('Current Time:', currentTime);
-      if (decodedToken.exp < currentTime) {
-        // Token has expired, set session expiration state to true
+    // Check if token has expired
+    const token = localStorage.getItem('access_token'); // Retrieve the token using 'access_token' key
+    console.log('Token:', token);
+    if (token) {
+      try {
+        const decodedToken = decode(token);// now using jwt library
+        console.log('Decoded Token:', decodedToken);
+        const currentTime = Date.now() / 1000;
+        console.log('Current Time:', currentTime);
+        if (decodedToken.exp < currentTime) {
+          // Token has expired, set session expiration state to true
+          setIsSessionExpired(true);
+        } else {
+          // Token is valid, set session expiration state to false
+          setIsSessionExpired(false);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        // Token decoding error, set session expiration state to true
         setIsSessionExpired(true);
-      } else {
-        // Token is valid, set session expiration state to false
-        setIsSessionExpired(false);
       }
-    } catch (error) {
-      console.error('Error decoding token:', error);
-      // Token decoding error, set session expiration state to true
+    } else {
+      // Token not found, set session expiration state to true
       setIsSessionExpired(true);
     }
-  } else {
-    // Token not found, set session expiration state to true
-    setIsSessionExpired(true);
-  }
-}, []);
-
-
+  }, []);
 
   const handleLogout = () => {
     setShowLogoutConfirmation(true);
@@ -72,7 +70,7 @@ export default function Dashboard() {
 
   const handleLogoutConfirmation = (confirmLogout) => {
     if (confirmLogout) {
-      localStorage.removeItem('token');
+      localStorage.removeItem('access_token'); // Remove 'access_token' from localStorage
       navigate('/login/user');
     }
     setShowLogoutConfirmation(false);
@@ -194,7 +192,7 @@ export default function Dashboard() {
         {/* Main content area */}
         <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
           <div className="py-6 px-4">
-            {/* Render SessionExpiredBanner if session is expired */}
+            {/* Render SessionExpiredBanner only if session is expired */}
             {isSessionExpired && <SessionExpiredBanner />}
             {/* Your content goes here */}
           </div>

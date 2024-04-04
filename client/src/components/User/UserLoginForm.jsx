@@ -43,6 +43,8 @@ const UserLoginForm = () => {
       if (response.ok) {
         const data = await response.json();
         if (data.access) {
+          // Store the access token in localStorage
+          localStorage.setItem('access_token', data.access);
           setSuccessMessage('Login successful! Redirecting to the dashboard...');
           setTimeout(() => {
             navigate('/dashboard/user');
