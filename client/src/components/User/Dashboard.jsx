@@ -2,28 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Disclosure, Transition } from '@headlessui/react';
 import { BellIcon, HomeIcon, UserIcon, MailIcon, CogIcon, LogoutIcon } from '@heroicons/react/outline';
 import { useNavigate } from 'react-router-dom';
-import jwt_decode from 'js-jwt'; // Importing jwt_decode from js-jwt library
+import { jwtDecode } from "jwt-decode"; // Importing jwt_decode from js-jwt library
 import SessionExpiredBanner from './SessionExpiredBanner'; // Import the SessionExpiredBanner component
 
-const user = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-};
-
-const navigation = [
-  { name: 'Home', href: '#', current: true, icon: HomeIcon },
-  { name: 'Profile', href: '#', current: false, icon: UserIcon },
-  { name: 'Ride History', href: '#', current: false, icon: MailIcon },
-  { name: 'Notifications', href: '#', current: false, icon: BellIcon },
-  { name: 'Settings', href: '#', current: false, icon: CogIcon },
-];
-
-const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
-  { name: 'Logout', href: '#', icon: LogoutIcon },
-];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -37,12 +18,37 @@ export default function Dashboard() {
   const [isSessionExpired, setIsSessionExpired] = useState(false);
 
   // Fetch token (replace with your actual token retrieval logic)
+  
   const token = localStorage.getItem('access_token');
+  const decodedToken = jwtDecode(token);
+  const user_id = decodedToken["user_id"];
+  const user = {
+  name: 'Tom Cook',
+  email: 'tom@example.com',
+  imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+};
+
+
+
+const navigation = [
+  { name: 'Home', href: '#', current: true, icon: HomeIcon },
+  { name: 'Profile', to: `/profile/user/${user_id}`, current: false, icon: UserIcon },
+  { name: 'Ride History', href: '#', current: false, icon: MailIcon },
+  { name: 'Notifications', href: '#', current: false, icon: BellIcon },
+  { name: 'Settings', href: '#', current: false, icon: CogIcon },
+];
+
+const userNavigation = [
+  { name: 'Your Profile', to: `/profile/user/${user_id}` },
+  { name: 'Settings', href: '#' },
+  { name: 'Logout', href: '#', icon: LogoutIcon },
+];
 
   useEffect(() => {
     if (token) {
       try {
-        const decodedToken = jwt_decode(token);
+        
+	console.log(decodedToken["user_id"]);
         const currentTime = Date.now() / 1000;
 
         if (decodedToken.exp < currentTime) {
