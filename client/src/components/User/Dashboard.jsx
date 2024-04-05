@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Disclosure, Transition } from '@headlessui/react';
 import { BellIcon, HomeIcon, UserIcon, MailIcon, CogIcon, LogoutIcon } from '@heroicons/react/outline';
 import { useNavigate } from 'react-router-dom';
-import decode from 'js-jwt';
+import jwt_decode from 'js-jwt'; // Importing jwt_decode from js-jwt library
 import SessionExpiredBanner from './SessionExpiredBanner'; // Import the SessionExpiredBanner component
 
 const user = {
@@ -34,35 +34,32 @@ export default function Dashboard() {
   const [activeLink, setActiveLink] = useState(null);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [isSessionExpired, setIsSessionExpired] = useState(false); // State to track session expiration
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
+
+  // Fetch token (replace with your actual token retrieval logic)
+  const token = localStorage.getItem('access_token');
 
   useEffect(() => {
-    // Check if token has expired
-    const token = localStorage.getItem('access_token'); // Retrieve the token using 'access_token' key
-    console.log('Token:', token);
     if (token) {
       try {
-        const decodedToken = decode(token);// now using jwt library
-        console.log('Decoded Token:', decodedToken);
+        const decodedToken = jwt_decode(token);
         const currentTime = Date.now() / 1000;
-        console.log('Current Time:', currentTime);
+
         if (decodedToken.exp < currentTime) {
-          // Token has expired, set session expiration state to true
           setIsSessionExpired(true);
+          localStorage.removeItem('access_token'); // Clear expired token
+          navigate('/login/user'); // Redirect to login on expiration
         } else {
-          // Token is valid, set session expiration state to false
           setIsSessionExpired(false);
         }
       } catch (error) {
         console.error('Error decoding token:', error);
-        // Token decoding error, set session expiration state to true
-        setIsSessionExpired(true);
+        setIsSessionExpired(true); // Handle decoding errors as expired
       }
     } else {
-      // Token not found, set session expiration state to true
-      setIsSessionExpired(true);
+      setIsSessionExpired(true); // No token found, assume expired
     }
-  }, []);
+  }, [token]); // Update effect whenever token changes
 
   const handleLogout = () => {
     setShowLogoutConfirmation(true);
@@ -70,8 +67,8 @@ export default function Dashboard() {
 
   const handleLogoutConfirmation = (confirmLogout) => {
     if (confirmLogout) {
-      localStorage.removeItem('access_token'); // Remove 'access_token' from localStorage
-      navigate('/login/user');
+      localStorage.removeItem('access_token'); // Remove token on logout
+      navigate('/login/user'); // Redirect to login
     }
     setShowLogoutConfirmation(false);
   };
@@ -172,13 +169,23 @@ export default function Dashboard() {
               leaveTo="transform opacity-0 scale-95"
             >
               <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
+                <div
+                  className="py-1"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="options-menu"
+                >
                   {userNavigation.map((item) => (
                     <a
                       key={item.name}
                       href={item.href}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       role="menuitem"
+                      onClick={() => {
+                        if (item.name === 'Logout') {
+                          handleLogout();
+                        }
+                      }}
                     >
                       {item.name}
                     </a>
@@ -190,19 +197,11 @@ export default function Dashboard() {
         </header>
 
         {/* Main content area */}
-        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
-          <div className="py-6 px-4">
-            {/* Render SessionExpiredBanner only if session is expired */}
-            {isSessionExpired && <SessionExpiredBanner />}
-            {/* Your content goes here */}
-          </div>
-        </main>
+        <div className="flex-1 overflow-y-auto p-4">
+          {/* Your content goes here */}
+          <p>Main Content Goes Here</p>
+        </div>
       </div>
-
-      {/* Render LogoutConfirmationForm if showLogoutConfirmation is true */}
-      {showLogoutConfirmation && (
-        <LogoutConfirmationForm onConfirm={handleLogoutConfirmation} />
-      )}
     </div>
   );
 }
