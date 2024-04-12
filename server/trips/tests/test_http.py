@@ -17,8 +17,8 @@ class UserSignUpViewTest(TestCase):
             'full_name': 'Test User',
             'phone_number': '1234567890',
             'email': 'test@example.com',
-            'password1': '@Thingo11',
-            'password2': '@Thingo11',
+            'password': '@Thingo11',
+            'confirm_password': '@Thingo11',
         }
         response = client.post(reverse('user-sign_up'), data=data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -48,26 +48,26 @@ class DriverSignUpViewTest(TestCase):
         client = Client()
         data = {
             'full_name': 'Test Driver',
-            'phone_number': '1234567890',
+            'phone_number': '1134567890',
             'email': 'driver@example.com',
-            'password1': 'testpassword',
-            'password2': 'testpassword',
+            'password': 'testpassword',
+            'confirm_password': 'testpassword',
             'physical_address': '123 Main St',
             'vehicle_registration_no': 'ABC123',
             'vehicle_type': VEHICLE_TYPES[0][0],
             'licence_no': '123456',
         }
         response = client.post(reverse('driver-sign_up'), data=data)
-        # pdb.set_trace()
+        pdb.set_trace()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Driver.objects.filter(email=data['email']).exists())
 
 class DriverLoginViewTest(TestCase):
     def setUp(self):
         self.driver = Driver.objects.create_driver(
-            full_name='Test Driver',
+            full_name='Test Driver2',
             phone_number='1234567890',
-            email='driver@example.com',
+            email='driver1@example.com',
             password='testpassword',
             physical_address='123 Main St',
             vehicle_registration_no='ABC123',
@@ -83,7 +83,7 @@ class DriverLoginViewTest(TestCase):
 
     def test_login_view(self):
         client = Client()
-        data = {'email': 'driver@example.com', 'password': 'testpassword'}
+        data = {'email': 'driver1@example.com', 'password': 'testpassword'}
         response = client.post(reverse('driver-login'), data=data)
         access = response.data['access']
         header, payload, signature = access.split('.')

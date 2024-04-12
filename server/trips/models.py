@@ -59,24 +59,8 @@ class Trip(models.Model):
     bid = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False, default=0.00)
     number_of_floors = models.IntegerField(default=0, null=False)
     is_accepted = models.BooleanField(default=False)
-    user_name = models.CharField(max_length=255, blank=True, null=True)
-    user_phone_number = models.CharField(max_length=12, blank=True, null=True)
-    driver_name = models.CharField(max_length=255, blank=True, null=True)
-    driver_phone_number = models.CharField(max_length=12, blank=True, null=True)
 
-
-    def save(self, *args, **kwargs):
-        # Fetch user details and populate user_full_name and user_phone_number fields
-        if self.user:
-            self.user_name = self.user.get_full_name()
-            self.user_phone_number = self.user.get_phone_number()
-
-        if self.driver:
-            self.driver_name = self.driver.get_full_name()
-            self.driver_phone_number = self.driver.get_phone_number()  
-        super().save(*args, **kwargs)
-    
-    
+        
     def __str__(self):
         return f'{self.id}'
     
@@ -90,6 +74,9 @@ class TripPayment(models.Model):
     trip = models.OneToOneField(Trip, on_delete=models.CASCADE, related_name='payment')
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name='payments')
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    # payment_type = models.CharField(max_length=20, choices=(
+    #     ('cash', 'Cash'),
+    #     ('card', 'Card')))
     payment_status = models.CharField(max_length=20, choices=(
         ('pending', 'Pending'),
         ('paid', 'Paid'),
@@ -98,7 +85,7 @@ class TripPayment(models.Model):
     payment_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-          return f"Payment for Trip {self.trip.id} by {self.driver.get_full_name()}"
+          return f"{self.id}"
 
     class Meta:
         verbose_name = "Trip Payment"

@@ -11,79 +11,109 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.urls import reverse
 from .models import Driver, User
-
 from .utils import Util
 
-class UserSerializer(serializers.ModelSerializer):
-    password1=serializers.CharField(
-        max_length=68,
-        min_length=8,
-        write_only=True)
-    password2=serializers.CharField(
-        max_length=68,
-        min_length=8,
-        write_only=True)
-    
- 
-    
-   
-    def validate(self, attrs):
-        
-        if attrs['password1'] != attrs['password2']:
-            raise serializers.ValidationError('Passwords must match.')
-        
-        if not attrs['full_name'].replace(" ", "").isalpha():
-            raise serializers.ValidationError(
-                {"full_name": "Full name should only contain letters"}
-            )
-     
-            
-        if User.objects.filter(email=attrs['email']).exists():
-            raise serializers.ValidationError(
-                {"email": "Email is already in use"}
-            )
-        return super().validate(attrs)
-    
-    def create(self, validated_data):
-        data = {
-            key: value for key, value in validated_data.items()
-            if key not in ('password1', 'password2')
-        }
-        data['password'] = validated_data['password1']
-        return User.objects.create_user(**data)
-
+class AdminUserSerializer(serializers.ModelSerializer):
+    confirm_password = serializers.CharField(write_only=True)
     class Meta:
         model = User
-        fields = ['id', 'email', 'full_name', 'phone_number', 'password1', 'password2']
+        fields = ['email', 'full_name', 'phone_number', 'password', 'confirm_password']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+    def validate(self, data):
+        # Validate Password
+        if data.get('password') != data.get('confirm_password'):
+            raise serializers.ValidationError("Password do not match")
+
+        # Validate email
+        if not data.get('email'):
+            raise serializers.ValidationError("Email is required")
+        # Add additional validation for email format if needed
+
+        # Validate full_name
+        if not data.get('full_name'):
+            raise serializers.ValidationError("Full name is required")
+
+        # Validate phone_number
+        if not data.get('phone_number'):
+            raise serializers.ValidationError("Phone number is required")
+
+        return super().validate(data)
+
+    def create(self, validated_data):
+        validated_data.pop('confirm_password')
+        return User.objects.create_superuser(**validated_data)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    confirm_password = serializers.CharField(write_only=True)
+    class Meta:
+        model = User
+        fields = ['email', 'full_name', 'phone_number', 'password', 'confirm_password']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+    def validate(self, data):
+        # Validate Password
+        if data.get('password') != data.get('confirm_password'):
+            raise serializers.ValidationError("Password do not match")
+
+        # Validate email
+        if not data.get('email'):
+            raise serializers.ValidationError("Email is required")
+        # Add additional validation for email format if needed
+
+        # Validate full_name
+        if not data.get('full_name'):
+            raise serializers.ValidationError("Full name is required")
+
+        # Validate phone_number
+        if not data.get('phone_number'):
+            raise serializers.ValidationError("Phone number is required")
+
+        return super().validate(data)
+
+    def create(self, validated_data):
+        validated_data.pop('confirm_password')
+        return User.objects.create_user(**validated_data)
+
+class UserProfileSerializer(serializers.ModelSerializer):
     
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'full_name', 'phone_number','profile_picture']
+        read_only_fields = ['id']
+    def update(self, user, data):
+        user.email = data.get('email', user.email)
+        user.full_name = data.get('full_name', user.full_name)
+        user.phone_number = data.get('phone_number', user.phone_number)
+        return user
+
+
+
         
 class DriverSerializer(serializers.ModelSerializer):
-    password1=serializers.CharField(
-        max_length=68,
-        min_length=8,
-        write_only=True)
-    password2=serializers.CharField(
-        max_length=68,
-        min_length=8,
-        write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
     
     class Meta:
         model = Driver
-        fields = ['id','email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'identity_document', 'driver_licence', 'vehicle_registration','criminal_record_check','password1', 'password2']
-        
+        fields = ['email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'identity_document', 'driver_licence', 'vehicle_registration','criminal_record_check','password', 'confirm_password']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }   
     def validate(self, attrs):
         
         if not attrs['full_name']:
             raise serializers.ValidationError(
                 {"full_name": "Full name is requred"}
             )
-         
        
         if Driver.objects.filter(email=attrs['email']).exists():
             raise serializers.ValidationError(
                 {"email": "Email is already in use"}
             )
-        if attrs['password1'] != attrs['password2']:
+        if attrs['password'] != attrs['confirm_password']:
             raise serializers.ValidationError(
                 {"password": "Password fields didn't match"}
             )
@@ -106,13 +136,8 @@ class DriverSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
     
     def create(self, validated_data):
-        data = {
-            key: value for key, value in validated_data.items()
-            if key not in ('password1', 'password2')
-        }
-        data['password'] = validated_data['password1']
-       
-        return Driver.objects.create_driver(**data)
+        validated_data.pop('confirm_password')
+        return Driver.objects.create_driver(**validated_data)
     
             
 class LoginUserSerializer(serializers.ModelSerializer):
