@@ -26,8 +26,6 @@ def create_user(email, full_name, phone_number, password, group='user'):
         password=password,
 
     )
-    user_group, _ = Group.objects.get_or_create(name=group)
-    user.groups.add(user_group)
     user.is_verified = True
     user.save()
     access = AccessToken.for_user(user)
@@ -54,8 +52,6 @@ def create_driver(
         licence_no=licence_no,
         password=password
         )
-    driver_group, _ = Group.objects.get_or_create(name=group)
-    driver.groups.add(driver_group)
     driver.is_verified = True
     driver.save()
 
@@ -381,7 +377,6 @@ class TestWebSocket:
 
         response = await channel_layer.receive('test_channel')
         response_data = response.get('data')
-        print(response_data)
         assert response_data['id'] == trip_id
         assert response_data['user']['full_name'] == user.full_name
         assert response_data['driver'] == driver.full_name
@@ -413,10 +408,9 @@ class TestWebSocket:
             'type': 'echo.message',
             'data': 'This is a test message.'
         }
-        print(connected)
         channel_layer = get_channel_layer()
         await channel_layer.group_send(f'{trip.id}', message=message)
         response = await communicator.receive_json_from()
-        assert response == messages
+        assert response == message
         await communicator.disconnect()
 

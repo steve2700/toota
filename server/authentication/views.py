@@ -3,7 +3,7 @@ import os
 from rest_framework import generics, status, views, permissions
 from rest_framework_simplejwt.views import TokenObtainPairView as Token, TokenVerifyView
 from rest_framework.response import Response
-from .serializers import UserSerializer, LoginUserSerializer, DriverSerializer, VerifyUserEmailSerializer, VerifyDriverEmailSerializer, LoginDriverSerializer, ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, CheckDriverVerificationSerializer
+from .serializers import UserSerializer, LoginUserSerializer, DriverSerializer, VerifyUserEmailSerializer, VerifyDriverEmailSerializer, LoginDriverSerializer, ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, CheckDriverVerificationSerializer, UserProfileSerializer, AdminUserSerializer
 from .models import  Driver, User
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -21,7 +21,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.shortcuts import redirect
 from django.http import HttpResponsePermanentRedirect
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import redirect
@@ -32,6 +32,32 @@ from django.http import HttpResponse
 class CustomRedirect(HttpResponsePermanentRedirect):
 
     allowed_schemes=[os.environ.get('APP_SCHEME'), 'http', 'https']
+
+class AdminUserSignUpView(generics.GenericAPIView):
+    serializer_class = AdminUserSerializer
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        user = request.data
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        
+        user_data = serializer.data
+        user=User.objects.get(email=user_data['email'])
+
+        token = RefreshToken.for_user(user).access_token
+        current_site = get_current_site(request).domain
+        relative_link = reverse('verify-user')
+        abs_url = 'http://'+current_site+relative_link+"?token="+str(token)
+        email_body=f'Hey {user.full_name} \nThank you for signing up for a Toota account, just one more step!\nFor security purposes, Please verify your email address using the link below \n {abs_url}'
+        data={
+            'email_body': email_body,
+            'domain': abs_url, 
+            'to_email': user.email,
+            'email_subject': 'Please verify your Toota Account'}
+        Util.send_email(data)
+        return Response(user_data, status=status.HTTP_201_CREATED)
 
 
 class UserSignUpView(generics.GenericAPIView):
@@ -65,12 +91,13 @@ class UserProfileView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated,]
     lookup_field = 'id'
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserProfileSerializer
     
     def get(self, request, id):
         try: 
             user = self.get_object()
             serializer = UserSerializer(user)
+
             return Response(serializer.data)
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)

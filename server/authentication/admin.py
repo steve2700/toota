@@ -15,6 +15,6 @@ class UserAdmin(DefaultUserAdmin):
 
 @admin.register(Driver)
 class DriverAdmin(DefaultUserAdmin):
-    list_display = ('id', 'email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'vehicle_registration', 'identity_document', 'criminal_record_check', 'driver_licence' )
+    list_display = ('id', 'email', 'full_name', 'phone_number','physical_address', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'vehicle_registration', 'identity_document', 'criminal_record_check', 'driver_licence' )
     ordering = ('full_name',)
     

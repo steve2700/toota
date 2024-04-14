@@ -2,27 +2,47 @@ from rest_framework import generics, status, views, permissions, viewsets
 from .models import Trip, TripPayment
 from .serializers import TripSerializer, TripPaymentSerializer
 from django.db.models import Q
+from django.http import HttpResponsePermanentRedirect
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from authentication.models import Driver
 
-class IsDriverOnActiveTrip(permissions.BasePermission):
-    def has_permission(self, request, view):
-        # Check if the user is authenticated and is a driver on an active trip
-        return request.user.is_authenticated and request.user.is_driver and request.user.active_trip
-
-class TripPaymentListCreateAPIView(generics.ListCreateAPIView):
-    queryset = TripPayment.objects.all()
+class TripPaymentView(generics.GenericAPIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
+    permission_classes = [IsAuthenticated,]
     serializer_class = TripPaymentSerializer
-    permission_classes = [permissions.IsAuthenticated, IsDriverOnActiveTrip]
 
-class TripPaymentDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = TripPayment.objects.all()
-    serializer_class = TripPaymentSerializer
-    permission_classes = [permissions.IsAuthenticated, IsDriverOnActiveTrip]
+    def post(request, *args, **kwargs):
+        driver_id = request.data.get('driver')
+        trip_id = request.data.get('trip')
+
+        try:
+            driver = Driver.objects.get(id=driver_id)
+            trip = Trip.objects.get(id=trip_id)
+
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return Response({'message': 'Payment created successfully'}, status=status.HTTP_201_CREATED)
+
+            return Response({'message': 'Payment created successfully'}, status=status.HTTP_201_CREATED)
+        except Driver.DoesNotExist:
+            return Response({'error': 'Driver not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Trip.DoesNotExist:
+            return Response({'error': 'Trip not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
 
 
 class TripView(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'id'
     lookup_url_kwarg = 'trip_id'
     permission_classes = (permissions.IsAuthenticated,)
+    
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
 
