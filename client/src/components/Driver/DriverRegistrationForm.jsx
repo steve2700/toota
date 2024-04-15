@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const DriverRegistrationForm = () => {
@@ -15,7 +15,9 @@ const DriverRegistrationForm = () => {
   });
 
   const [errors, setErrors] = useState({});
-
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -24,190 +26,218 @@ const DriverRegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if all fields are completed
+    const requiredFields = ['email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'licence_no', 'password1', 'password2'];
+    const missingFields = requiredFields.filter(field => !formData[field]);
+
+    if (missingFields.length > 0) {
+      setErrors({ general: 'Please complete all fields.' });
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:8000/api/driver/sign_up/', formData);
-      console.log(response.data); // Assuming the response contains success message or token
-      // Display success message to user
-      alert('Registration successful! Please check your email for verification.');
-      setErrors({}); // Clear any previous errors
+      if (response.status === 201) {
+        setSuccessMessage('Account created successfully. Please check your email.');
+        setFormData({
+          email: '',
+          full_name: '',
+          phone_number: '',
+          physical_address: '',
+          vehicle_registration_no: '',
+          vehicle_type: 'bike',
+          licence_no: '',
+          password1: '',
+          password2: '',
+        });
+      }
     } catch (error) {
-      if (error.response) {
-        // Server responded with non 2xx status code
+      if (error.response && error.response.status === 400) {
         setErrors(error.response.data);
       } else {
-        // Network error or similar
-        console.error('Error:', error.message);
+        setErrors({ general: 'Something went wrong. Please try again later.' });
       }
     }
   };
 
+  useEffect(() => {
+    // Clear errors after 5 seconds
+    const timeout = setTimeout(() => {
+      setErrors({});
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [errors]);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <div className="max-w-md mx-auto mt-8 bg-yellow-100 p-8 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Driver Registration Form</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="container mx-auto">
+      <h1 className="text-3xl font-bold mb-4">Driver Registration</h1>
+      {successMessage && (
+        <div className="bg-green-200 text-green-800 px-4 py-2 mb-4 rounded">{successMessage}</div>
+      )}
+      {errors.general && (
+        <div className="bg-red-200 text-red-800 px-4 py-2 mb-4 rounded">{errors.general}</div>
+      )}
+      <form onSubmit={handleSubmit} className="max-w-lg">
+        {/* Email */}
         <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">Email</label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            maxLength={255}
-            required
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.email ? 'border-red-500' : ''}`}
           />
-          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          {errors.email && <p className="text-red-500 text-xs italic">{errors.email}</p>}
         </div>
-
         {/* Full Name */}
         <div className="mb-4">
-          <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">Full Name</label>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="full_name">Full Name</label>
           <input
             type="text"
             id="full_name"
             name="full_name"
             value={formData.full_name}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            maxLength={255}
-            required
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.full_name ? 'border-red-500' : ''}`}
           />
-          {errors.full_name && <p className="text-red-500 text-sm mt-1">{errors.full_name}</p>}
+          {errors.full_name && <p className="text-red-500 text-xs italic">{errors.full_name}</p>}
         </div>
-
         {/* Phone Number */}
         <div className="mb-4">
-          <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700">Phone Number</label>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone_number">Phone Number</label>
           <input
-            type="tel"
+            type="text"
             id="phone_number"
             name="phone_number"
             value={formData.phone_number}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            maxLength={12}
-            required
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.phone_number ? 'border-red-500' : ''}`}
           />
-          {errors.phone_number && <p className="text-red-500 text-sm mt-1">{errors.phone_number}</p>}
+          {errors.phone_number && <p className="text-red-500 text-xs italic">{errors.phone_number}</p>}
         </div>
-
         {/* Physical Address */}
         <div className="mb-4">
-          <label htmlFor="physical_address" className="block text-sm font-medium text-gray-700">Physical Address</label>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="physical_address">Physical Address</label>
           <input
             type="text"
             id="physical_address"
             name="physical_address"
             value={formData.physical_address}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            maxLength={300}
-            required
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.physical_address ? 'border-red-500' : ''}`}
           />
-          {errors.physical_address && <p className="text-red-500 text-sm mt-1">{errors.physical_address}</p>}
+          {errors.physical_address && <p className="text-red-500 text-xs italic">{errors.physical_address}</p>}
         </div>
-
-        {/* Vehicle Registration No */}
+        {/* Vehicle Registration Number */}
         <div className="mb-4">
-          <label htmlFor="vehicle_registration_no" className="block text-sm font-medium text-gray-700">Vehicle Registration No</label>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="vehicle_registration_no">Vehicle Registration Number</label>
           <input
             type="text"
             id="vehicle_registration_no"
             name="vehicle_registration_no"
             value={formData.vehicle_registration_no}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            maxLength={100}
-            required
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.vehicle_registration_no ? 'border-red-500' : ''}`}
           />
-          {errors.vehicle_registration_no && <p className="text-red-500 text-sm mt-1">{errors.vehicle_registration_no}</p>}
+          {errors.vehicle_registration_no && <p className="text-red-500 text-xs italic">{errors.vehicle_registration_no}</p>}
         </div>
-
         {/* Vehicle Type */}
         <div className="mb-4">
-          <label htmlFor="vehicle_type" className="block text-sm font-medium text-gray-700">Vehicle Type</label>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="vehicle_type">Vehicle Type</label>
           <select
             id="vehicle_type"
             name="vehicle_type"
             value={formData.vehicle_type}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            required
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.vehicle_type ? 'border-red-500' : ''}`}
           >
             <option value="bike">Bike</option>
             <option value="car">Car</option>
-            <option value="van">Van</option>
-            <option value="truck_1">Truck 1</option>
-            <option value="truck_1.5">Truck 1.5</option>
-            <option value="truck_2">Truck 2</option>
-            <option value="truck_4">Truck 4</option>
-          </select>
-          {errors.vehicle_type && <p className="text-red-500 text-sm mt-1">{errors.vehicle_type}</p>}
-        </div>
+            <option value="truck">Truck 1</option>
+	    <option value="van">Van</option>
+	    <option value="truck_1.5">Truck 1.5</option>
+	    <option value="truck_2">Truck 2</option>
+	    <option value="truck_4">Truck 4</option>
 
-        {/* Licence No */}
+            {/* Add other vehicle types as needed */}
+          </select>
+          {errors.vehicle_type && <p className="text-red-500 text-xs italic">{errors.vehicle_type}</p>}
+        </div>
+        {/* Driver's Licence Number */}
         <div className="mb-4">
-          <label htmlFor="licence_no" className="block text-sm font-medium text-gray-700">Driver's Licence Number</label>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="licence_no">Driver's Licence Number</label>
           <input
             type="text"
             id="licence_no"
             name="licence_no"
             value={formData.licence_no}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            maxLength={100}
-            required
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.licence_no ? 'border-red-500' : ''}`}
           />
-          {errors.licence_no && <p className="text-red-500 text-sm mt-1">{errors.licence_no}</p>}
+          {errors.licence_no && <p className="text-red-500 text-xs italic">{errors.licence_no}</p>}
         </div>
-
-        {/* Password */}
-        <div className="mb-4">
-          <label htmlFor="password1" className="block text-sm font-medium text-gray-700">Password</label>
+        {/* Password field */}
+        <div className="mb-4 relative">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password1">Password</label>
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             id="password1"
             name="password1"
             value={formData.password1}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            minLength={8}
-            maxLength={68}
-            required
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.password1 ? 'border-red-500' : ''}`}
           />
-          {errors.password1 && <p className="text-red-500 text-sm mt-1">{errors.password1}</p>}
+          {/* Show/Hide password button */}
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="absolute inset-y-0 right-0 px-3 py-2 text-gray-600 hover:text-gray-800 focus:outline-none"
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+          {errors.password1 && <p className="text-red-500 text-xs italic">{errors.password1}</p>}
         </div>
-
-        {/* Confirm Password */}
-        <div className="mb-4">
-          <label htmlFor="password2" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+        {/* Confirm password field */}
+        <div className="mb-4 relative">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password2">Confirm Password</label>
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             id="password2"
             name="password2"
             value={formData.password2}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            minLength={8}
-            maxLength={68}
-            required
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.password2 ? 'border-red-500' : ''}`}
           />
-          {errors.password2 && <p className="text-red-500 text-sm mt-1">{errors.password2}</p>}
+          {/* Show/Hide password button */}
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="absolute inset-y-0 right-0 px-3 py-2 text-gray-600 hover:text-gray-800 focus:outline-none"
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+          {errors.password2 && <p className="text-red-500 text-xs italic">{errors.password2}</p>}
         </div>
-
-        <button
-          type="submit"
-          className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-black bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400"
-        >
-          Register with Toota
-        </button>
+        <div className="mb-4">
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Register
+          </button>
+        </div>
       </form>
-
-      <div className="mt-4 text-center">
-        <p>Already have a Toota account?</p>
-        <a href="/login/driver" className="text-indigo-600 hover:text-indigo-800">Login here</a>
-      </div>
+	  <div className="mt-4 text-center">
+	  <p>Already have a Toota account?</p>
+	  <a href="/login/driver" className="text-indigo-600 hover:text-indigo-800">Login here</a>
+    </div>
     </div>
   );
 };

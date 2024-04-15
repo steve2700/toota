@@ -4,6 +4,8 @@ import { BellIcon, HomeIcon, UserIcon, MailIcon, CogIcon, LogoutIcon } from '@he
 import { Link, useNavigate } from 'react-router-dom'; // Import Link and useNavigate
 import { jwtDecode } from "jwt-decode"; // Importing jwt_decode from js-jwt library
 import SessionExpiredBanner from './SessionExpiredBanner'; // Import the SessionExpiredBanner component
+import CreateTripForm from './CreateTripForm'; // Import the CreateTripForm component
+
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -200,8 +202,8 @@ export default function Dashboard() {
 
         {/* Main content area */}
         <div className="flex-1 overflow-y-auto p-4">
-          {/* Your content goes here */}
-          <p>Main Content Goes Here</p>
+          {/* Render CreateTripForm component */}
+          <CreateTripForm />
         </div>
       </div>
     </div>
