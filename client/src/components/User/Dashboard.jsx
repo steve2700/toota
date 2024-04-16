@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Disclosure, Transition } from '@headlessui/react';
 import { BellIcon, HomeIcon, UserIcon, MailIcon, CogIcon, LogoutIcon } from '@heroicons/react/outline';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import Link and useNavigate
 import { jwtDecode } from "jwt-decode"; // Importing jwt_decode from js-jwt library
 import SessionExpiredBanner from './SessionExpiredBanner'; // Import the SessionExpiredBanner component
+import CreateTripForm from './CreateTripForm'; // Import the CreateTripForm component
 
 
 function classNames(...classes) {
@@ -23,32 +24,29 @@ export default function Dashboard() {
   const decodedToken = jwtDecode(token);
   const user_id = decodedToken["user_id"];
   const user = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-};
+    name: 'Tom Cook',
+    email: 'tom@example.com',
+    imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+  };
 
+  const navigation = [
+    { name: 'Home', href: '#', current: true, icon: HomeIcon },
+    { name: 'Profile', to: `/profile/user/${user_id}`, current: false, icon: UserIcon },
+    { name: 'Ride History', href: '#', current: false, icon: MailIcon },
+    { name: 'Notifications', href: '#', current: false, icon: BellIcon },
+    { name: 'Settings', href: '#', current: false, icon: CogIcon },
+  ];
 
-
-const navigation = [
-  { name: 'Home', href: '#', current: true, icon: HomeIcon },
-  { name: 'Profile', to: `/profile/user/${user_id}`, current: false, icon: UserIcon },
-  { name: 'Ride History', href: '#', current: false, icon: MailIcon },
-  { name: 'Notifications', href: '#', current: false, icon: BellIcon },
-  { name: 'Settings', href: '#', current: false, icon: CogIcon },
-];
-
-const userNavigation = [
-  { name: 'Your Profile', to: `/profile/user/${user_id}` },
-  { name: 'Settings', href: '#' },
-  { name: 'Logout', href: '#', icon: LogoutIcon },
-];
+  const userNavigation = [
+    { name: 'Your Profile', to: `/profile/user/${user_id}` },
+    { name: 'Settings', href: '#' },
+    { name: 'Logout', href: '#', icon: LogoutIcon },
+  ];
 
   useEffect(() => {
     if (token) {
       try {
-        
-	console.log(decodedToken["user_id"]);
+        console.log(decodedToken["user_id"]);
         const currentTime = Date.now() / 1000;
 
         if (decodedToken.exp < currentTime) {
@@ -92,9 +90,9 @@ const userNavigation = [
               <div className="ml-2 text-gray-200 text-sm">Navigation</div>
               <div className="mt-2 space-y-1">
                 {navigation.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.to}
                     className={classNames(
                       item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                       'group flex items-center px-2 py-2 text-sm font-medium rounded-md',
@@ -111,7 +109,7 @@ const userNavigation = [
                       aria-hidden="true"
                     />
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -121,9 +119,9 @@ const userNavigation = [
                   <div className="ml-2 text-gray-200 text-sm">Account</div>
                   <div className="mt-2 space-y-1">
                     {userNavigation.map((item) => (
-                      <a
+                      <Link
                         key={item.name}
-                        href={item.href}
+                        to={item.to}
                         className={classNames(
                           'group flex items-center px-2 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white rounded-md',
                           activeLink === item.name && 'text-yellow-500'
@@ -140,7 +138,7 @@ const userNavigation = [
                           <item.icon className="mr-3 h-6 w-6 text-gray-400 group-hover:text-gray-300" />
                         )}
                         {item.name}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -182,9 +180,9 @@ const userNavigation = [
                   aria-labelledby="options-menu"
                 >
                   {userNavigation.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
-                      href={item.href}
+                      to={item.to}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       role="menuitem"
                       onClick={() => {
@@ -194,7 +192,7 @@ const userNavigation = [
                       }}
                     >
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -204,8 +202,8 @@ const userNavigation = [
 
         {/* Main content area */}
         <div className="flex-1 overflow-y-auto p-4">
-          {/* Your content goes here */}
-          <p>Main Content Goes Here</p>
+          {/* Render CreateTripForm component */}
+          <CreateTripForm />
         </div>
       </div>
     </div>

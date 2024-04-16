@@ -1,254 +1,246 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaCar, FaIdCard, FaLock } from 'react-icons/fa';
-import axios from 'axios'; 
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const DriverRegistrationForm = () => {
   const [formData, setFormData] = useState({
-    full_name: '',
     email: '',
+    full_name: '',
     phone_number: '',
     physical_address: '',
-    vehicle_registration: '',
+    vehicle_registration_no: '',
     vehicle_type: 'bike',
     licence_no: '',
     password1: '',
     password2: '',
   });
 
-  const [formErrors, setFormErrors] = useState({});
+  const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
-
-  const handleInputChange = (e) => {
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if all fields are completed
+    const requiredFields = ['email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'licence_no', 'password1', 'password2'];
+    const missingFields = requiredFields.filter(field => !formData[field]);
+
+    if (missingFields.length > 0) {
+      setErrors({ general: 'Please complete all fields.' });
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:8000/api/driver/sign_up/', formData);
-      setSuccessMessage(response.data.message);
-      setFormData({
-        full_name: '',
-        email: '',
-        phone_number: '',
-        physical_address: '',
-        vehicle_registration: '',
-        vehicle_type: 'bike',
-        licence_no: '',
-        password1: '',
-        password2: '',
-      });
-      setFormErrors({});
+      if (response.status === 201) {
+        setSuccessMessage('Account created successfully. Please check your email.');
+        setFormData({
+          email: '',
+          full_name: '',
+          phone_number: '',
+          physical_address: '',
+          vehicle_registration_no: '',
+          vehicle_type: 'bike',
+          licence_no: '',
+          password1: '',
+          password2: '',
+        });
+      }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        setFormErrors(error.response.data.errors);
+      if (error.response && error.response.status === 400) {
+        setErrors(error.response.data);
       } else {
-        console.error('An error occurred:', error.message);
+        setErrors({ general: 'Something went wrong. Please try again later.' });
       }
     }
   };
 
+  useEffect(() => {
+    // Clear errors after 5 seconds
+    const timeout = setTimeout(() => {
+      setErrors({});
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [errors]);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <div className="flex items-center justify-center h-screen mt-8 bg-gray-100">
-      <div className="max-w-md w-full px-6">
-        <div className="bg-white rounded shadow-md p-6">
-          <h2 className="text-2xl font-bold mb-6 text-center">Driver Registration</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2" htmlFor="full_name">
-                <FaUser className="inline-block mr-2" />
-                Full Name
-              </label>
-              <input
-                type="text"
-                id="full_name"
-                name="full_name"
-                value={formData.full_name}
-                onChange={handleInputChange}
-                placeholder="Enter your full name"
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-              {formErrors.full_name && <p className="text-red-500 text-sm mt-1">{formErrors.full_name}</p>}
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2" htmlFor="email">
-                <FaEnvelope className="inline-block mr-2" />
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="Enter your email"
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-              {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2" htmlFor="phone_number">
-                <FaPhone className="inline-block mr-2" />
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                id="phone_number"
-                name="phone_number"
-                value={formData.phone_number}
-                onChange={handleInputChange}
-                placeholder="Enter your phone number"
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-              {formErrors.phone_number && <p className="text-red-500 text-sm mt-1">{formErrors.phone_number}</p>}
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2" htmlFor="physical_address">
-                <FaMapMarkerAlt className="inline-block mr-2" />
-                Physical Address
-              </label>
-              <input
-                type="text"
-                id="physical_address"
-                name="physical_address"
-                value={formData.physical_address}
-                onChange={handleInputChange}
-                placeholder="Enter your physical address"
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-              {formErrors.physical_address && <p className="text-red-500 text-sm mt-1">{formErrors.physical_address}</p>}
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2" htmlFor="vehicle_registration">
-                <FaCar className="inline-block mr-2" />
-                Vehicle Registration
-              </label>
-              <input
-                type="text"
-                id="vehicle_registration"
-                name="vehicle_registration"
-                value={formData.vehicle_registration}
-                onChange={handleInputChange}
-                placeholder="Enter your vehicle registration number"
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-              {formErrors.vehicle_registration && <p className="text-red-500 text-sm mt-1">{formErrors.vehicle_registration}</p>}
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2" htmlFor="vehicle_type">
-                Vehicle Type
-              </label>
-              <select
-                id="vehicle_type"
-                name="vehicle_type"
-                value={formData.vehicle_type}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border rounded"
-                required
-              >
-                <option value="bike">Bike</option>
-                <option value="car">Car</option>
-                <option value="van">Van</option>
-                <option value="truck_1">Truck 1</option>
-                <option value="truck_1.5">Truck 1.5</option>
-                <option value="truck_2">Truck 2</option>
-                <option value="truck_4">Truck 4</option>
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2" htmlFor="licence_no">
-                <FaIdCard className="inline-block mr-2" />
-                Licence Number
-              </label>
-              <input
-                type="text"
-                id="licence_no"
-                name="licence_no"
-                value={formData.licence_no}
-                onChange={handleInputChange}
-                placeholder="Enter your licence number"
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-              {formErrors.licence_no && <p className="text-red-500 text-sm mt-1">{formErrors.licence_no}</p>}
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2" htmlFor="password1">
-                <FaLock className="inline-block mr-2" />
-                Password
-              </label>
-              <input
-                type="password"
-                id="password1"
-                name="password1"
-                value={formData.password1}
-                onChange={handleInputChange}
-                placeholder="Enter your password"
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-              {formErrors.password1 && <p className="text-red-500 text-sm mt-1">{formErrors.password1}</p>}
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-semibold mb-2" htmlFor="password2">
-                <FaLock className="inline-block mr-2" />
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                id="password2"
-                name="password2"
-                value={formData.password2}
-                onChange={handleInputChange}
-                placeholder="Confirm your password"
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-              {formErrors.password2 && <p className="text-red-500 text-sm mt-1">{formErrors.password2}</p>}
-            </div>
-
-            {/* Success Message */}
-            {successMessage && <p className="text-green-500 text-sm mb-4">{successMessage}</p>}
-
-            {/* Submit Button */}
-            <div className="mb-6">
-              <button
-                type="submit"
-                className="w-full bg-black text-white py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline-black"
-              >
-                Register as a Driver
-              </button>
-            </div>
-          </form>
-
-          {/* Login Link */}
-          <div className="text-sm text-gray-600 text-center">
-            Already have a driver's account?{' '}
-            <Link to="/login/driver" className="text-blue-500 hover:underline">
-              Log in here
-            </Link>
-          </div>
+    <div className="container mx-auto">
+      <h1 className="text-3xl font-bold mb-4">Driver Registration</h1>
+      {successMessage && (
+        <div className="bg-green-200 text-green-800 px-4 py-2 mb-4 rounded">{successMessage}</div>
+      )}
+      {errors.general && (
+        <div className="bg-red-200 text-red-800 px-4 py-2 mb-4 rounded">{errors.general}</div>
+      )}
+      <form onSubmit={handleSubmit} className="max-w-lg">
+        {/* Email */}
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.email ? 'border-red-500' : ''}`}
+          />
+          {errors.email && <p className="text-red-500 text-xs italic">{errors.email}</p>}
         </div>
-      </div>
+        {/* Full Name */}
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="full_name">Full Name</label>
+          <input
+            type="text"
+            id="full_name"
+            name="full_name"
+            value={formData.full_name}
+            onChange={handleChange}
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.full_name ? 'border-red-500' : ''}`}
+          />
+          {errors.full_name && <p className="text-red-500 text-xs italic">{errors.full_name}</p>}
+        </div>
+        {/* Phone Number */}
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone_number">Phone Number</label>
+          <input
+            type="text"
+            id="phone_number"
+            name="phone_number"
+            value={formData.phone_number}
+            onChange={handleChange}
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.phone_number ? 'border-red-500' : ''}`}
+          />
+          {errors.phone_number && <p className="text-red-500 text-xs italic">{errors.phone_number}</p>}
+        </div>
+        {/* Physical Address */}
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="physical_address">Physical Address</label>
+          <input
+            type="text"
+            id="physical_address"
+            name="physical_address"
+            value={formData.physical_address}
+            onChange={handleChange}
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.physical_address ? 'border-red-500' : ''}`}
+          />
+          {errors.physical_address && <p className="text-red-500 text-xs italic">{errors.physical_address}</p>}
+        </div>
+        {/* Vehicle Registration Number */}
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="vehicle_registration_no">Vehicle Registration Number</label>
+          <input
+            type="text"
+            id="vehicle_registration_no"
+            name="vehicle_registration_no"
+            value={formData.vehicle_registration_no}
+            onChange={handleChange}
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.vehicle_registration_no ? 'border-red-500' : ''}`}
+          />
+          {errors.vehicle_registration_no && <p className="text-red-500 text-xs italic">{errors.vehicle_registration_no}</p>}
+        </div>
+        {/* Vehicle Type */}
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="vehicle_type">Vehicle Type</label>
+          <select
+            id="vehicle_type"
+            name="vehicle_type"
+            value={formData.vehicle_type}
+            onChange={handleChange}
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.vehicle_type ? 'border-red-500' : ''}`}
+          >
+            <option value="bike">Bike</option>
+            <option value="car">Car</option>
+            <option value="truck">Truck 1</option>
+	    <option value="van">Van</option>
+	    <option value="truck_1.5">Truck 1.5</option>
+	    <option value="truck_2">Truck 2</option>
+	    <option value="truck_4">Truck 4</option>
+
+            {/* Add other vehicle types as needed */}
+          </select>
+          {errors.vehicle_type && <p className="text-red-500 text-xs italic">{errors.vehicle_type}</p>}
+        </div>
+        {/* Driver's Licence Number */}
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="licence_no">Driver's Licence Number</label>
+          <input
+            type="text"
+            id="licence_no"
+            name="licence_no"
+            value={formData.licence_no}
+            onChange={handleChange}
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.licence_no ? 'border-red-500' : ''}`}
+          />
+          {errors.licence_no && <p className="text-red-500 text-xs italic">{errors.licence_no}</p>}
+        </div>
+        {/* Password field */}
+        <div className="mb-4 relative">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password1">Password</label>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            id="password1"
+            name="password1"
+            value={formData.password1}
+            onChange={handleChange}
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.password1 ? 'border-red-500' : ''}`}
+          />
+          {/* Show/Hide password button */}
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="absolute inset-y-0 right-0 px-3 py-2 text-gray-600 hover:text-gray-800 focus:outline-none"
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+          {errors.password1 && <p className="text-red-500 text-xs italic">{errors.password1}</p>}
+        </div>
+        {/* Confirm password field */}
+        <div className="mb-4 relative">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password2">Confirm Password</label>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            id="password2"
+            name="password2"
+            value={formData.password2}
+            onChange={handleChange}
+            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.password2 ? 'border-red-500' : ''}`}
+          />
+          {/* Show/Hide password button */}
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="absolute inset-y-0 right-0 px-3 py-2 text-gray-600 hover:text-gray-800 focus:outline-none"
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+          {errors.password2 && <p className="text-red-500 text-xs italic">{errors.password2}</p>}
+        </div>
+        <div className="mb-4">
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Register
+          </button>
+        </div>
+      </form>
+	  <div className="mt-4 text-center">
+	  <p>Already have a Toota account?</p>
+	  <a href="/login/driver" className="text-indigo-600 hover:text-indigo-800">Login here</a>
+    </div>
     </div>
   );
 };
 
 export default DriverRegistrationForm;
-
 
