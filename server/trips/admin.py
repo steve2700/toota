@@ -69,7 +69,7 @@ class TripAdmin(admin.ModelAdmin):
     )
     
     readonly_fields = (
-        'id', 'payment_date', 'payment_status'
+        'id', 'payment_date'
     
     )
 

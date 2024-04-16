@@ -31,6 +31,7 @@ const DriverLoginForm = () => {
   const handleLoginSuccess = (token) => {
     const decoded = jwt.decode(token);
     const userId = decoded.user_id;
+    console.log(decoded)
 
     localStorage.setItem('userId', userId);
     navigate('/dashboard/driver');

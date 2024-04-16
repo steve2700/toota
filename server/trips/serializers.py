@@ -41,10 +41,8 @@ class TripPaymentSerializer(serializers.ModelSerializer):
         return super().validate(data)
 
     def create(self, validate_data):
-        trip =  TripPayment.objects.create(**data)
-        trip.payment_status = 'Paid'
-        trip.save()
-        return trip
+        return TripPayment.objects.create(**data)
+
 
 
 

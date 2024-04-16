@@ -15,8 +15,8 @@ class TripPaymentView(generics.GenericAPIView):
     serializer_class = TripPaymentSerializer
 
     def post(request, *args, **kwargs):
-        driver_id = request.data.get('driver')
-        trip_id = request.data.get('trip')
+        driver_id = request.data.get('driver_id')
+        trip_id = request.data.get('trip_id')
 
         try:
             driver = Driver.objects.get(id=driver_id)
@@ -25,6 +25,9 @@ class TripPaymentView(generics.GenericAPIView):
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            payment_instance = serializer.instance
+            payment_instance.payment_status = 'PAID'  # Change payment_status to 'PAID'
+            payment_instance.save()
 
             return Response({'message': 'Payment created successfully'}, status=status.HTTP_201_CREATED)
 

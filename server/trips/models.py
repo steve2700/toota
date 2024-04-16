@@ -70,6 +70,16 @@ class Trip(models.Model):
     
 
 class TripPayment(models.Model):
+    PAID = 'PAID'
+    PENDING = 'PENDING'
+    CANCELLED = 'CANCELLED'
+    PAYMENT_STATUS = (
+        (PAID, 'PAID'),
+        (CANCELLED, 'CANCELLED'),
+        (PENDING, 'PENDING')
+    )
+   
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4,  editable=False, unique=True)
     trip = models.OneToOneField(Trip, on_delete=models.CASCADE, related_name='payment')
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name='payments')
@@ -77,11 +87,7 @@ class TripPayment(models.Model):
     # payment_type = models.CharField(max_length=20, choices=(
     #     ('cash', 'Cash'),
     #     ('card', 'Card')))
-    payment_status = models.CharField(max_length=20, choices=(
-        ('pending', 'Pending'),
-        ('paid', 'Paid'),
-        ('cancelled', 'Cancelled')
-    ), default='pending')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default=PENDING)
     payment_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
