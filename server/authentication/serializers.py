@@ -8,7 +8,7 @@ from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnico
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.urls import reverse
 from .models import Driver, User
 from .utils import Util
@@ -17,7 +17,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
     class Meta:
         model = User
-        fields = ['email', 'full_name', 'phone_number', 'password', 'confirm_password']
+        fields = ['email', 'full_name', 'phone_number', 'profile_picture', 'password', 'confirm_password']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -48,9 +48,10 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
+    profile_picture = serializers.ImageField()
     class Meta:
         model = User
-        fields = ['email', 'full_name', 'phone_number', 'password', 'confirm_password']
+        fields = ['email', 'full_name', 'phone_number', 'profile_picture', 'password', 'confirm_password']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -79,15 +80,18 @@ class UserSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField()
     
     class Meta:
         model = User
         fields = ['id', 'email', 'full_name', 'phone_number','profile_picture']
         read_only_fields = ['id']
+
     def update(self, user, data):
         user.email = data.get('email', user.email)
         user.full_name = data.get('full_name', user.full_name)
         user.phone_number = data.get('phone_number', user.phone_number)
+        user.profile_picture = data.get('profile_picture', profile_picture)
         return user
 
 
@@ -98,10 +102,8 @@ class DriverSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Driver
-        fields = ['email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'identity_document', 'driver_licence', 'vehicle_registration','criminal_record_check','password', 'confirm_password']
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }   
+        fields = ['email', 'full_name', 'phone_number', 'physical_address', 'profile_picture', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'identity_document', 'driver_licence', 'vehicle_registration','criminal_record_check','password', 'confirm_password']
+         
     def validate(self, attrs):
         
         if not attrs['full_name']:
@@ -252,3 +254,18 @@ class CheckDriverVerificationSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['token']
+
+class LogoutSerializer(serializers.Serializer):
+    
+
+    def validate(self, data):
+        self.token = data.get('refresh')
+        return data
+
+    def save(self, **kwargs):
+        try:
+            RefreshToken(self.token).blacklist()
+        except TokenError:
+            self.fail('bad token')
+
+   

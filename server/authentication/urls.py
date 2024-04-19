@@ -11,7 +11,7 @@ urlpatterns = [
     path('user/confirm-password-reset/', views.SetNewPasswordAPIVIew.as_view(), name='confirm-password-reset'),
     path('activation/success/', views.ActivationSuccessView.as_view(), name='activation_success'),
     path('admin/sign_up/', views.AdminUserSignUpView.as_view(), name='admin-sign_up'),
-    # path('user/logout/', views.LogoutUserView.as_view(), name='user-logout'),
+    path('user/logout/', views.LogoutView.as_view(), name='user-logout'),
     path('driver/sign_up/', views.DriverSignUpView.as_view(), name='driver-sign_up'),
     path('driver/login/', views.LoginDriverView.as_view(), name='driver-login'),
     path('driver/profile/<id>/', views.DriverProfileView.as_view(), name='driver-profile'),
@@ -19,6 +19,6 @@ urlpatterns = [
     path('driver/password-reset/', views.RequestDriverPasswordResetEmail.as_view(), name='password-reset-driver'),
     path('driver/verification-check/', views.CheckDriverVerification.as_view(), name='driver_document-check'),
     path('driver/password-reset/<uidb64>/<token>/',views.PasswordDriverTokenCheck.as_view(), name='password-reset-confirm'),
-    # path('driver/confirm-password-reset/', views.SetNewPasswordAPIVIew.as_view(), name='confirm-password-reset'),
-    # path('driver/logout/', views.LogoutDriverView.as_view(), name='driver-logout'),
+    path('driver/confirm-password-reset/', views.SetNewPasswordAPIVIew.as_view(), name='confirm-password-reset'),
+    path('driver/logout/', views.LogoutView.as_view(), name='driver-logout'),
 ]

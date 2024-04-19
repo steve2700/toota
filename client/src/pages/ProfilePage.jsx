@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaEnvelope, FaUser, FaPhone } from 'react-icons/fa'; // Import icons from Font Awesome icon pack
 import {jwtDecode} from 'jwt-decode';
+import { getUser } from  '../services/AuthService'
+
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,19 +20,16 @@ const ProfilePage = () => {
     const fetchUserProfile = async () => {
       try {
         const jwt = localStorage.getItem('access_token');
+        
         if (jwt) {
-          const decodedToken = jwtDecode(jwt);
-          const user_id = decodedToken["user_id"];
-          const response = await axios.get(`http://localhost:8000/api/user/profile/${user_id}`, {
-            headers: {
-              Authorization: `Bearer ${jwt}`
-            }
-          });
-          setUser(response.data);
+          const response =  await getUser()
+          console.log(response)
+          setUser(response);
           setFormData({
-            email: response.data.email,
-            full_name: response.data.full_name,
-            phone_number: response.data.phone_number,
+            email: response.email,
+            full_name: response.full_name,
+            phone_number: response.phone_number,
+
           });
         } else {
           setErrorMessage('No authentication token available');
@@ -55,7 +54,10 @@ const ProfilePage = () => {
     e.preventDefault();
     try {
       const jwt = localStorage.getItem('access_token');
-      const response = await axios.put(`http://localhost:8000/api/user/profile/${user.user_id}`, formData, {
+      const new_user = jwtDecode(jwt);
+      const user_id = new_user['user_id'];
+
+      const response = await axios.patch(`http://localhost:8000/api/user/profile/${user_id}/`, formData, {
         headers: {
           Authorization: `Bearer ${jwt}`
         }
@@ -79,19 +81,19 @@ const ProfilePage = () => {
 
   return (
     <div className="container mx-auto mt-8">
-      <h1 className="text-3xl font-bold mb-4">Profile Page</h1>
+      <h1 className="mb-4 text-3xl font-bold">Profile</h1>
       {successMessage && (
-        <div className="bg-green-200 text-green-800 px-4 py-2 mb-4 rounded">
+        <div className="px-4 py-2 mb-4 text-green-800 bg-green-200 rounded">
           {successMessage}
         </div>
       )}
       {user && (
-        <div className="bg-white shadow-md rounded-lg p-6">
+        <div className="p-6 bg-white rounded-lg shadow-md">
           {editMode ? (
             <form onSubmit={handleSubmit}>
               {/* Form fields */}
               <div className="mb-4">
-                <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+                <label htmlFor="email" className="block mb-2 text-sm font-bold text-gray-700">
                   Email
                 </label>
                 <input
@@ -100,11 +102,11 @@ const ProfilePage = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="px-3 py-2 w-full leading-tight text-gray-700 rounded border shadow appearance-none focus:outline-none focus:shadow-outline"
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="full_name" className="block text-gray-700 text-sm font-bold mb-2">
+                <label htmlFor="full_name" className="block mb-2 text-sm font-bold text-gray-700">
                   Full Name
                 </label>
                 <input
@@ -113,11 +115,11 @@ const ProfilePage = () => {
                   name="full_name"
                   value={formData.full_name}
                   onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="px-3 py-2 w-full leading-tight text-gray-700 rounded border shadow appearance-none focus:outline-none focus:shadow-outline"
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="phone_number" className="block text-gray-700 text-sm font-bold mb-2">
+                <label htmlFor="phone_number" className="block mb-2 text-sm font-bold text-gray-700">
                   Phone Number
                 </label>
                 <input
@@ -126,12 +128,12 @@ const ProfilePage = () => {
                   name="phone_number"
                   value={formData.phone_number}
                   onChange={handleInputChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="px-3 py-2 w-full leading-tight text-gray-700 rounded border shadow appearance-none focus:outline-none focus:shadow-outline"
                 />
               </div>
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
               >
                 Save Changes
               </button>
@@ -139,7 +141,8 @@ const ProfilePage = () => {
           ) : (
             <div>
               {/* Profile information */}
-              <div className="bg-gray-100 rounded-md p-4 mb-4">
+              <div className="p-4 mb-4 bg-gray-100 rounded-md">
+                 
                 <p className="text-lg text-gray-800">
                   <strong><FaEnvelope /> Email:</strong> {user.email}
                 </p>
@@ -152,7 +155,7 @@ const ProfilePage = () => {
               </div>
               <button
                 onClick={() => setEditMode(true)}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
               >
                 Edit Profile
               </button>

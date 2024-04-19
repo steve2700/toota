@@ -85,8 +85,8 @@ const UserRegistrationForm = () => {
             full_name: formData.fullName,
             phone_number: formData.phoneNumber,
             email: formData.email,
-            password1: formData.password,
-            password2: formData.confirmPassword,
+            password: formData.password,
+            confirm_password: formData.confirmPassword,
           }),
         });
 

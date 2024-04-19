@@ -5,7 +5,7 @@ from channels.layers import get_channel_layer
 from channels.db import database_sync_to_async
 from toota.asgi import application
 from authentication.models import User, Driver
-from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from django.contrib.auth.models import Group
 from authentication.utils import VEHICLE_TYPES, get_current_time
 from django.core import serializers
@@ -18,7 +18,7 @@ TEST_CHANNEL_LAYERS = {
 }
 
 @database_sync_to_async
-def create_user(email, full_name, phone_number, password, group='user'):
+def create_user(email, full_name, phone_number, password):
     user = User.objects.create_user(
         email=email,
         full_name=full_name,
@@ -28,7 +28,7 @@ def create_user(email, full_name, phone_number, password, group='user'):
     )
     user.is_verified = True
     user.save()
-    access = AccessToken.for_user(user)
+    access = RefreshToken.for_user(user)
     return user, access
 
 @database_sync_to_async
@@ -40,8 +40,7 @@ def create_driver(
     vehicle_registration_no, 
     vehicle_type, 
     licence_no, 
-    password,
-    group='driver'):
+    password):
     driver = Driver.objects.create_driver(
         email=email,
         full_name=full_name,
@@ -98,6 +97,7 @@ class TestWebSocket:
             path=f'/toota/?token={access}'
         )
         connected, _ = await communicator.connect()
+        pdb.set_trace()
         assert connected is True
         await communicator.disconnect()
         
@@ -378,7 +378,7 @@ class TestWebSocket:
         response = await channel_layer.receive('test_channel')
         response_data = response.get('data')
         assert response_data['id'] == trip_id
-        assert response_data['user']['full_name'] == user.full_name
+        assert response_data['user'].full_name == user.full_name
         assert response_data['driver'] == driver.full_name
 
         await communicator.disconnect()

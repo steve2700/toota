@@ -18,7 +18,7 @@ def get_user(scope):
     if not token:
         return AnonymousUser()
     try:
-        access_token = AccessToken(token[0])
+        access_token = AccessToken(token['access'])
         user = User.objects.get(id=access_token['user_id'])
 
     except Exception as e:
@@ -38,7 +38,7 @@ def get_driver(scope):
     if not token:
         return AnonymousUser()
     try:
-        access_token = AccessToken(token[0])
+        access_token = AccessToken(token['access'])
         driver = Driver.objects.get(id=access_token['user_id'])
 
     except Exception as e:

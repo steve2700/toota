@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'authentication',
     'trips',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -158,7 +159,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-REDIS_URL = os.getenv('REDIS_URL', 'redis://default:Tb6IaS9TgBvwFtJiwhb7Dw3RxoImm9LP@redis-12258.c14.us-east-1-2.ec2.cloud.redislabs.com:12258')
+REDIS_URL = os.getenv('REDIS_URL', 'rediss://red-cn9ilmdjm4es73c5biig:XNalq7X5mJVpdVewgf4anUJ9Dr8EDji3@oregon-redis.render.com:6379')
 
 CHANNEL_LAYERS = {
     'default': {        

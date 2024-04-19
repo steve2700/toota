@@ -51,7 +51,9 @@ const UserLoginForm = () => {
         const data = await response.json();
         if (data.access) {
           localStorage.setItem('access_token', data.access);
+          localStorage.setItem('refresh_token', data.refresh)
           console.log('Token retrieved from server:', data.access);
+          console.log('Token retrieved from server:', data.refresh);
           console.log('Token stored in localStorage:', localStorage.getItem('access_token'));
           setSuccessMessage('Login successful! Redirecting to the dashboard...');
           setTimeout(() => {

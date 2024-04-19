@@ -3,7 +3,7 @@ import os
 from rest_framework import generics, status, views, permissions
 from rest_framework_simplejwt.views import TokenObtainPairView as Token, TokenVerifyView
 from rest_framework.response import Response
-from .serializers import UserSerializer, LoginUserSerializer, DriverSerializer, VerifyUserEmailSerializer, VerifyDriverEmailSerializer, LoginDriverSerializer, ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, CheckDriverVerificationSerializer, UserProfileSerializer, AdminUserSerializer
+from .serializers import UserSerializer, LoginUserSerializer, DriverSerializer, VerifyUserEmailSerializer, VerifyDriverEmailSerializer, LoginDriverSerializer, ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, CheckDriverVerificationSerializer, UserProfileSerializer, AdminUserSerializer, LogoutSerializer
 from .models import  Driver, User
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -95,7 +95,7 @@ class UserProfileView(generics.GenericAPIView):
     
     def get(self, request, id):
         try: 
-            user = self.get_object()
+            user = User.objects.get(id=id)
             serializer = UserSerializer(user)
 
             return Response(serializer.data)
@@ -403,3 +403,14 @@ class SetNewPasswordAPIVIew(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         return Response({'sucess': True, 'message': 'Password reset success'}, status=status.HTTP_200_OK)
  
+
+class LogoutView(generics.GenericAPIView):
+    serializer_class = LogoutSerializer
+    permission_classes = [IsAuthenticated,]
+
+    def post(self, request):
+        serializer=self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(status = status.HTTP_204_NO_CONTENT)
