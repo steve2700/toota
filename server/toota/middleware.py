@@ -20,6 +20,7 @@ def get_user(scope):
     try:
         access_token = AccessToken(token['access'])
         user = User.objects.get(id=access_token['user_id'])
+        print(user)
 
     except Exception as e:
         return AnonymousUser()
@@ -40,6 +41,7 @@ def get_driver(scope):
     try:
         access_token = AccessToken(token['access'])
         driver = Driver.objects.get(id=access_token['user_id'])
+        print(driver)
 
     except Exception as e:
         return AnonymousUser()
@@ -51,9 +53,12 @@ def get_driver(scope):
 
 class TokenAuthMiddleware(AuthMiddleware):
     async def resolve_scope(self, scope):
-        scope['user']._wrapped = await get_user(scope)
-        scope['user']._wrapped= await get_driver(scope)
-        
+        user = await get_user(scope)
+        driver = await get_driver(scope)
+
+        scope['user']._wrapped = user
+        if not user:
+            scope['user']._wrapped = driver
 
 def TokenAuthMiddlewareStack(inner):
     return CookieMiddleware(SessionMiddleware(TokenAuthMiddleware(inner)))

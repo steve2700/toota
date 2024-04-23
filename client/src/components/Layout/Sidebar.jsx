@@ -3,6 +3,7 @@ import { DASHBOARD_SIDEBAR_LINKS, DASHBOARD_BOTTOM_LINKS } from '../../lib/utils
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../../../src/logo.jpg';
 import classNames from 'classnames'
+
 const linkStyles = 'flex items-center gap-2 font-light py-2 hover:bg-gray-700 hover:no-underline active:bg-gray-600 rounded-sm text-base'
 
 export default function Sidebar() {

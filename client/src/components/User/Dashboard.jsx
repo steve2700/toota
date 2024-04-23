@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CreateTripForm from './CreateTripForm';
 import { useNavigate} from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
+import { connect } from '../../services/TripService';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ function Dashboard() {
 
   useEffect(() => {
     if (token) {
+      connect();
       try {
         console.log(decodedToken["user_id"]);
         const currentTime = Date.now() / 1000;

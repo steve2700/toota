@@ -13,6 +13,7 @@ const ProfilePage = () => {
     email: '',
     full_name: '',
     phone_number: '',
+    
   });
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -142,7 +143,7 @@ const ProfilePage = () => {
             <div>
               {/* Profile information */}
               <div className="p-4 mb-4 bg-gray-100 rounded-md">
-                 
+
                 <p className="text-lg text-gray-800">
                   <strong><FaEnvelope /> Email:</strong> {user.email}
                 </p>

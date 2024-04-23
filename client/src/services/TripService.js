@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { share } from 'rxjs/operators';
 import { webSocket } from 'rxjs/webSocket';
-
+import WebSocket from 'websocket';
 import { getAccessToken } from './AuthService';
 
 let _socket;
@@ -11,10 +11,16 @@ export const connect = () => {
   if (!_socket || _socket.closed) {
     const token = getAccessToken();
     console.log(token)
-    _socket = webSocket(`ws://localhost:8000/toota/?token=${token}`);
-    console.log(_socket)
-    messages = _socket.pipe(share());
-    messages.subscribe(message => console.log(message));
+    try {
+      _socket = webSocket(`ws://localhost:8000/toota/?token=${token}`);
+      console.log(_socket)
+      messages = _socket.pipe(share());
+      messages.subscribe(message => console.log(message));
+    } catch (error){
+      console.error(error)
+    }
+    
+    
   }
 };
 

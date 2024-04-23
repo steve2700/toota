@@ -1,4 +1,5 @@
 import pytest
+import asyncio
 import pdb
 from channels.testing import WebsocketCommunicator
 from channels.layers import get_channel_layer
@@ -28,7 +29,7 @@ def create_user(email, full_name, phone_number, password):
     )
     user.is_verified = True
     user.save()
-    access = RefreshToken.for_user(user)
+    access = AccessToken.for_user(user)
     return user, access
 
 @database_sync_to_async
@@ -92,12 +93,12 @@ class TestWebSocket:
             '1234567890',
             'password'
         )
+        
         communicator = WebsocketCommunicator(
             application=application,
             path=f'/toota/?token={access}'
         )
         connected, _ = await communicator.connect()
-        pdb.set_trace()
         assert connected is True
         await communicator.disconnect()
         
@@ -162,7 +163,7 @@ class TestWebSocket:
             'type': 'echo.message',
             'data': 'This is a test message',
         }
-        channel_layer = get_channel_layer()
+        channel_layer =  get_channel_layer()
         await channel_layer.group_send('drivers', message=message)
         response = await communicator.receive_json_from()
         assert response == message
@@ -244,7 +245,7 @@ class TestWebSocket:
         response = await channel_layer.receive('test_channel')
         response_data = response.get('data')
         assert response_data['id'] is not None
-        assert response_data['user']['full_name'] == user.full_name
+        assert response_data['user'] == user.full_name
         assert response_data['driver']  is None
         await communicator.disconnect()
 
@@ -378,7 +379,7 @@ class TestWebSocket:
         response = await channel_layer.receive('test_channel')
         response_data = response.get('data')
         assert response_data['id'] == trip_id
-        assert response_data['user'].full_name == user.full_name
+        assert response_data['user'] == user.full_name
         assert response_data['driver'] == driver.full_name
 
         await communicator.disconnect()
@@ -408,8 +409,9 @@ class TestWebSocket:
             'type': 'echo.message',
             'data': 'This is a test message.'
         }
-        channel_layer = get_channel_layer()
+        channel_layer =  get_channel_layer()
         await channel_layer.group_send(f'{trip.id}', message=message)
+        await asyncio.sleep(1)
         response = await communicator.receive_json_from()
         assert response == message
         await communicator.disconnect()

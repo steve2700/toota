@@ -48,10 +48,10 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
-    profile_picture = serializers.ImageField()
+    
     class Meta:
         model = User
-        fields = ['email', 'full_name', 'phone_number', 'profile_picture', 'password', 'confirm_password']
+        fields = ['email', 'full_name', 'phone_number',  'password', 'confirm_password']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -102,7 +102,7 @@ class DriverSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Driver
-        fields = ['email', 'full_name', 'phone_number', 'physical_address', 'profile_picture', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'identity_document', 'driver_licence', 'vehicle_registration','criminal_record_check','password', 'confirm_password']
+        fields = ['email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'identity_document', 'driver_licence', 'vehicle_registration','criminal_record_check','password', 'confirm_password']
          
     def validate(self, attrs):
         
@@ -257,7 +257,6 @@ class CheckDriverVerificationSerializer(serializers.Serializer):
 
 class LogoutSerializer(serializers.Serializer):
     
-
     def validate(self, data):
         self.token = data.get('refresh')
         return data

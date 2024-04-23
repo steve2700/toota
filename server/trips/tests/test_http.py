@@ -20,8 +20,9 @@ class UserSignUpViewTest(TestCase):
             'password': '@Thingo11',
             'confirm_password': '@Thingo11',
         }
-        user = User.objects.get(full_name=data['full_name'])
+        
         response = client.post(reverse('user-sign_up'), data=data)
+        # pdb.set_trace()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(User.objects.filter(email=data['email']).exists())
 

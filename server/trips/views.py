@@ -10,7 +10,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from authentication.models import Driver
 
 class TripPaymentView(generics.GenericAPIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
+   
     permission_classes = [IsAuthenticated,]
     serializer_class = TripPaymentSerializer
 
