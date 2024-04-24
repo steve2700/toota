@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const DriverRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -8,236 +8,240 @@ const DriverRegistrationForm = () => {
     phone_number: '',
     physical_address: '',
     vehicle_registration_no: '',
-    vehicle_type: 'bike',
+    vehicle_type: '',
     licence_no: '',
-    password1: '',
-    password2: '',
+    password: '',
+    confirm_password: '',
   });
 
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-  
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  const clearMessages = () => {
+    setSuccessMessage('');
+    setErrors({});
+  };
+
+  useEffect(() => {
+    const clearMessagesTimeout = setTimeout(() => {
+      clearMessages();
+    }, 7000);
+
+    return () => clearTimeout(clearMessagesTimeout);
+  }, [successMessage, errors]);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+    setTimeout(() => {
+      setShowPassword(false);
+    }, 5000);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if all fields are completed
-    const requiredFields = ['email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'licence_no', 'password1', 'password2'];
-    const missingFields = requiredFields.filter(field => !formData[field]);
-
-    if (missingFields.length > 0) {
-      setErrors({ general: 'Please complete all fields.' });
-      return;
-    }
-
     try {
-      const response = await axios.post('http://localhost:8000/api/driver/sign_up/', formData);
+      const response = await fetch('http://localhost:8000/api/driver/sign_up/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
       if (response.status === 201) {
-        setSuccessMessage('Account created successfully. Please check your email.');
+        setSuccessMessage('Driver account created successfully! Please check your email to verify.');
         setFormData({
           email: '',
           full_name: '',
           phone_number: '',
           physical_address: '',
           vehicle_registration_no: '',
-          vehicle_type: 'bike',
+          vehicle_type: '',
           licence_no: '',
-          password1: '',
-          password2: '',
+          password: '',
+          confirm_password: '',
         });
+      } else if (response.status === 400) {
+        const errorData = await response.json();
+        setErrors(errorData);
       }
     } catch (error) {
-      if (error.response && error.response.status === 400) {
-        setErrors(error.response.data);
-      } else {
-        setErrors({ general: 'Something went wrong. Please try again later.' });
-      }
+      console.error('Signup error:', error);
+      setErrors({ generic: 'An error occurred. Please try again later.' });
     }
   };
 
-  useEffect(() => {
-    // Clear errors after 5 seconds
-    const timeout = setTimeout(() => {
-      setErrors({});
-    }, 5000);
-
-    return () => clearTimeout(timeout);
-  }, [errors]);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
-    <div className="container mx-auto">
-      <h1 className="text-3xl font-bold mb-4">Driver Registration</h1>
-      {successMessage && (
-        <div className="bg-green-200 text-green-800 px-4 py-2 mb-4 rounded">{successMessage}</div>
-      )}
-      {errors.general && (
-        <div className="bg-red-200 text-red-800 px-4 py-2 mb-4 rounded">{errors.general}</div>
-      )}
-      <form onSubmit={handleSubmit} className="max-w-lg">
-        {/* Email */}
+    <div className="min-h-screen flex items-center justify-center">
+      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full md:w-2/3 lg:w-1/2 xl:w-1/3" onSubmit={handleSubmit}>
+        <h2 className="text-2xl mb-6 font-bold text-center">Driver Sign Up</h2>
+
+        {successMessage && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
+            {successMessage}
+          </div>
+        )}
+
+        {errors && Object.keys(errors).map((key) => (
+          <div key={key} className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+            {errors[key]}
+          </div>
+        ))}
+
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">Email</label>
+          <label htmlFor="email" className="block text-gray-700 font-bold mb-2">Email</label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.email ? 'border-red-500' : ''}`}
+            className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Enter your email"
           />
-          {errors.email && <p className="text-red-500 text-xs italic">{errors.email}</p>}
         </div>
-        {/* Full Name */}
+        
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="full_name">Full Name</label>
+          <label htmlFor="full_name" className="block text-gray-700 font-bold mb-2">Full Name</label>
           <input
             type="text"
             id="full_name"
             name="full_name"
             value={formData.full_name}
             onChange={handleChange}
-            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.full_name ? 'border-red-500' : ''}`}
+            className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Enter your full name"
           />
-          {errors.full_name && <p className="text-red-500 text-xs italic">{errors.full_name}</p>}
         </div>
-        {/* Phone Number */}
+       
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone_number">Phone Number</label>
-          <input
-            type="text"
-            id="phone_number"
-            name="phone_number"
-            value={formData.phone_number}
-            onChange={handleChange}
-            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.phone_number ? 'border-red-500' : ''}`}
-          />
-          {errors.phone_number && <p className="text-red-500 text-xs italic">{errors.phone_number}</p>}
-        </div>
-        {/* Physical Address */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="physical_address">Physical Address</label>
-          <input
-            type="text"
-            id="physical_address"
-            name="physical_address"
-            value={formData.physical_address}
-            onChange={handleChange}
-            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.physical_address ? 'border-red-500' : ''}`}
-          />
-          {errors.physical_address && <p className="text-red-500 text-xs italic">{errors.physical_address}</p>}
-        </div>
-        {/* Vehicle Registration Number */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="vehicle_registration_no">Vehicle Registration Number</label>
-          <input
-            type="text"
-            id="vehicle_registration_no"
-            name="vehicle_registration_no"
-            value={formData.vehicle_registration_no}
-            onChange={handleChange}
-            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.vehicle_registration_no ? 'border-red-500' : ''}`}
-          />
-          {errors.vehicle_registration_no && <p className="text-red-500 text-xs italic">{errors.vehicle_registration_no}</p>}
-        </div>
-        {/* Vehicle Type */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="vehicle_type">Vehicle Type</label>
-          <select
-            id="vehicle_type"
-            name="vehicle_type"
-            value={formData.vehicle_type}
-            onChange={handleChange}
-            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.vehicle_type ? 'border-red-500' : ''}`}
-          >
-            <option value="bike">Bike</option>
-            <option value="car">Car</option>
-            <option value="truck">Truck 1</option>
-	    <option value="van">Van</option>
-	    <option value="truck_1.5">Truck 1.5</option>
-	    <option value="truck_2">Truck 2</option>
-	    <option value="truck_4">Truck 4</option>
+  <label htmlFor="phone_number" className="block text-gray-700 font-bold mb-2">Phone Number</label>
+  <input
+    type="text"
+    id="phone_number"
+    name="phone_number"
+    value={formData.phone_number}
+    onChange={handleChange}
+    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+    placeholder="Enter your phone number"
+  />
+</div>
 
-            {/* Add other vehicle types as needed */}
-          </select>
-          {errors.vehicle_type && <p className="text-red-500 text-xs italic">{errors.vehicle_type}</p>}
-        </div>
-        {/* Driver's Licence Number */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="licence_no">Driver's Licence Number</label>
-          <input
-            type="text"
-            id="licence_no"
-            name="licence_no"
-            value={formData.licence_no}
-            onChange={handleChange}
-            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.licence_no ? 'border-red-500' : ''}`}
-          />
-          {errors.licence_no && <p className="text-red-500 text-xs italic">{errors.licence_no}</p>}
-        </div>
-        {/* Password field */}
-        <div className="mb-4 relative">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password1">Password</label>
+<div className="mb-4">
+  <label htmlFor="physical_address" className="block text-gray-700 font-bold mb-2">Physical Address</label>
+  <input
+    type="text"
+    id="physical_address"
+    name="physical_address"
+    value={formData.physical_address}
+    onChange={handleChange}
+    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+    placeholder="Enter your physical address"
+  />
+</div>
+
+<div className="mb-4">
+  <label htmlFor="vehicle_registration_no" className="block text-gray-700 font-bold mb-2">Vehicle Registration Number</label>
+  <input
+    type="text"
+    id="vehicle_registration_no"
+    name="vehicle_registration_no"
+    value={formData.vehicle_registration_no}
+    onChange={handleChange}
+    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+    placeholder="Enter your vehicle registration number"
+  />
+</div>
+
+<div className="mb-4">
+  <label htmlFor="vehicle_type" className="block text-gray-700 font-bold mb-2">Vehicle Type</label>
+  <select
+    id="vehicle_type"
+    name="vehicle_type"
+    value={formData.vehicle_type}
+    onChange={handleChange}
+    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+  >
+    <option value="">Select vehicle type</option>
+    <option value="bike">Bike</option>
+    <option value="car">Car</option>
+    <option value="van">Van</option>
+    <option value="truck_1">Truck 1</option>
+    <option value="truck_1.5">Truck 1.5</option>
+    <option value="truck_2">Truck 2</option>
+    <option value="truck_4">Truck 4</option>
+  </select>
+</div>
+
+<div className="mb-4">
+  <label htmlFor="licence_no" className="block text-gray-700 font-bold mb-2">Driver's Licence Number</label>
+  <input
+    type="text"
+    id="licence_no"
+    name="licence_no"
+    value={formData.licence_no}
+    onChange={handleChange}
+    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+    placeholder="Enter your driver's licence number"
+  />
+</div>
+
+<div className="mb-4 relative">
+          <label htmlFor="password" className="block text-gray-700 font-bold mb-2">Password</label>
           <input
             type={showPassword ? 'text' : 'password'}
-            id="password1"
-            name="password1"
-            value={formData.password1}
+            id="password"
+            name="password"
+            value={formData.password}
             onChange={handleChange}
-            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.password1 ? 'border-red-500' : ''}`}
+            className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="Enter your password"
           />
-          {/* Show/Hide password button */}
-          <button
-            type="button"
+          <span
+            className="text-gray-600 absolute right-0 mr-3 cursor-pointer"
             onClick={togglePasswordVisibility}
-            className="absolute inset-y-0 right-0 px-3 py-2 text-gray-600 hover:text-gray-800 focus:outline-none"
           >
             {showPassword ? 'Hide' : 'Show'}
-          </button>
-          {errors.password1 && <p className="text-red-500 text-xs italic">{errors.password1}</p>}
+          </span>
         </div>
-        {/* Confirm password field */}
-        <div className="mb-4 relative">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password2">Confirm Password</label>
-          <input
-            type={showPassword ? 'text' : 'password'}
-            id="password2"
-            name="password2"
-            value={formData.password2}
-            onChange={handleChange}
-            className={`appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.password2 ? 'border-red-500' : ''}`}
-          />
-          {/* Show/Hide password button */}
-          <button
-            type="button"
-            onClick={togglePasswordVisibility}
-            className="absolute inset-y-0 right-0 px-3 py-2 text-gray-600 hover:text-gray-800 focus:outline-none"
-          >
-            {showPassword ? 'Hide' : 'Show'}
-          </button>
-          {errors.password2 && <p className="text-red-500 text-xs italic">{errors.password2}</p>}
-        </div>
-        <div className="mb-4">
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Register
-          </button>
+
+
+<div className="mb-4">
+  <label htmlFor="confirm_password" className="block text-gray-700 font-bold mb-2">Confirm Password</label>
+  <input
+    type="password"
+    id="confirm_password"
+    name="confirm_password"
+    value={formData.confirm_password}
+    onChange={handleChange}
+    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+    placeholder="Confirm your password"
+  />
+</div>
+
+        <button
+          type="submit"
+          className="w-full bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-black hover:bg-gray-800 mt-6"
+        >
+          Register Your Account
+        </button>
+
+        <div className="text-center mt-4">
+          <p className="text-sm">
+            Already have an account?{' '}
+            <Link to="/login/driver" className="text-blue-500 hover:underline">
+              Log in here
+            </Link>
+          </p>
         </div>
       </form>
-	  <div className="mt-4 text-center">
-	  <p>Already have a Toota account?</p>
-	  <a href="/login/driver" className="text-indigo-600 hover:text-indigo-800">Login here</a>
-    </div>
     </div>
   );
 };
