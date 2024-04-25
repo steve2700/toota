@@ -115,6 +115,11 @@ class DriverSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"email": "Email is already in use"}
             )
+
+        if Driver.objects.filter(full_name=attrs['full_name']).exists():
+            raise serializers.ValidationError(
+                    {"full_name": "Full name is already in use"}
+            )
         if attrs['password'] != attrs['confirm_password']:
             raise serializers.ValidationError(
                 {"password": "Password fields didn't match"}

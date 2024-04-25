@@ -12,63 +12,70 @@ const DriverLoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
-  const [tokenExpired, setTokenExpired] = useState(false);
+  
 
-  useEffect(() => {
-    if (tokenExpired) {
-      setTimeout(() => {
-        setTokenExpired(false);
-      }, 3000);
-    }
-  }, [tokenExpired]);
-
-  // Function to clear error messages after 7 seconds
+   const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+   // function to clear error message after 7 seconds
   const clearErrors = () => {
     setTimeout(() => {
       setFormErrors({});
     }, 7000);
   };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
-
-  const handleLoginSuccess = (token) => {
-    const decoded = jwt_decode(token);
-    const userId = decoded.user_id;
-    localStorage.setItem('userId', userId);
-    navigate('/dashboard/driver');
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await fetch('http://localhost:8000/api/driver/login', {
+      const response = await fetch('http://127.0.0.1:8000/api/driver/login/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       });
 
-      if (response.status === 200) {
+      if (response.ok) {
         const data = await response.json();
-        handleLoginSuccess(data.access);
-        setFormData({ email: '', password: '' });
-        setFormErrors({});
-        setSuccessMessage('Login successful!');
-      } else if (response.status === 404) {
-        setFormErrors({ general: 'Invalid credentials, please try again.' });
-        clearErrors();
+        if (data.access) {
+          localStorage.setItem('access_token', data.access);
+          localStorage.setItem('refresh_token', data.refresh)
+          console.log('Token retrieved from server:', data.access);
+          console.log('Token retrieved from server:', data.refresh);
+          console.log('Token stored in localStorage:', localStorage.getItem('access_token'));
+          setSuccessMessage('Login successful! Redirecting to the dashboard...');
+          setTimeout(() => {
+            navigate('/dashboard/driver');
+          }, 2000);
+          setFormData({ email: '', password: '' });
+          setErrors({});
+        } else {
+          throw new Error('Token not found in response');
+        }
       } else {
-        setFormErrors({ general: 'An error occurred. Please try again later.' });
+        const errorData = await response.json();
+        if (response.status === 401) {
+          setErrors({
+            ...errors,
+            invalidCredentials: 'Invalid email or password. Please try again.',
+          });
+        } else {
+          setErrors(errorData);
+        }
+        clearErrors(); // Call clearErrors function
       }
     } catch (error) {
-      console.error('An error occurred:', error.message);
-      setFormErrors({ general: 'An error occurred. Please try again later.' });
+      console.error('Error during login:', error);
+      setErrors({ generic: 'An error occurred. Please try again later.' });
+      clearErrors(); // Call clearErrors function
     }
   };
+
+
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">

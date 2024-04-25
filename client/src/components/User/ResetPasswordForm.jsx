@@ -1,13 +1,29 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import Message from './Message';
 
 const ResetPasswordForm = () => {
-  const { token } = useParams();
+  const { uidb64, token } = useParams();
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [isTokenValid, setIsTokenValid] = useState(false);
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/driver/password-reset/${uidb64}/${token}`);
+        if (response.status === 200) {
+          setIsTokenValid(true);
+        }
+      } catch (error) {
+        setMessage(error.response.data.message || 'An unexpected error occurred.');
+        setMessageType('error');
+      }
+    };
+    verifyToken();
+  }, [uidb64, token]);
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
@@ -21,21 +37,25 @@ const ResetPasswordForm = () => {
       }
 
       // Make the backend API call to reset password
-      const response = await axios.post(`http://localhost:3001/auth/reset-password/${token}`, { newPassword });
+      const response = await axios.post(`http://localhost:8000/api/driver/password-reset/${uidb64}/${token}`, { newPassword });
 
       if (response.status === 200) {
         setMessage(response.data.message);
         setMessageType('success');
       }
     } catch (error) {
-      if (error.response.status === 404) {
-        setMessage('User not found.');
-      } else {
-        setMessage(error.response.data.message || 'An unexpected error occurred.');
-      }
+      setMessage(error.response.data.message || 'An unexpected error occurred.');
       setMessageType('error');
     }
   };
+
+  if (!isTokenValid) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <Message message={message} type={messageType} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">

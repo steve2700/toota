@@ -63,7 +63,7 @@ const DriverRegistrationForm = () => {
           phone_number: '',
           physical_address: '',
           vehicle_registration_no: '',
-          vehicle_type: '',
+          vehicle_type: 'bike',
           licence_no: '',
           password: '',
           confirm_password: '',

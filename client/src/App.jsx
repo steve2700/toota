@@ -30,7 +30,7 @@ function App() {
           <Route path="/signup/user" element={<UserRegistrationForm />} />
           <Route path="/login/user" element={<UserLoginForm />} />
           <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-          <Route path="/reset-password/:token" element={<ResetPasswordForm />} />
+          <Route path="/reset-password/:uidb64/:token" component={ResetPasswordForm} />
           <Route path="/dashboard/user/" element={<Layout />} >
             <Route index element={<Dashboard />} />
             <Route path='profile' element={<ProfilePage />} />
