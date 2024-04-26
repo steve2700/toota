@@ -31,23 +31,10 @@ const DriverDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-white shadow-md py-4 px-8 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">TOOTA</h1>
-        <div className="flex gap-4">
-          <NotificationIcon />
-          <ProfileIcon />
-          <LogoutIcon className="h-6 w-6 text-gray-600 cursor-pointer" onClick={handleLogout} />
-        </div>
-      </header>
-
+     
       {/* Main Content */}
       <main className="container mx-auto px-8 py-6">
         {/* Dashboard Navigation */}
-        <nav className="flex justify-between mb-8">
-          <NavItem icon={<HomeIcon className="h-6 w-6" />} text="Dashboard" />
-          <NavItem icon={<UserIcon className="h-6 w-6" />} text="Driver Profile" handleClick={toggleEditingProfile} /> {/* Added handleClick prop */}
-          <NavItem icon={<BellIcon className="h-6 w-6" />} text="Notifications" />
-        </nav>
 
         {/* Sections */}
         {editingProfile ? ( // Conditionally render profile form if editingProfile is true

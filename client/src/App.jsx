@@ -2,6 +2,8 @@ import React, { useState, createContext } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import DriverLoginForm from "./components/Driver/DriverLoginForm";
 import DriverRegistrationForm from "./components/Driver/DriverRegistrationForm";
+import DriverProfile from "./components/Driver/DriverProfile"
+import History from './components/Driver/History'
 import UserLoginForm from "./components/User/UserLoginForm";
 import UserRegistrationForm from "./components/User/UserRegistrationForm";
 import ForgotPasswordForm from "./components/User/ForgotPasswordForm";
@@ -12,18 +14,20 @@ import DriverDashboard from './components/Driver/DriverDashboard';
 import DocumentUploadForm from "./components/Driver/DocumentUploadForm";
 import ProfilePage from './pages/ProfilePage';
 import Layout from './components/Layout/Layout';
+import LayoutDriver from './components/Layout/LayoutDriver'
 import RideHistory from './pages/RideHistory';
 import Calendar from './pages/Calendar';
 import Logout from './pages/Logout';
+import DriverLogout from './components/Driver/DriverLogout'
 
-export const AuthContext = createContext();
+
 
 function App() {
-  const [jwt, setJWT] = useState(null);
+  
 
   return (
     <Router>
-      <AuthContext.Provider value={{ auth: [jwt, setJWT] }}>
+      
         <Routes>
           <Route path="/signup/driver" element={<DriverRegistrationForm />} />
           <Route path="/login/driver" element={<DriverLoginForm />} />
@@ -38,12 +42,18 @@ function App() {
             <Route path='calendar' element={<Calendar />} />
             <Route path='logout' element={<Logout />} />
           </Route>
-          <Route path="/dashboard/driver" element={<DriverDashboard />} />
-          <Route path="/upload-document" element={<DocumentUploadForm />} />
+
+          <Route path="/dashboard/driver/" element={<LayoutDriver />} >
+            <Route index element={<DriverDashboard />} />
+            <Route path='profile' element={<DriverProfile />} />
+            <Route path='calendar' element={<Calendar />} />
+            <Route path='trip-history' element= {<History />} />
+            <Route path='logout' element={<DriverLogout />} />
+          </Route>
           {/*<Route path="/profile/user/:token" element={<ProfilePage />} />*/}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </AuthContext.Provider>
+     
     </Router>
   );
 }
