@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaExclamationCircle } from 'react-icons/fa';
 
@@ -12,18 +12,19 @@ const DriverLoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
-  
 
-   const handleChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-   // function to clear error message after 7 seconds
+
+  // function to clear error message after 7 seconds
   const clearErrors = () => {
     setTimeout(() => {
       setFormErrors({});
     }, 7000);
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -39,43 +40,30 @@ const DriverLoginForm = () => {
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.access) {
-          localStorage.setItem('access_token', data.access);
-          localStorage.setItem('refresh_token', data.refresh)
-          console.log('Token retrieved from server:', data.access);
-          console.log('Token retrieved from server:', data.refresh);
-          console.log('Token stored in localStorage:', localStorage.getItem('access_token'));
-          setSuccessMessage('Login successful! Redirecting to the dashboard...');
-          setTimeout(() => {
-            navigate('/dashboard/driver');
-          }, 2000);
-          setFormData({ email: '', password: '' });
-          setErrors({});
-        } else {
-          throw new Error('Token not found in response');
-        }
-      } else {
-        const errorData = await response.json();
+      const responseData = await response.json();
+
+      if (!response.ok) {
         if (response.status === 401) {
-          setErrors({
-            ...errors,
-            invalidCredentials: 'Invalid email or password. Please try again.',
-          });
+          setFormErrors({ general: 'Invalid email or password. Please try again.' });
         } else {
-          setErrors(errorData);
+          setFormErrors(responseData);
         }
         clearErrors(); // Call clearErrors function
+      } else {
+        const { access } = responseData;
+        localStorage.setItem('access_token', access);
+        setSuccessMessage('Login successful! Redirecting to the dashboard...');
+        setTimeout(() => {
+          navigate('/dashboard/driver');
+        }, 2000);
+        setFormData({ email: '', password: '' });
       }
     } catch (error) {
       console.error('Error during login:', error);
-      setErrors({ generic: 'An error occurred. Please try again later.' });
+      setFormErrors({ generic: 'An error occurred. Please try again later.' });
       clearErrors(); // Call clearErrors function
     }
   };
-
-
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -101,7 +89,7 @@ const DriverLoginForm = () => {
             id="email"
             name="email"
             value={formData.email}
-            onChange={handleInputChange}
+            onChange={handleChange} 
             placeholder="Enter your email"
             className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
             required
@@ -120,7 +108,7 @@ const DriverLoginForm = () => {
               id="password"
               name="password"
               value={formData.password}
-              onChange={handleInputChange}
+              onChange={handleChange} 
               placeholder="Enter your password"
               className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
               required
