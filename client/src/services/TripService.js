@@ -10,10 +10,11 @@ export let messages;
 export const connect = () => {
   if (!_socket || _socket.closed) {
     const token = getAccessToken();
+    const config = { headers: { Authorization: `Bearer ${token}` } };
     console.log(token)
     try {
-      _socket = webSocket(`ws://localhost:8000/toota/?token=${token}`);
-      console.log(_socket)
+      _socket = webSocket(`ws:localhost:8000/toota/?token=${token}`);
+      
       messages = _socket.pipe(share());
       messages.subscribe(message => console.log(message));
     } catch (error){

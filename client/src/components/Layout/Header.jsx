@@ -35,7 +35,7 @@ export default  function Header(){
     fetchUserProfile();
   }, []);
 	
-	console.log(user)
+	
 
 
 	return (

@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import { jwtDecode } from "jwt-decode";
+import { getAccessToken , getUser} from "../../services/AuthService";
 
 const CreateTripForm = () => {
+  const token = getAccessToken();
+  const decodedToken = jwtDecode(token);
+  const user_id = decodedToken["user_id"];
+  
   const [formData, setFormData] = useState({
     pickup_location: '',
     dropoff_location: '',
@@ -10,23 +16,27 @@ const CreateTripForm = () => {
     dropoff_contact_number: '',
     load_description: '',
     vehicle_type: '',
+    number_of_floors: 0,
+    user: user_id,
+    
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    // If the field name is 'pickup_time', format the value as required
+    const formattedValue = name === 'pickup_time' ? value.replace('T', ' ') : value;
+    const id = name == 'user' ? parseInt(value) : formattedValue 
+    setFormData({ ...formData, [name]: name === 'number_of_floors' ? parseInt(value) : formattedValue });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/api/trip/', formData);
-
-      // Initialize WebSocket connection
-      const socket = io('ws://localhost:8000');
-      
-      // Emit event to notify other users of the new trip
-      socket.emit('new_trip', formData);
+      await axios.post('http://localhost:8000/api/trips/', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       
       // Reset form after successful submission
       setFormData({
@@ -36,6 +46,7 @@ const CreateTripForm = () => {
         dropoff_contact_number: '',
         load_description: '',
         vehicle_type: '',
+        user: user_id,
       });
       
       alert('Trip created successfully!');
@@ -44,6 +55,8 @@ const CreateTripForm = () => {
       alert('Failed to create trip. Please try again.');
     }
   };
+
+  console.log(`user: ${user_id}`)
 
   return (
     <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
