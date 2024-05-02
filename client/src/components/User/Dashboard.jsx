@@ -3,8 +3,14 @@ import CreateTripForm from './CreateTripForm';
 import { useNavigate} from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
 import { getAccessToken , getUser} from "../../services/AuthService";
+
+import { ToastContainer, toast } from 'react-toastify';
+import supabase from '../../services/SupaBaseClient';
+
+
 function Dashboard() {
   const navigate = useNavigate();
+  const [trips, setTrips] = useState(null);
   const [activeLink, setActiveLink] = useState(null);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -13,9 +19,11 @@ function Dashboard() {
   const token = getAccessToken()
   const decodedToken = jwtDecode(token);
   const user_id = decodedToken["user_id"];
+  supabase
+  .channel('drivers').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trips_trip' }, (payload) => toast("Trip created successfully!")).subscribe()
+ 
   
   useEffect(() => {
-
     if (token) {
       
       try {
@@ -36,6 +44,8 @@ function Dashboard() {
     } else {
       setIsSessionExpired(true); // No token found, assume expired
     }
+    
+    
   }, [token]); // Update effect whenever token changes
 
   const handleLogout = () => {
@@ -53,6 +63,8 @@ function Dashboard() {
   return (
     <div className="">
          <CreateTripForm />
+         <ToastContainer />
+
     </div>
   )
 }

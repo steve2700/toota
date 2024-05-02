@@ -12,18 +12,26 @@ import NotFound from "./pages/NotFound";
 import Dashboard from './components/User/Dashboard';
 import DriverDashboard from './components/Driver/DriverDashboard';
 import DocumentUploadForm from "./components/Driver/DocumentUploadForm";
-import ProfilePage from './pages/ProfilePage';
-import Layout from './components/Layout/Layout';
-import LayoutDriver from './components/Layout/LayoutDriver'
+import ProfilePage from './components/User/ProfilePage';
+import Layout from './components/Layout/User/Layout';
+import LayoutDriver from './components/Layout/Driver/LayoutDriver'
 import RideHistory from './pages/RideHistory';
 import Calendar from './pages/Calendar';
-import Logout from './pages/Logout';
+import Logout from './components/User/Logout';
 import DriverLogout from './components/Driver/DriverLogout'
-
+import LayoutAdmin from './components/Layout/Admin/LayoutAdmin';
+import AdminDashboard from './components/Admin/AdminDashboard';
+import AdminProfile from './components/Admin/AdminProfile';
+import Drivers from './components/Admin/Drivers';
+import Users from './components/Admin/Users';
+import Trips from './components/Admin/Trips';
+import Payments from './components/Admin/Payments';
+import AdminLogout from './components/Admin/AdminLogout';
+import AdminLogin from './components/Admin/AdminLogin';
+import AdminSignup from './components/Admin/AdminSignup';
 
 
 function App() {
-  
 
   return (
     <Router>
@@ -42,6 +50,16 @@ function App() {
             <Route path='calendar' element={<Calendar />} />
             <Route path='logout' element={<Logout />} />
           </Route>
+          <Route path="/signup/admin/" element={<AdminSignup />} />
+          <Route path="/login/admin/" element={<AdminLogin />} />
+          <Route path="/dashboard/admin/" element={<LayoutAdmin />} >
+            <Route index element={<AdminDashboard />} />
+            <Route path='profile' element={<AdminProfile />} />
+            <Route path='users' element= {<Users />} />
+            <Route path='drivers' element={<Drivers />} />
+            <Route path='payments' element={<Payments />} />
+            <Route path='logout' element={<AdminLogout />} />
+          </Route>
 
           <Route path="/dashboard/driver/" element={<LayoutDriver />} >
             <Route index element={<DriverDashboard />} />
@@ -50,11 +68,14 @@ function App() {
             <Route path='trip-history' element= {<History />} />
             <Route path='logout' element={<DriverLogout />} />
           </Route>
+
+
           {/*<Route path="/profile/user/:token" element={<ProfilePage />} />*/}
           <Route path="*" element={<NotFound />} />
         </Routes>
      
     </Router>
+    
   );
 }
 
