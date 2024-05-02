@@ -29,6 +29,8 @@ import Payments from './components/Admin/Payments';
 import AdminLogout from './components/Admin/AdminLogout';
 import AdminLogin from './components/Admin/AdminLogin';
 import AdminSignup from './components/Admin/AdminSignup';
+import UserCalendar from './components/User/UserCalendar';
+import DriverCalender from './components/Driver/DriverCalender';
 
 
 function App() {
@@ -47,7 +49,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path='profile' element={<ProfilePage />} />
             <Route path='trip-history' element= {<RideHistory />} />
-            <Route path='calendar' element={<Calendar />} />
+            <Route path='calendar' element={<UserCalendar />} />
             <Route path='logout' element={<Logout />} />
           </Route>
           <Route path="/signup/admin/" element={<AdminSignup />} />
@@ -64,7 +66,7 @@ function App() {
           <Route path="/dashboard/driver/" element={<LayoutDriver />} >
             <Route index element={<DriverDashboard />} />
             <Route path='profile' element={<DriverProfile />} />
-            <Route path='calendar' element={<Calendar />} />
+            <Route path='calendar' element={<DriverCalender />} />
             <Route path='trip-history' element= {<History />} />
             <Route path='logout' element={<DriverLogout />} />
           </Route>
