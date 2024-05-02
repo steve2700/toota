@@ -3,6 +3,8 @@ import { BellIcon, UserIcon, CogIcon, ClockIcon, CurrencyDollarIcon, ClipboardCh
 import { useNavigate } from 'react-router-dom';
 import LogoutConfirmationForm from './LogoutConfirmationForm'; // Import the LogoutConfirmationForm component
 import DriverProfileForm from "./DriverProfile";
+import { ToastContainer, toast } from 'react-toastify';
+import supabase from '../../services/SupaBaseClient';
 
 const DriverDashboard = () => {
   const navigate = useNavigate();
@@ -12,7 +14,8 @@ const DriverDashboard = () => {
   const handleLogout = () => {
     setShowLogoutConfirmation(true);
   };
-
+  supabase
+  .channel('drivers').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trips_trip' }, (payload) => toast("New Trip Created")).subscribe()
   const handleLogoutConfirmation = (confirmLogout) => {
     if (confirmLogout) {
       // Perform logout action
@@ -54,6 +57,18 @@ const DriverDashboard = () => {
       {showLogoutConfirmation && (
         <LogoutConfirmationForm onConfirm={handleLogoutConfirmation} />
       )}
+      <ToastContainer 
+        autoClose={10000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition: Bounce
+      />
     </div>
   );
 };
@@ -71,6 +86,7 @@ const NavItem = ({ icon, text, handleClick }) => { // Added handleClick prop
 // Component for dashboard sections
 const DashboardSection = ({ icon, title }) => {
   return (
+
     <div className="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
       {icon}
       <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
@@ -85,6 +101,7 @@ const NotificationIcon = () => {
       <BellIcon className="h-6 w-6 text-gray-600 cursor-pointer" />
       {/* Add notification badge if needed */}
       {/* <div className="bg-red-500 w-3 h-3 rounded-full absolute top-0 right-0 transform translate-x-1 -translate-y-1"></div> */}
+
     </div>
   );
 };
@@ -93,6 +110,7 @@ const NotificationIcon = () => {
 const ProfileIcon = () => {
   return (
     <UserIcon className="h-6 w-6 text-gray-600 cursor-pointer" />
+    
   );
 };
 

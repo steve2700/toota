@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import { jwtDecode } from "jwt-decode";
+import { getAccessToken , getUser} from "../../services/AuthService";
 
 const CreateTripForm = () => {
+  const [trip, setTrip] = useState(null);
+
+  const token = getAccessToken();
+  const decodedToken = jwtDecode(token);
+  const user_id = decodedToken["user_id"];
+  
+  
   const [formData, setFormData] = useState({
     pickup_location: '',
     dropoff_location: '',
@@ -10,23 +19,28 @@ const CreateTripForm = () => {
     dropoff_contact_number: '',
     load_description: '',
     vehicle_type: '',
+    number_of_floors: '',
+    bid: '',
+    user: user_id,
+    
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    // If the field name is 'pickup_time', format the value as required
+    const formattedValue = name === 'pickup_time' ? value.replace('T', ' ') : value;
+    const id = name == 'user' ? parseInt(value) : formattedValue 
+    setFormData({ ...formData, [name]: name === 'number_of_floors' ? parseInt(value) : formattedValue });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/api/trip/', formData);
-
-      // Initialize WebSocket connection
-      const socket = io('ws://localhost:8000');
-      
-      // Emit event to notify other users of the new trip
-      socket.emit('new_trip', formData);
+      const response = await axios.post('http://localhost:8000/api/trip/', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       
       // Reset form after successful submission
       setFormData({
@@ -36,14 +50,21 @@ const CreateTripForm = () => {
         dropoff_contact_number: '',
         load_description: '',
         vehicle_type: '',
+        bid: '',
+        number_of_floors: '',
+        user: user_id,
       });
       
-      alert('Trip created successfully!');
+      console.log('Trip created successfully!');
+      setTrip(response.data)
+     
     } catch (error) {
       console.error('Error creating trip:', error);
       alert('Failed to create trip. Please try again.');
     }
   };
+
+  console.log(`user: ${user_id}`)
 
   return (
     <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
@@ -95,6 +116,18 @@ const CreateTripForm = () => {
         />
       </div>
       <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Number Of Floors</label>
+        <input
+          type="number"
+          name="number_of_floors"
+          value={formData.number_of_floors}
+          onChange={handleChange}
+          placeholder="Enter number of floors"
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          required
+        />
+      </div>
+      <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">Load Description</label>
         <textarea
           name="load_description"
@@ -123,6 +156,18 @@ const CreateTripForm = () => {
           <option value="truck_2">2 ton Truck</option>
           <option value="truck_4">4 ton Truck</option>
         </select>
+      </div>
+       <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">Bid</label>
+        <input
+          type="number"
+          name="bid"
+          value={formData.bid}
+          onChange={handleChange}
+          placeholder="Enter bid amount "
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          required
+        />
       </div>
       <div className="flex items-center justify-between">
         <button

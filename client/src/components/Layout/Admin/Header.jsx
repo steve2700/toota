@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getUser } from '../../services/AuthService';
+import { getUser } from '../../../services/AuthService';
 import { Popover, Transition, Menu } from '@headlessui/react';
 import { Fragment } from 'react'
 import { HiOutlineBell } from 'react-icons/hi'

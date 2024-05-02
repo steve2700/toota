@@ -1,11 +1,10 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getAccessToken } from  '../../services/AuthService'
 
 
-const DriverLogout = () => {
+const Logout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,10 +17,10 @@ const DriverLogout = () => {
       };
       const refresh = localStorage.getItem('refresh_token')
       try {
-        const res = await axios.post(`http://localhost:8000/api/driver/logout/`, refresh, config);
+        const res = await axios.post(`http://localhost:8000/api/user/logout/`, refresh, config);
         console.log(res.data)
         localStorage.removeItem('access_token');
-        navigate('/login/driver'); 
+        navigate('/login/user'); 
         return res
         } catch (err){
           console.error(err)
@@ -33,4 +32,4 @@ const DriverLogout = () => {
   return;
 };
 
-export default DriverLogout;
+export default Logout;

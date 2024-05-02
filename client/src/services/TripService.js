@@ -1,73 +1,44 @@
 import axios from 'axios'
-import { share } from 'rxjs/operators';
-import { webSocket } from 'rxjs/webSocket';
-import WebSocket from 'websocket';
 import { getAccessToken } from './AuthService';
 
-let _socket;
-export let messages;
-
-export const connect = () => {
-  if (!_socket || _socket.closed) {
-    const token = getAccessToken();
-    console.log(token)
-    try {
-      _socket = webSocket(`ws://localhost:8000/toota/?token=${token}`);
-      console.log(_socket)
-      messages = _socket.pipe(share());
-      messages.subscribe(message => console.log(message));
-    } catch (error){
-      console.error(error)
-    }
-    
-    
-  }
-};
-
-export const createTrip = (trip) => {
-  try {
-    connect();
-    const message = {
-    type: 'create.trip',
-    data: trip
-  };
-  _socket.next(message)
-    
-  } catch (error) {
-    console.error(error)
-    
-  } 
-}
 
 export const getTrip = async (id) => {
-  const url = `${process.env.BASE_URL}/api/trip/${id}/`;
+  const url = `http://localhost:8000/api/trip/${id}/`;
   const token = getAccessToken();
   const headers = { Authorization: `Bearer ${token}`};
   try {
-    const response = await axios.get(url, { headers });
-    return { response, isError: false };
-  } catch (response) {
+    const response =  axios.get(url, { headers });
+    const trips = response.data
+    return trips
+  } catch (error) {
     return { response, isError: true };
   }
 }
 
-export const getTrips = async () => {
-  const url = `${process.env.BASE_URL}/api/trip/`;
-  const token = getAccessToken();
-  const headers = { Authorization: `Bearer ${token}` };
+export const getAllTrips = async () => {
+  const token = getAccessToken(); 
+  console.log(token);
+  const config = { headers: { Authorization: `Bearer ${token}` } };
+
   try {
-    const response = await axios.get(url, { headers });
-    return { response, isError: false };
-  } catch (response) {
-    return { response, isError: true };
+    const response = await axios.get(`http://localhost:8000/api/trip/all/`, config);
+    const trip = response.data 
+    return trip
+  } catch(err) {
+    console.error(err);
   }
 };
 
-export const updateTrip = (trip) => {
-  connect();
-  const message = {
-    type: 'update.trip',
-    data: trip
-  };
-  _socket.next(message);
+export const getAllCompletedTrips = async () => {
+  const token = getAccessToken(); 
+  console.log(token);
+  const config = { headers: { Authorization: `Bearer ${token}` } };
+
+  try {
+    const response = await axios.get(`http://localhost:8000/api/trip/completed/`, config);
+    const trip = response.data 
+    return trip
+  } catch(err) {
+    console.error(err);
+  }
 };

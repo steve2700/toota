@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { getAccessToken } from  '../services/AuthService'
+import { getAccessToken } from  '../../services/AuthService'
 
 
-const Logout = () => {
+const AdminLogout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const Logout = () => {
         const res = await axios.post(`http://localhost:8000/api/user/logout/`, refresh, config);
         console.log(res.data)
         localStorage.removeItem('access_token');
-        navigate('/login/user'); 
+        navigate('/login/admin/'); 
         return res
         } catch (err){
           console.error(err)
@@ -32,4 +32,4 @@ const Logout = () => {
   return;
 };
 
-export default Logout;
+export default AdminLogout;

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaEnvelope, FaUser, FaPhone } from 'react-icons/fa'; // Import icons from Font Awesome icon pack
 import {jwtDecode} from 'jwt-decode';
-import { getUser } from  '../services/AuthService'
+import { getUser } from  '../../services/AuthService';
+import Loader from "react-js-loader";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);

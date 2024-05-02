@@ -7,8 +7,8 @@ function LayoutDriver() {
   return (
     <div className="flex flex-row bg-gray-100 h-screen w-screen overflow-hidden">
         <SideBarDriver />
-        <div className="flex-1">
-           <Header />
+        <div className="flex-1 overflow-y-auto">
+          <Header />
           <div className='p-4'>{<Outlet />}</div>
         </div>
     </div>
