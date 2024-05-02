@@ -3,7 +3,7 @@ import os
 from rest_framework import generics, status, views, permissions
 from rest_framework_simplejwt.views import TokenObtainPairView as Token, TokenVerifyView
 from rest_framework.response import Response
-from .serializers import UserSerializer, LoginUserSerializer, DriverSerializer, VerifyUserEmailSerializer, VerifyDriverEmailSerializer, LoginDriverSerializer, ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, CheckDriverVerificationSerializer, UserProfileSerializer, AdminUserSerializer, LogoutSerializer
+from .serializers import UserSerializer, LoginUserSerializer, DriverSerializer, VerifyUserEmailSerializer, VerifyDriverEmailSerializer, LoginDriverSerializer, ResetPasswordEmailRequestSerializer, SetNewPasswordSerializer, CheckDriverVerificationSerializer, UserProfileSerializer, AdminUserSerializer, LogoutSerializer, DriverProfileSerializer
 from .models import  Driver, User
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -60,6 +60,37 @@ class AdminUserSignUpView(generics.GenericAPIView):
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
+class UserListView(generics.ListAPIView):
+    """
+    UserListView - Gets all users saved
+    """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAdminUser & IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        count = queryset.count()
+        return Response({"count": count, "users": serializer.data}, status=status.HTTP_200_OK)
+
+
+
+class DriverListView(generics.ListAPIView):
+    """
+    UserListView - Gets all users saved
+    """
+    queryset = Driver.objects.all()
+    serializer_class = DriverSerializer
+    permission_classes = [permissions.IsAdminUser & IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        count = queryset.count()
+        return Response({"count": count, "users": serializer.data}, status=status.HTTP_200_OK)
+
+
 class UserSignUpView(generics.GenericAPIView):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
@@ -87,7 +118,6 @@ class UserSignUpView(generics.GenericAPIView):
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 class UserProfileView(generics.GenericAPIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated,]
     lookup_field = 'id'
     queryset = User.objects.all()
@@ -247,11 +277,10 @@ class DriverSignUpView(generics.GenericAPIView):
         return Response(driver_data, status=status.HTTP_201_CREATED)
     
 class DriverProfileView(generics.GenericAPIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
     permission_classes = [IsAuthenticated,]
     lookup_field = 'id'
-    queryset = User.objects.all()
-    serializer_class = DriverSerializer
+    queryset = Driver.objects.all()
+    serializer_class = DriverProfileSerializer
 
     def get(self, request, id):
         try: 
@@ -366,31 +395,23 @@ class PasswordDriverTokenCheck(generics.GenericAPIView):
 
 
 class CheckDriverVerification(generics.GenericAPIView):
+    lookup_field = 'id'
+    queryset = Driver.objects.all()
     serializer_class = CheckDriverVerificationSerializer
-    authentication_classes = [SessionAuthentication, BasicAuthentication, JWTAuthentication]
-    permission_classes = [IsAuthenticated,]
-
-    token_param_config=openapi.Parameter(
-        'token', 
-        in_=openapi.IN_QUERY, 
-        description='Description',
-        type=openapi.TYPE_STRING)
-    @swagger_auto_schema(manual_parameters=[token_param_config])
-    def post(self, request):
-        token = request.data['token']
+    
+    permission_classes = [AllowAny]
+    
+    def get(self, request, id):
         try:
-            payload = AccessToken(token)
-            driver = Driver.objects.get(id=payload['user_id'])
+            driver = Driver.objects.get(id=id)
 
             if driver:
                 if driver.identity_document and driver.drivers_license and driver.vehicle_registration and driver.criminal_record_check:
                     return Response({"verified": True})
                 else:
                     return Response({"verified:": False})
-        except jwt.ExpiredSignatureError:
-            return Response({'error': "link expired"}, status=status.HTTP_400_BAD_REQUEST)
-        except jwt.exceptions.DecodeError:
-            return Response({'error': "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+        except Driver.DoesNotExist:
+            return Response({"error": "Driver not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 

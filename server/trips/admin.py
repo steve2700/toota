@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Trip, TripPayment
+from .models import Trip, Payment
 
 
 @admin.register(Trip)
@@ -12,6 +12,7 @@ class TripAdmin(admin.ModelAdmin):
         'driver',
         'user',
         'vehicle_type', 
+        'pickup_time',
         'load_description',
         'status',
         'created',
@@ -26,6 +27,7 @@ class TripAdmin(admin.ModelAdmin):
         'driver',
         'user',
         'vehicle_type', 
+        'pickup_time',
         'load_description',
         'status',
         'created',
@@ -44,7 +46,7 @@ class TripAdmin(admin.ModelAdmin):
     
     )
 
-@admin.register(TripPayment)
+@admin.register(Payment)
 class TripAdmin(admin.ModelAdmin):
     fields = (
         'id', 
@@ -53,6 +55,7 @@ class TripAdmin(admin.ModelAdmin):
         'amount_paid',
         'payment_status', 
         'payment_date',
+        'order_number'
     )
 
     list_display = (
@@ -62,6 +65,7 @@ class TripAdmin(admin.ModelAdmin):
         'amount_paid',
         'payment_status', 
         'payment_date',
+        'order_number'
     )
 
     list_filter = (
