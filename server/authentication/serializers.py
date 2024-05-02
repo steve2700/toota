@@ -51,7 +51,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['email', 'full_name', 'phone_number',  'password', 'confirm_password']
+        fields = ['id', 'email', 'full_name', 'phone_number',  'password', 'confirm_password']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -103,6 +103,9 @@ class DriverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Driver
         fields = ['email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'identity_document', 'driver_licence', 'vehicle_registration','criminal_record_check','password', 'confirm_password']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
          
     def validate(self, attrs):
         
@@ -255,10 +258,10 @@ class SetNewPasswordSerializer(serializers.Serializer):
     
 
 class CheckDriverVerificationSerializer(serializers.Serializer):
-    token=serializers.CharField(min_length=1, write_only=True)
 
     class Meta:
-        fields = ['token']
+        model = Driver
+        fields = ['id']
 
 class LogoutSerializer(serializers.Serializer):
     
@@ -273,3 +276,19 @@ class LogoutSerializer(serializers.Serializer):
             self.fail('bad token')
 
    
+class DriverProfileSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField()
+    
+    class Meta:
+        model = Driver
+        fields = ['id', 'email', 'full_name', 'phone_number','profile_picture', 'vehicle_registration_no', 'vehicle_type']
+        read_only_fields = ['id']
+
+    def update(self, user, data):
+        user.email = data.get('email', user.email)
+        user.full_name = data.get('full_name', user.full_name)
+        user.phone_number = data.get('phone_number', user.phone_number)
+        user.profile_picture = data.get('profile_picture', profile_picture)
+        user.vehicle_type = data.get('vehicle_type', vehicle_type)
+
+        return user
