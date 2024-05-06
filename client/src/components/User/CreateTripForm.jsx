@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import { getAccessToken , getUser} from "../../services/AuthService";
 
 const CreateTripForm = () => {
+  const [message, setMessage] = useState(null);
   const [trip, setTrip] = useState(null);
 
   const token = getAccessToken();
@@ -177,6 +178,13 @@ const CreateTripForm = () => {
           Create Trip
         </button>
       </div>
+      {/* Success message styling and positioning */}
+      {message && (
+	      <div className={`mt-4 p-2 rounded ${message.type === 'success' ? 'bg-green-200' : 'bg-red-200'}`} style={{ position: 'fixed', top: '20px', right: '20px', zIndex: '9999' }}>
+	       <p className="text-sm text-gray-800">{message.text}</p>
+	      <button onClick={handleCloseMessage} className="text-sm text-gray-600 font-semibold mt-1">Close</button>
+	      </div>
+     )}	      
     </form>
   );
 };

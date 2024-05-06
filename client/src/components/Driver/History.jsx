@@ -1,51 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { ClockIcon, ClipboardCheckIcon } from '@heroicons/react/outline'; // Import required icons
+import axios from 'axios';
+import { getAccessToken } from "../../services/AuthService";
 
-const RideHistorySection = () => {
-  // Define state to store ride history data
-  const [rideHistory, setRideHistory] = useState([]);
-
-  // Simulated ride history data (replace this with actual data from backend)
-  const mockRideHistory = [
-    { id: 1, date: '2022-03-15', pickupLocation: 'Location A', dropOffLocation: 'Location B', fare: 20.5 },
-    { id: 2, date: '2022-03-14', pickupLocation: 'Location C', dropOffLocation: 'Location D', fare: 18.75 },
-    // Add more ride history data as needed
-  ];
+const History = () => {
+  const [trips, setTrips] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch ride history data from backend API and update state
-    setRideHistory(mockRideHistory); // Replace with actual fetch logic
+    fetchRideHistory();
   }, []);
 
+  const fetchRideHistory = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = getAccessToken();
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const url = `http://localhost:8000/api/trip/driver/${driver_id}`;
+      console.log('URL:', url);
+      const response = await axios.get(url, config);
+      console.log('Response:', response);
+      console.log('Data received:', response.data);
+      if (Array.isArray(response.data)) {
+        setTrips(response.data);
+      } else {
+        throw new Error('Invalid data format');
+      }
+    } catch (err) {
+      console.error('Error fetching ride history:', err);
+      setError('Error fetching ride history. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div>
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">Ride History</h2>
-      {rideHistory.length > 0 ? (
-        <div>
-          {rideHistory.map((ride) => (
-            <div key={ride.id} className="bg-white p-4 rounded-md shadow-md mb-4">
-              <div className="flex items-center space-x-4">
-                <ClockIcon className="h-8 w-8 text-gray-600" />
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800">Date: {ride.date}</h3>
-                  <p className="text-gray-500">Pickup: {ride.pickupLocation}</p>
-                  <p className="text-gray-500">Drop-off: {ride.dropOffLocation}</p>
-                  <p className="text-gray-500">Fare: ${ride.fare.toFixed(2)}</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <ClipboardCheckIcon className="h-8 w-8 text-gray-600" />
-                <p className="text-gray-500">Status: Completed</p>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="container mx-auto p-4 pt-6">
+      {isLoading ? (
+        <p className="text-center text-gray-500">Loading ride history...</p>
+      ) : error ? (
+        <p className="text-center text-red-500">{error}</p>
       ) : (
-        <p className="text-gray-500">No ride history available</p>
+        trips.length > 0 ? (
+          trips.map((trip) => (
+            <div key={trip.id} className="bg-white rounded-lg shadow-md p-4 mt-4">
+              <h2 className="text-lg font-bold">{trip.id}</h2>
+              <p className="text-gray-600">Pickup Location: {trip.pickup_location}</p>
+              <p className="text-gray-600">Dropoff Location: {trip.dropoff_location}</p>
+              <p className="text-gray-600">Date: {trip.date}</p>
+              <p className="text-gray-600">Status: {trip.status}</p>
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-500">No ride history available.</p>
+        )
       )}
     </div>
   );
 };
 
-export default RideHistorySection;
+export default History;
 
