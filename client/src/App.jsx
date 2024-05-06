@@ -31,6 +31,7 @@ import AdminLogin from './components/Admin/AdminLogin';
 import AdminSignup from './components/Admin/AdminSignup';
 import UserCalendar from './components/User/UserCalendar';
 import DriverCalender from './components/Driver/DriverCalender';
+import DriverDetails from './components/Driver/DriverCalender';
 
 
 function App() {
@@ -59,6 +60,7 @@ function App() {
             <Route path='profile' element={<AdminProfile />} />
             <Route path='users' element= {<Users />} />
             <Route path='drivers' element={<Drivers />} />
+            <Route path='driver/:id' element={<DriverDetails />} />
             <Route path='payments' element={<Payments />} />
             <Route path='logout' element={<AdminLogout />} />
           </Route>

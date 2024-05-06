@@ -27,7 +27,7 @@ const AdminProfile = () => {
           const response =  await getUser()
           console.log(response)
           setUser(response);
-          setLoading(false)
+          setLoading()
           setFormData({
             email: response.email,
             full_name: response.full_name,
