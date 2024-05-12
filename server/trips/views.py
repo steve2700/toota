@@ -1,9 +1,9 @@
 # views.py
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from .models import Trip
+from .models import Trip, Payment
 from authentication.models import Driver
-from .serializers import TripSerializer
+from .serializers import TripSerializer, PaymentSerializer
 from rest_framework import permissions
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -61,6 +61,10 @@ class TripListView(generics.ListAPIView):
     serializer_class = TripSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        # Filter the queryset by the latest trips based on pickup_time
+        return Trip.objects.order_by('-pickup_time')
+
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
@@ -107,3 +111,12 @@ class TripCompletedCountView(generics.GenericAPIView):
             pickup_time__month=month
         ).count()
         return completed_trips_count
+
+
+class PaymentListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+
+class PaymentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer

@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import TripListCreateView, TripRetrieveUpdateDeleteView, TripRetrieveByDriverView, TripListView, TripCompletedCountView
+from .views import TripListCreateView, TripRetrieveUpdateDeleteView, TripRetrieveByDriverView, TripListView, TripCompletedCountView, PaymentListCreateAPIView, PaymentRetrieveUpdateDestroyAPIView
 
 app_name = 'trip'
 
@@ -10,5 +10,7 @@ urlpatterns = [
     path('driver/<int:driver_id>', TripRetrieveByDriverView.as_view(), name='trip-retrieve-by-driver'),
     path('all/', TripListView. as_view(), name='all-trips'),
     path('completed/', TripCompletedCountView.as_view(), name='completed-trips'),
+    path('payments/', PaymentListCreateAPIView.as_view(), name='payment-list-create'),
+    path('payments/<uuid:pk>/', PaymentRetrieveUpdateDestroyAPIView.as_view(), name='payment-detail'),
    
 ]

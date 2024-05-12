@@ -102,7 +102,7 @@ class DriverSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Driver
-        fields = ['email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'identity_document', 'driver_licence', 'vehicle_registration','criminal_record_check','password', 'confirm_password']
+        fields = ['id','email', 'full_name', 'phone_number', 'physical_address', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'identity_document', 'driver_licence', 'vehicle_registration','criminal_record_check','password', 'confirm_password']
         extra_kwargs = {
             'password': {'write_only': True}
         }
