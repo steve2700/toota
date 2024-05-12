@@ -1,5 +1,5 @@
-import React, { useState, createContext } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import DriverLoginForm from "./components/Driver/DriverLoginForm";
 import DriverRegistrationForm from "./components/Driver/DriverRegistrationForm";
 import DriverProfile from "./components/Driver/DriverProfile"
@@ -8,7 +8,13 @@ import UserLoginForm from "./components/User/UserLoginForm";
 import UserRegistrationForm from "./components/User/UserRegistrationForm";
 import ForgotPasswordForm from "./components/User/ForgotPasswordForm";
 import ResetPasswordForm from "./components/User/ResetPasswordForm";
+import DriverForgotPasswordForm from "./components/Driver/DriverForgotPasswordForm";
+import DriverResetPasswordForm from "./components/Driver/DriverResetPasswordForm";
 import NotFound from "./pages/NotFound";
+import Homepage from "./pages/Homepage";
+import AboutUs from "./pages/AboutUs";
+import BecomeDriver from "./pages/BecomeDriver";
+
 import Dashboard from './components/User/Dashboard';
 import DriverDashboard from './components/Driver/DriverDashboard';
 import DocumentUploadForm from "./components/Driver/DocumentUploadForm";
@@ -31,6 +37,7 @@ import AdminLogin from './components/Admin/AdminLogin';
 import AdminSignup from './components/Admin/AdminSignup';
 import UserCalendar from './components/User/UserCalendar';
 import DriverCalender from './components/Driver/DriverCalender';
+import DriverDetails from './components/Driver/DriverCalender';
 
 
 function App() {
@@ -44,7 +51,10 @@ function App() {
           <Route path="/signup/user" element={<UserRegistrationForm />} />
           <Route path="/login/user" element={<UserLoginForm />} />
           <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-          <Route path="/reset-password/:uidb64/:token" component={ResetPasswordForm} />
+          <Route path="/reset-password/:uidb64/:token" element={<ResetPasswordForm />} />
+	  <Route path="/driver-forgot-password" element={<DriverForgotPasswordForm />} />
+	  <Route path="/driver-reset-password/:uidb64/:token" element={<DriverResetPasswordForm />} />
+	  <Route path="/driver-verification-documents" element={<DocumentUploadForm />} />
           <Route path="/dashboard/user/" element={<Layout />} >
             <Route index element={<Dashboard />} />
             <Route path='profile' element={<ProfilePage />} />
@@ -59,6 +69,7 @@ function App() {
             <Route path='profile' element={<AdminProfile />} />
             <Route path='users' element= {<Users />} />
             <Route path='drivers' element={<Drivers />} />
+            <Route path='driver/:id' element={<DriverDetails />} />
             <Route path='payments' element={<Payments />} />
             <Route path='logout' element={<AdminLogout />} />
           </Route>
@@ -73,6 +84,9 @@ function App() {
 
 
           {/*<Route path="/profile/user/:token" element={<ProfilePage />} />*/}
+	  <Route path="/" element={<Homepage />} />
+	  <Route path="/become-driver" element={<BecomeDriver />} />
+	  <Route path="/about" element={<AboutUs />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
      
@@ -82,4 +96,3 @@ function App() {
 }
 
 export default App;
-

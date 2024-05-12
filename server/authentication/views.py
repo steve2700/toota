@@ -215,39 +215,36 @@ class RequestUserPasswordResetEmail(generics.GenericAPIView):
             token = PasswordResetTokenGenerator().make_token(user)
             current_site = get_current_site(request=request).domain
             relative_link = reverse('password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
-            redirect_url = request.data.get('redirect_url', '')
-            abs_url = f'http://{current_site}{relative_link}'
-            email_body=f"Hey {user.full_name} \n\n It seems like you've requested a password reset for your Toota account.No worries, we've got you covered!\nTo reset your password, please follow the link below:\n{abs_url}?redirect_url={redirect_url}\n\nIf you did not request this password reset, please ignore this email. Your account is secure, and no changes have been made.\n\nToota Support Team"
+            redirect_url = 'http://localhost:5173/reset-password/'+uidb64+'/'+token
+            email_body=f"Hey {user.full_name} \n\n It seems like you've requested a password reset for your Toota account no worries, we've got you covered!\nTo reset your password, please follow the link below:\n{redirect_url}\n\nIf you did not request this password reset, please ignore this email. Your account is secure, and no changes have been made.\n\nToota Support Team"
             data={
                 'email_body': email_body,
-                'domain': abs_url, 
+                'domain': current_site, 
                 'to_email': user.email,
                 'email_subject': 'Reset your Password'
             }
             Util.send_email(data)
         return Response({'success': 'We have sent a link to reset your password'}, status=status.HTTP_200_OK)
     
-    
 class PasswordUserTokenCheck(generics.GenericAPIView):
     serializer_class = SetNewPasswordSerializer
     permission_classes = [AllowAny]
 
     def get(self, request, uidb64, token):
-        redirect_url = request.GET.get('redirect_url')
         try:
-            id = smart_str(urlsafe_base64_decode(uidb64))
+            id = urlsafe_base64_decode(uidb64).decode()
             user = User.objects.get(id=id)
 
             if not PasswordResetTokenGenerator().check_token(user, token):
-                if len(redirect_url) > 3:
-                    return CustomRedirect(redirect_url+'?token_valid=False')
-                else:
-                    return CustomRedirect(os.environ.get('FRONTEND_URL', '')+'?token_valid=False')
+                return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
-            return CustomRedirect(redirect_url+'?token_valid=True&message=Credentials Valid&uidb64='+uidb64+'&token='+token)
+            return Response({'message': 'Credentials Valid', 'uidb64': uidb64, 'token': token}, status=status.HTTP_200_OK)
 
-        except DjangoUnicodeDecodeError as identifier:
-           return CustomRedirect(f'{redirect_url}?token_valid=False')
+        except (ValueError, User.DoesNotExist, DjangoUnicodeDecodeError):
+            return Response({'error': 'Invalid parameters'}, status=status.HTTP_400_BAD_REQUEST)
+
+    
+
        
     
 class DriverSignUpView(generics.GenericAPIView):
@@ -355,16 +352,15 @@ class RequestDriverPasswordResetEmail(generics.GenericAPIView):
         email = request.data['email']
         if Driver.objects.filter(email=email).exists():
             user = Driver.objects.get(email=email)
-            uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
+            uidb64 = urlsafe_base64_encode(smart_bytes(str(user.id)))
             token = PasswordResetTokenGenerator().make_token(user)
             current_site = get_current_site(request=request).domain
             relative_link = reverse('password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
-            redirect_url = request.data.get('redirect_url', '')
-            abs_url = f'http://{current_site}{relative_link}'
-            email_body=f"Hey {user.full_name} \n\n It seems like you've requested a password reset for your Toota account.No worries, we've got you covered!\nTo reset your password, please follow the link below:\n{abs_url}?redirect_url={redirect_url}\n\nIf you did not request this password reset, please ignore this email. Your account is secure, and no changes have been made.\n\nToota Support Team"
+            redirect_url = 'http://localhost:5173/driver-reset-password/'+uidb64+'/'+token
+            email_body=f"Hey {user.full_name} \n\n It seems like you've requested a password reset for your Toota account no worries, we've got you covered!\nTo reset your password, please follow the link below:\n{redirect_url}\n\nIf you did not request this password reset, please ignore this email. Your account is secure, and no changes have been made.\n\nToota Support Team"
             data={
                 'email_body': email_body,
-                'domain': abs_url, 
+                'domain': current_site,
                 'to_email': user.email,
                 'email_subject': 'Reset your Password'
             }
@@ -376,22 +372,19 @@ class RequestDriverPasswordResetEmail(generics.GenericAPIView):
 class PasswordDriverTokenCheck(generics.GenericAPIView):
     serializer_class = SetNewPasswordSerializer
     permission_classes = [AllowAny]
+
     def get(self, request, uidb64, token):
-        redirect_url = request.GET.get('redirect_url')
         try:
-            id = smart_str(urlsafe_base64_decode(uidb64))
-            user = Driver.objects.get(id=id)
+            id = urlsafe_base64_decode(uidb64).decode()
+            driver = Driver.objects.get(id=id)
 
-            if not PasswordResetTokenGenerator().check_token(user, token):
-                if len(redirect_url) > 3:
-                    return CustomRedirect(redirect_url+'?token_valid=False')
-                else:
-                    return CustomRedirect(os.environ.get('FRONTEND_URL', '')+'?token_valid=False')
+            if not PasswordResetTokenGenerator().check_token(driver, token):
+                return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
-            return CustomRedirect(redirect_url+'?token_valid=True&message=Credentials Valid&uidb64='+uidb64+'&token='+token)
+            return Response({'message': 'Credentials Valid', 'uidb64': uidb64, 'token': token}, status=status.HTTP_200_OK)
 
-        except DjangoUnicodeDecodeError as identifier:
-           return CustomRedirect(f'{redirect_url}?token_valid=False')
+        except (ValueError, Driver.DoesNotExist, DjangoUnicodeDecodeError):
+            return Response({'error': 'Invalid parameters'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CheckDriverVerification(generics.GenericAPIView):

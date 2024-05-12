@@ -148,7 +148,9 @@ class DriverSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('confirm_password')
         return Driver.objects.create_driver(**validated_data)
-    
+
+
+
             
 class LoginUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=255, min_length=8)
