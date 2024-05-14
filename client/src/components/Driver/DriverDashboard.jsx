@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BellIcon, UserIcon, CogIcon, ClockIcon, CurrencyDollarIcon, ClipboardCheckIcon, QuestionMarkCircleIcon, HomeIcon, LogoutIcon } from '@heroicons/react/outline'; // Import required icons
 import { useNavigate } from 'react-router-dom';
 import LogoutConfirmationForm from './LogoutConfirmationForm'; // Import the LogoutConfirmationForm component
 import DriverProfileForm from "./DriverProfile";
 import { ToastContainer, toast } from 'react-toastify';
 import supabase from '../../services/SupaBaseClient';
+import { getAccessToken } from '../../services/AuthService';
+import { jwtDecode } from "jwt-decode";
 
 const DriverDashboard = () => {
   const navigate = useNavigate();
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false); // State variable to track profile editing mode
-
+  const token = getAccessToken();
   const handleLogout = () => {
     setShowLogoutConfirmation(true);
   };
@@ -20,11 +22,13 @@ const DriverDashboard = () => {
     if (confirmLogout) {
       // Perform logout action
       // Redirect to login/driver route
-      navigate('/login/driver');
+      navigate('/login/driver/');
     } else {
       setShowLogoutConfirmation(false);
     }
   };
+
+ 
 
   // Function to toggle profile editing mode
   const toggleEditingProfile = () => {
