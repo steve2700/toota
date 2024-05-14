@@ -292,5 +292,11 @@ class DriverProfileSerializer(serializers.ModelSerializer):
         user.phone_number = data.get('phone_number', user.phone_number)
         user.profile_picture = data.get('profile_picture', profile_picture)
         user.vehicle_type = data.get('vehicle_type', vehicle_type)
+        user.vehicle_registration_no = data.get('vehicle_registration_no', vehicle_registration_no)
+        user.vehicle_registration = data.get('vehicle_registration', vehicle_registration)
+        user.licence_no = data.get('licence_no', licence_no)
+        user.identity_document = data.get('identity_document', identity_document)
+        user.driver_licence = data.get('driver_licence', driver_licence)
+        user.criminal_record_check = data.get('criminal_record_check', criminal_record_check)
 
         return user
