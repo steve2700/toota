@@ -283,7 +283,7 @@ class DriverProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Driver
-        fields = ['id', 'email', 'full_name', 'phone_number','profile_picture', 'vehicle_registration_no', 'vehicle_type']
+        fields = ['id','email', 'full_name', 'phone_number', 'physical_address', 'profile_picture', 'vehicle_registration_no', 'vehicle_type', 'licence_no', 'identity_document', 'driver_licence', 'vehicle_registration','criminal_record_check']
         read_only_fields = ['id']
 
     def update(self, user, data):
