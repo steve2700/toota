@@ -14,7 +14,7 @@ const PaymentForm = ({ tripId, driverId, bid, onSubmit , token}) => {
     try {
       // Send payment request to the API
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.post('http://localhost:8000/api/trip/payments/', {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/trip/payments/`, {
         tripId,
         driverId,
         amount: parseFloat(amount),

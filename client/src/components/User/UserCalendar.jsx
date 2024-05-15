@@ -17,7 +17,7 @@ const UserCalendar = () => {
     try {
       const token = getAccessToken();
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.get(`http://localhost:8000/api/user/trips/`, config);
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/user/trips/`, config);
       setTrips(response.data);
     } catch (err) {
       console.error(err);

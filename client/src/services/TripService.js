@@ -3,7 +3,7 @@ import { getAccessToken } from './AuthService';
 
 
 export const getTrip = async (id) => {
-  const url = `http://localhost:8000/api/trip/${id}/`;
+  const url = `${import.meta.env.VITE_BASE_URL}/api/trip/${id}/`;
   const token = getAccessToken();
   const headers = { Authorization: `Bearer ${token}`};
   try {
@@ -16,7 +16,7 @@ export const getTrip = async (id) => {
 }
 
 export const updateTrip = async (id, data) => {
-  const url = `http://localhost:8000/api/trip/${id}/`;
+  const url = `${import.meta.env.VITE_BASE_URL}/api/trip/${id}/`;
   const token = getAccessToken();
   
   const headers = { Authorization: `Bearer ${token}` };
@@ -38,7 +38,7 @@ export const getAllTrips = async () => {
   const config = { headers: { Authorization: `Bearer ${token}` } };
 
   try {
-    const response = await axios.get(`http://localhost:8000/api/trip/all/`, config);
+    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/trip/all/`, config);
     const trip = response.data 
     return trip
   } catch(err) {
@@ -52,7 +52,7 @@ export const getAllCompletedTrips = async () => {
   const config = { headers: { Authorization: `Bearer ${token}` } };
 
   try {
-    const response = await axios.get(`http://localhost:8000/api/trip/completed/`, config);
+    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/trip/completed/`, config);
     const trip = response.data 
     return trip
   } catch(err) {

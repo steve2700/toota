@@ -14,7 +14,7 @@ export const getUser = async () => {
 	try {
 		const decodedToken = jwtDecode(token); // Decode the JWT token
 		const user_id = decodedToken["user_id"];
-		const response = await axios.get(`http://localhost:8000/api/user/profile/${user_id}/`, config);
+		const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/user/profile/${user_id}/`, config);
 		const userData = response.data 
 		return userData
 	} catch(err) {
@@ -29,7 +29,7 @@ export const getAllUsers = async () => {
 	try {
 		const decodedToken = jwtDecode(token); // Decode the JWT token
 		const user_id = decodedToken["user_id"];
-		const response = await axios.get(`http://localhost:8000/api/users/`, config);
+		const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/users/`, config);
 		const userData = response.data 
 		return userData
 	} catch(err) {
@@ -45,7 +45,7 @@ export const getAllDrivers = async () => {
 	try {
 		const decodedToken = jwtDecode(token); // Decode the JWT token
 		const user_id = decodedToken["user_id"];
-		const response = await axios.get(`http://localhost:8000/api/drivers/`, config);
+		const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/drivers/`, config);
 		const userData = response.data 
 		return userData
 	} catch(err) {
@@ -60,7 +60,7 @@ export const getDriver = async () => {
 	try {
 		const decodedToken = jwtDecode(token); // Decode the JWT token
 		const user_id = decodedToken["user_id"];
-		const response = await axios.get(`http://localhost:8000/api/driver/profile/${user_id}/`, config);
+		const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/driver/profile/${user_id}/`, config);
 		const userData = response.data 
 		return userData
 	} catch(err) {

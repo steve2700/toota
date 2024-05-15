@@ -18,6 +18,10 @@ const DocumentUploadForm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+
+    const checkDriverVerification = async () => {
+
+    }
     const fetchDriverId = async () => {
       try {
         if (token) {
@@ -30,7 +34,32 @@ const DocumentUploadForm = () => {
     };
 
     fetchDriverId();
+
+
   }, [token]);
+
+  useEffect(() => {
+
+     const checkDriverVerification = async () => {
+      if (token){
+        const driver = await getDriver();
+      
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+        try {
+           const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/driver/verification-check/${driver.id}/`, config);
+           if (response.data.verified === true){
+            navigate('/dashboard/driver');
+           }
+           console.log(response.data.verified === true);
+         } catch(error){
+          console.error(error)
+         }
+      }
+      
+    }
+    checkDriverVerification();
+
+  }, [token])
 
  const handleFileChange = (e, fileType) => {
   const file = e.target.files[0]; // Get the first file from the files array
@@ -53,14 +82,14 @@ const DocumentUploadForm = () => {
 
     try {
       const driver = await getDriver();
-      const { id } = driver;
+      
 
       const formDataToSend = new FormData();
       for (const key in formData) {
         formDataToSend.append(key, formData[key]);
       }
 
-      const response = await axios.patch(`http://127.0.0.1:8000/api/driver/profile/${id}/`, formDataToSend, {
+      const response = await axios.patch(`${import.meta.env.VITE_BASE_URL}/api/driver/profile/${driver.id}/`, formDataToSend, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

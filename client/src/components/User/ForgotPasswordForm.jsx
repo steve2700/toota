@@ -19,7 +19,7 @@ const ForgotPasswordForm = () => {
       }
 
       // Make the backend API call to send reset password link
-      const response = await axios.post('http://localhost:8000/api/user/password-reset/', { email });
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/user/password-reset/`, { email });
 
       if (response.status === 200) {
         setMessage('Reset link has been sent to your email.');

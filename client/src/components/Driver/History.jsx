@@ -16,7 +16,7 @@ const History = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const tripId = selectedTrip.id;
       console.log('Ending trip with ID:', tripId);
-      const response = await axios.patch(`http://localhost:8000/api/trip/${tripId}/`, { status: 'COMPLETED' }, config);
+      const response = await axios.patch(`${import.meta.env.VITE_BASE_URL}/api/trip/${tripId}/`, { status: 'COMPLETED' }, config);
       console.log('End Trip Response:', response);
       setMessage({ text: 'Trip has completed.', type: 'success' });
       setSelectedTrip(null); // Reset selected trip after ending
@@ -41,7 +41,7 @@ const History = () => {
       const decoded = jwtDecode(token);
       const driver_id = decoded['user_id']
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const url = `http://localhost:8000/api/trip/driver/${driver_id}`;
+      const url = `${import.meta.env.VITE_BASE_URL}/api/trip/driver/${driver_id}`;
       console.log('URL:', url);
       const response = await axios.get(url, config);
       console.log('Response:', response);

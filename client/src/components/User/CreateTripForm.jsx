@@ -37,7 +37,7 @@ const CreateTripForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/trip/', formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/trip/`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

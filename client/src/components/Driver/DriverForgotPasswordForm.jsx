@@ -19,7 +19,7 @@ const DriverForgotPasswordForm = () => {
       }
 
       // Make the backend API call to send reset password link
-      const response = await axios.post('http://localhost:8000/api/driver/password-reset/', { email });
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/driver/password-reset/`, { email });
 
       if (response.status === 200) {
         setMessage('Reset link has been sent to your email.');

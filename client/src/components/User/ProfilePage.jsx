@@ -59,7 +59,7 @@ const ProfilePage = () => {
       const new_user = jwtDecode(jwt);
       const user_id = new_user['user_id'];
 
-      const response = await axios.patch(`http://localhost:8000/api/user/profile/${user_id}/`, formData, {
+      const response = await axios.patch(`${import.meta.env.VITE_BASE_URL}/api/user/profile/${user_id}/`, formData, {
         headers: {
           Authorization: `Bearer ${jwt}`
         }

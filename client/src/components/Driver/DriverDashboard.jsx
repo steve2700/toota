@@ -5,6 +5,7 @@ import LogoutConfirmationForm from './LogoutConfirmationForm'; // Import the Log
 import DriverProfileForm from "./DriverProfile";
 import { ToastContainer, toast } from 'react-toastify';
 import supabase from '../../services/SupaBaseClient';
+import { jwtDecode } from "jwt-decode";
 import { getDriver, getAccessToken } from "../../services/AuthService";
 
 const DriverDashboard = () => {
@@ -12,22 +13,29 @@ const DriverDashboard = () => {
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false); // State variable to track profile editing mode
   const [verified, setVerified] = useState(false);
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
+
   const token = getAccessToken();
+  const decodedToken = jwtDecode(token);
 
   useEffect(() => {
     const fetchVerificationStatus = async () => {
       try {
         if (token) {
           const driver = await getDriver();
-          const response = await fetch(`http://127.0.0.1:8000/api/driver/verification-check/${driver.id}/`, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-          });
-          const data = await response.json();
-          const { verified } = data;
-          setVerified(verified);
+          const config = { headers: { Authorization: `Bearer ${token}` } };
+          try {
+
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/driver/verification-check/${driver.id}/`, config);
+             if (response.data.verified === false){
+              navigate('/driver-verification-documents');
+             }
+
+          } catch(err){
+            console.error(err)
+          }
+
+          
         }
       } catch (error) {
         console.error('Error fetching verification status:', error);
@@ -38,25 +46,30 @@ const DriverDashboard = () => {
   }, [token]);
 
   useEffect(() => {
-    if (!verified) {
-      navigate('/driver-verification-documents');
-    }
-  }, [verified, navigate]);
+    if (token) {
+      
+      try {
+        
+        const currentTime = Date.now() / 1000;
 
-
-  const handleLogout = () => {
-    setShowLogoutConfirmation(true);
-  };
-
-  const handleLogoutConfirmation = (confirmLogout) => {
-    if (confirmLogout) {
-      // Perform logout action
-      // Redirect to login/driver route
-      navigate('/login/driver/');
+        if (decodedToken.exp < currentTime) {
+          setIsSessionExpired(true);
+          localStorage.removeItem('access_token'); // Clear expired token
+          navigate('/login/driver'); // Redirect to login on expiration
+        } else {
+          setIsSessionExpired(false);
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        setIsSessionExpired(true); // Handle decoding errors as expired
+      }
     } else {
-      setShowLogoutConfirmation(false);
+      setIsSessionExpired(true); // No token found, assume expired
     }
-  };
+    
+  
+  }, [ token]);
+
 
  
 

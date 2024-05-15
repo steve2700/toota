@@ -17,7 +17,7 @@ const DriverResetPasswordForm = () => {
     console.log('Verifying token...');
     const verifyToken = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/driver/password-reset/${uidb64}/${token}/`);
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/driver/password-reset/${uidb64}/${token}/`);
         console.log('Token verification response:', response);
         if (response.status === 200) {
           console.log('Token is valid');

@@ -17,7 +17,7 @@ const AdminLogout = () => {
       };
       const refresh = localStorage.getItem('refresh_token')
       try {
-        const res = await axios.post(`http://localhost:8000/api/user/logout/`, refresh, config);
+        const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/user/logout/`, refresh, config);
         console.log(res.data)
         localStorage.removeItem('access_token');
         navigate('/login/admin/'); 

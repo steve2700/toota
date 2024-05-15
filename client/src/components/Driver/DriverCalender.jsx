@@ -26,7 +26,7 @@ const DriverCalendar = () => {
     try {
       const token = getAccessToken();
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const response = await axios.get(`http://localhost:8000/api/trip/`, config);
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/trip/`, config);
       console.log('Fetched Trips:', response.data);
       setTrips(response.data.filter(trip => trip.status !== 'COMPLETED')); // Filter out completed trips
     } catch (err) {
@@ -49,7 +49,7 @@ const DriverCalendar = () => {
     try {
       const token = getAccessToken();
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const acceptResponse = await axios.patch(`http://localhost:8000/api/trip/${trip.id}/`, { status: 'ACCEPTED' }, config);
+      const acceptResponse = await axios.patch(`${import.meta.env.VITE_BASE_URL}/api/trip/${trip.id}/`, { status: 'ACCEPTED' }, config);
       console.log('Accept Trip Response:', acceptResponse);
       setMessage({ text: 'Trip accepted.', type: 'success' });
       // Update the status of the selected trip to 'ACCEPTED'
@@ -71,7 +71,7 @@ const DriverCalendar = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const tripId = trip.id;
       console.log('Starting trip with ID:', tripId);
-      const startResponse = await axios.patch(`http://localhost:8000/api/trip/${tripId}/`, { status: 'IN_PROGRESS' }, config);
+      const startResponse = await axios.patch(`${import.meta.env.VITE_BASE_URL}/api/trip/${tripId}/`, { status: 'IN_PROGRESS' }, config);
       console.log('Start Trip Response:', startResponse);
       setMessage({ text: 'Trip has started.', type: 'success' });
       setSelectedTrip(null); // Reset selected trip after starting
@@ -96,7 +96,7 @@ const DriverCalendar = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const tripId = trip.id;
       console.log('Ending trip with ID:', tripId);
-      const endResponse = await axios.patch(`http://localhost:8000/api/trip/${tripId}/`, { status: 'COMPLETED' }, config);
+      const endResponse = await axios.patch(`${import.meta.env.VITE_BASE_URL}/api/trip/${tripId}/`, { status: 'COMPLETED' }, config);
       console.log('End Trip Response:', endResponse);
     } catch (err) {
       console.error(err);
