@@ -1,4 +1,5 @@
 import React from 'react';
+import Header from './Header';
 import { Link } from 'react-router-dom';
 import { MdOutlineAttachMoney } from "react-icons/md";
 import { RiTimeLine, RiRoadMapLine } from 'react-icons/ri';
@@ -6,6 +7,8 @@ import { FaHandshake } from 'react-icons/fa';
 
 const BecomeDriver = () => {
   return (
+    <div>
+	  <Header />
     <section className="become-driver shadow-md rounded overflow-hidden">
       <div className="flex items-center justify-center mb-6"> {/* Adjusted alignment */}
         <div className="text-center"> {/* Centered heading */}
@@ -70,6 +73,7 @@ const BecomeDriver = () => {
         </Link>
       </div>
     </section>
+    </div>	  
   );
 };
 

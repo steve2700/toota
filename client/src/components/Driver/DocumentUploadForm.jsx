@@ -53,7 +53,7 @@ const DocumentUploadForm = () => {
       const { id } = driver;
 
       const response = await fetch(`http://127.0.0.1:8000/api/driver/profile/${id}/`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

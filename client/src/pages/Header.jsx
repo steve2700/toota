@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Assuming using React Router
-import logo from '../72dpi_logo_white.jpg'; // Adjust the path accordingly
+import { Link } from 'react-router-dom';
+import logo from '../72dpi_logo_white.jpg';
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,9 +10,9 @@ function Header() {
   };
 
   return (
-    <header className="flex justify-between items-center py-4 px-6 bg-black text-white">
+    <header className="flex justify-between items-center py-4 px-6 bg-yellow-400 text-black">
       <div className="flex items-center">
-        <img src={logo} alt="Toota" className="h-16" /> {/* Adjust the height as needed */}
+        <img src={logo} alt="Toota" className="h-16" />
       </div>
       <nav className="hidden md:flex space-x-4">
         <Link to="/" className="hover:text-primary">Home</Link>
@@ -20,10 +20,10 @@ function Header() {
         <Link to="/become-driver" className="hover:text-primary">Become a Driver</Link>
       </nav>
       <div className="flex items-center md:space-x-4">
-        <Link to="/login/user" className="px-4 py-2 rounded-md bg-primary hover:bg-secondary transition-colors duration-300">
+        <Link to="/login/user" className="px-4 py-2 rounded-md bg-transparent text-white border border-white hover:bg-white hover:text-black transition-colors duration-300"> {/* Changed classes to match the signup button */}
           Login
         </Link>
-        <Link to="/signup/user" className="px-4 py-2 rounded-md bg-transparent text-white border border-white hover:bg-white hover:text-black transition-colors duration-300">
+        <Link to="/signup/user" className="px-4 py-2 rounded-md bg-white text-black border border-white hover:bg-black hover:text-white transition-colors duration-300"> {/* Applied classes from signup button */}
           Sign Up
         </Link>
         <button onClick={toggleMenu} className="md:hidden focus:outline-none">
