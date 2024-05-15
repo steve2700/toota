@@ -6,7 +6,6 @@ import DriverProfileForm from "./DriverProfile";
 import { ToastContainer, toast } from 'react-toastify';
 import supabase from '../../services/SupaBaseClient';
 import { getDriver, getAccessToken } from "../../services/AuthService";
->>>>>>> origin/main
 
 const DriverDashboard = () => {
   const navigate = useNavigate();
