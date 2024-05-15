@@ -1,2 +1,0 @@
-# toota
-digital platform
