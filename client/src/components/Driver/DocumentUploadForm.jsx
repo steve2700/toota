@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FaIdCard, FaPassport, FaFile, FaCheck, FaTimes } from 'react-icons/fa'; // Import icons from Font Awesome
-import DocumentVerificationMessageForm from './DocumentVerificationMessageForm'; // Import the message form component
+import { FaIdCard, FaPassport, FaFile, FaCheck, FaTimes } from 'react-icons/fa';
+import DocumentVerificationMessageForm from './DocumentVerificationMessageForm';
 import { getDriver, getAccessToken } from "../../services/AuthService";
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import axios for making HTTP requests
 
 const DocumentUploadForm = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,10 @@ const DocumentUploadForm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+
+    const checkDriverVerification = async () => {
+
+    }
     const fetchDriverId = async () => {
       try {
         if (token) {
@@ -29,12 +34,37 @@ const DocumentUploadForm = () => {
     };
 
     fetchDriverId();
+
+
   }, [token]);
 
-  const handleFileChange = (e, fileType) => {
-    const file = e.target.files[0];
-    setFormData({ ...formData, [fileType]: file });
-  };
+  useEffect(() => {
+
+     const checkDriverVerification = async () => {
+      if (token){
+        const driver = await getDriver();
+      
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+        try {
+           const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/driver/verification-check/${driver.id}/`, config);
+           if (response.data.verified === true){
+            navigate('/dashboard/driver');
+           }
+           console.log(response.data.verified === true);
+         } catch(error){
+          console.error(error)
+         }
+      }
+      
+    }
+    checkDriverVerification();
+
+  }, [token])
+
+ const handleFileChange = (e, fileType) => {
+  const file = e.target.files[0]; // Get the first file from the files array
+  setFormData({ ...formData, [fileType]: file });
+};
 
   const handleRemoveFile = (fileType) => {
     setFormData({ ...formData, [fileType]: null });
@@ -43,25 +73,31 @@ const DocumentUploadForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Check if all fields are uploaded
-    if (!formData.identity_document || !formData.driver_licence || !formData.criminal_record_check || !formData.vehicle_registration) {
-      alert('All documents are required'); 
-      return;
+    for (const key in formData) {
+      if (!formData[key]) {
+        alert('All documents are required');
+        return;
+      }
     }
 
     try {
       const driver = await getDriver();
-      const { id } = driver;
+      
 
-      const response = await fetch(`http://127.0.0.1:8000/api/driver/profile/${id}/`, {
-        method: 'PUT',
+      const formDataToSend = new FormData();
+      for (const key in formData) {
+        formDataToSend.append(key, formData[key]);
+      }
+
+      const response = await axios.patch(`${import.meta.env.VITE_BASE_URL}/api/driver/profile/${driver.id}/`, formDataToSend, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
         },
-        body: JSON.stringify(formData),
       });
+      console.log(response)
 
-      if (response.ok) {
+      if (response.status === 200) {
         // After successful submission, set submissionSuccess to true
         setSubmissionSuccess(true);
         // Redirect to the driver dashboard
@@ -181,7 +217,7 @@ const DocumentUploadForm = () => {
                       <input
                         type="file"
                         id="vehicleRegistration"
-                       name="vehicleRegistration"
+                        name="vehicleRegistration"
                         onChange={(e) => handleFileChange(e, 'vehicle_registration')}
                         accept=".pdf,.jpg,.jpeg,.png"
                         className="w-full px-3 py-2 border rounded"
@@ -210,4 +246,3 @@ const DocumentUploadForm = () => {
 };
 
 export default DocumentUploadForm;
-

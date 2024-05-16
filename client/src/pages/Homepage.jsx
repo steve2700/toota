@@ -8,7 +8,7 @@ const Homepage = () => {
     return (
         <div>
             <Header /> {/* Include the Header component */}
-                <div className="bg-yellow-400 text-black h-screen flex items-center justify-center">
+            <div className="bg-gradient-to-b from-black to-black text-white h-screen flex items-center justify-center">
                 <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Welcome Message and Paragraph */}
                     <div className="text-center md:text-left">
@@ -23,7 +23,7 @@ const Homepage = () => {
                             animate={{ opacity: 1, y: 0 }} // Animation to trigger when component mounts
                             transition={{ delay: 0.5, duration: 1 }} // Transition properties
                         >
-                            <FaBolt className="text-black-400 text-4xl animate-bounce" /> {/* Bolt icon with animation */}
+                            <FaBolt className="text-yellow-400 text-4xl animate-bounce" /> {/* Bolt icon with animation */}
                         </motion.div>
                     </div>
                     {/* Hero Image */}
@@ -92,7 +92,7 @@ const Homepage = () => {
                     </div>
                 </div>
             </section>
-            <Footer />
+	    <Footer />
         </div>
     );
 };
