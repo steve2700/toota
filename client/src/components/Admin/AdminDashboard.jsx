@@ -59,7 +59,7 @@ function AdminDashboard() {
   }, []);
   
   return (
-    <div className="flex justify-start items-center flex-col gap-4">
+    <div className="flex justify-start items-center flex-col gap-4 md: flex-row">
       {isSessionExpired && <p>Session expired. Please log in again.</p>}
       {isLoading ? (
         <div className="flex items-center h-full">
