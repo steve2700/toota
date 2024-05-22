@@ -165,7 +165,7 @@ const DriverCalendar = () => {
       {selectedTrip && (
       <dialog open={showPaymentModal && !paymentSuccess} className="modal">
         <div className="modal-box">
-          <PaymentForm tripId={selectedTrip.id} driverId={selectedTrip.driver}  bid={selectedTrip.bid} onSubmit={handlePaymentSubmit} token={token}/>
+          <PaymentForm tripId={selectedTrip.id} driverId={selectedTrip.driver.id}  bid={selectedTrip.bid} onSubmit={handlePaymentSubmit} token={token}/>
         </div>
         <form method="dialog" className="modal-backdrop">
           <button onClick={() => setShowPaymentModal(false)}>Close</button>
