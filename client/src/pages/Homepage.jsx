@@ -11,10 +11,10 @@ const Homepage = () => {
       <div className="bg-white-400 text-black h-screen flex items-center justify-center">
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="text-center md:text-left">
-            <h1 className="text-4xl text-[#f89f1b] font-bold mb-4">Welcome to Toota</h1>
-            <p className="text-lg mb-8">Your ultimate solution for seamless transportation and logistics services.</p>
-            <p className="text-lg mb-8">With Toota, you can effortlessly connect with a diverse fleet of vehicles and experienced drivers to meet all your transportation needs. Whether you're moving goods or seeking a ride, Toota ensures a reliable, efficient, and hassle-free experience every time.</p>
-            <p className="text-lg mb-8">Join Toota today and experience the future of transportation!</p>
+            <h1 className="text-3xl md:text-4xl text-[#f89f1b] font-bold mb-4">Welcome to Toota</h1>
+            <p className="text-base md:text-lg mb-8">Your ultimate solution for seamless transportation and logistics services.</p>
+            <p className="text-base md:text-lg mb-8">With Toota, you can effortlessly connect with a diverse fleet of vehicles and experienced drivers to meet all your transportation needs. Whether you're moving goods. Toota ensures a reliable, efficient, and hassle-free experience every time.</p>
+            <p className="text-base md:text-lg mb-8">Join Toota today and experience the future of transportation!</p>
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
