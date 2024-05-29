@@ -5,9 +5,6 @@ import threading
 
 
 VEHICLE_TYPES = (
-        ('bike', 'Bike'),
-        ('car', 'Car'),
-        ('van', 'Van'),
         ('truck_1', '1 ton Truck'),
         ('truck_1.5', '1.5 ton Truck'),
         ('truck_2', '2 ton Truck'),
