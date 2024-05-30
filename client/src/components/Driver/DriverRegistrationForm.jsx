@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { FaEnvelope, FaUser, FaPhone, FaHome, FaCar, FaIdCard, FaLock, FaExclamationCircle } from 'react-icons/fa';
+import logo from '../../logo.jpg'; // Ensure the path is correct
 
 const DriverRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -8,7 +10,7 @@ const DriverRegistrationForm = () => {
     phone_number: '',
     physical_address: '',
     vehicle_registration_no: '',
-    vehicle_type: '',
+    vehicle_type: 'bike',
     licence_no: '',
     password: '',
     confirm_password: '',
@@ -46,6 +48,11 @@ const DriverRegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (formData.password !== formData.confirm_password) {
+      setErrors({ confirm_password: "Passwords do not match" });
+      return;
+    }
+
     try {
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/driver/sign_up/`, {
         method: 'POST',
@@ -79,166 +86,203 @@ const DriverRegistrationForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full md:w-2/3 lg:w-1/2 xl:w-1/3" onSubmit={handleSubmit}>
-        <h2 className="text-2xl mb-6 font-bold text-center">Driver Sign Up</h2>
+    <div className="flex flex-col items-center justify-center min-h-screen py-12">
+      <form className="bg-white p-8 shadow-md rounded w-full sm:w-96" onSubmit={handleSubmit}>
+        <div className="flex justify-center mb-4">
+          <img src={logo} alt="Toota Logo" className="w-24 h-24" />
+        </div>
+        <h2 className="text-2xl font-bold text-center mb-4 text-[#f89f1b]">Driver Sign Up</h2>
 
         {successMessage && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
             {successMessage}
           </div>
         )}
 
         {errors && Object.keys(errors).map((key) => (
-          <div key={key} className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-            {errors[key]}
+          <div key={key} className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 flex items-center">
+            <FaExclamationCircle className="mr-2" />
+            <span>{errors[key]}</span>
           </div>
         ))}
 
         <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700 font-bold mb-2">Email</label>
+          <label htmlFor="email" className="block text-sm font-semibold text-gray-600 flex items-center">
+            <FaEnvelope className="mr-2" />
+            Email
+          </label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="Enter your email"
+            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:border-[#f89f1b]"
+            required
           />
         </div>
-        
+
         <div className="mb-4">
-          <label htmlFor="full_name" className="block text-gray-700 font-bold mb-2">Full Name</label>
+          <label htmlFor="full_name" className="block text-sm font-semibold text-gray-600 flex items-center">
+            <FaUser className="mr-2" />
+            Full Name
+          </label>
           <input
             type="text"
             id="full_name"
             name="full_name"
             value={formData.full_name}
             onChange={handleChange}
-            className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="Enter your full name"
+            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:border-[#f89f1b]"
+            required
           />
         </div>
-       
+
         <div className="mb-4">
-  <label htmlFor="phone_number" className="block text-gray-700 font-bold mb-2">Phone Number</label>
-  <input
-    type="text"
-    id="phone_number"
-    name="phone_number"
-    value={formData.phone_number}
-    onChange={handleChange}
-    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-    placeholder="Enter your phone number"
-  />
-</div>
+          <label htmlFor="phone_number" className="block text-sm font-semibold text-gray-600 flex items-center">
+            <FaPhone className="mr-2" />
+            Phone Number
+          </label>
+          <input
+            type="text"
+            id="phone_number"
+            name="phone_number"
+            value={formData.phone_number}
+            onChange={handleChange}
+            placeholder="Enter your phone number"
+            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:border-[#f89f1b]"
+            required
+          />
+        </div>
 
-<div className="mb-4">
-  <label htmlFor="physical_address" className="block text-gray-700 font-bold mb-2">Physical Address</label>
-  <input
-    type="text"
-    id="physical_address"
-    name="physical_address"
-    value={formData.physical_address}
-    onChange={handleChange}
-    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-    placeholder="Enter your physical address"
-  />
-</div>
+        <div className="mb-4">
+          <label htmlFor="physical_address" className="block text-sm font-semibold text-gray-600 flex items-center">
+            <FaHome className="mr-2" />
+            Physical Address
+          </label>
+          <input
+            type="text"
+            id="physical_address"
+            name="physical_address"
+            value={formData.physical_address}
+            onChange={handleChange}
+            placeholder="Enter your physical address"
+            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:border-[#f89f1b]"
+            required
+          />
+        </div>
 
-<div className="mb-4">
-  <label htmlFor="vehicle_registration_no" className="block text-gray-700 font-bold mb-2">Vehicle Registration Number</label>
-  <input
-    type="text"
-    id="vehicle_registration_no"
-    name="vehicle_registration_no"
-    value={formData.vehicle_registration_no}
-    onChange={handleChange}
-    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-    placeholder="Enter your vehicle registration number"
-  />
-</div>
+        <div className="mb-4">
+          <label htmlFor="vehicle_registration_no" className="block text-sm font-semibold text-gray-600 flex items-center">
+            <FaCar className="mr-2" />
+            Vehicle Registration Number
+          </label>
+          <input
+            type="text"
+            id="vehicle_registration_no"
+            name="vehicle_registration_no"
+            value={formData.vehicle_registration_no}
+            onChange={handleChange}
+            placeholder="Enter your vehicle registration number"
+            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:border-[#f89f1b]"
+            required
+          />
+        </div>
 
-<div className="mb-4">
-  <label htmlFor="vehicle_type" className="block text-gray-700 font-bold mb-2">Vehicle Type</label>
-  <select
-    id="vehicle_type"
-    name="vehicle_type"
-    value={formData.vehicle_type}
-    onChange={handleChange}
-    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-  >
-    <option value="">Select vehicle type</option>
-    <option value="bike">Bike</option>
-    <option value="car">Car</option>
-    <option value="van">Van</option>
-    <option value="truck_1">Truck 1</option>
-    <option value="truck_1.5">Truck 1.5</option>
-    <option value="truck_2">Truck 2</option>
-    <option value="truck_4">Truck 4</option>
-  </select>
-</div>
+        <div className="mb-4">
+          <label htmlFor="vehicle_type" className="block text-sm font-semibold text-gray-600 flex items-center">
+            Vehicle Type
+          </label>
+          <select
+            id="vehicle_type"
+            name="vehicle_type"
+            value={formData.vehicle_type}
+            onChange={handleChange}
+            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:border-[#f89f1b]"
+            required
+          >
+            <option value="">Select vehicle type</option>
+            <option value="bike">Bike</option>
+            <option value="car">Car</option>
+            <option value="van">Van</option>
+            <option value="truck_1">Truck 1</option>
+            <option value="truck_1.5">Truck 1.5</option>
+            <option value="truck_2">Truck 2</option>
+            <option value="truck_4">Truck 4</option>
+          </select>
+        </div>
 
-<div className="mb-4">
-  <label htmlFor="licence_no" className="block text-gray-700 font-bold mb-2">Driver's Licence Number</label>
-  <input
-    type="text"
-    id="licence_no"
-    name="licence_no"
-    value={formData.licence_no}
-    onChange={handleChange}
-    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-    placeholder="Enter your driver's licence number"
-  />
-</div>
+        <div className="mb-4">
+          <label htmlFor="licence_no" className="block text-sm font-semibold text-gray-600 flex items-center">
+            <FaIdCard className="mr-2" />
+            Driver's Licence Number
+          </label>
+          <input
+            type="text"
+            id="licence_no"
+            name="licence_no"
+            value={formData.licence_no}
+            onChange={handleChange}
+            placeholder="Enter your driver's licence number"
+            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:border-[#f89f1b]"
+            required
+          />
+        </div>
 
-<div className="mb-4 relative">
-          <label htmlFor="password" className="block text-gray-700 font-bold mb-2">Password</label>
+        <div className="mb-4 relative">
+          <label htmlFor="password" className="block text-sm font-semibold text-gray-600 flex items-center">
+            <FaLock className="mr-2" />
+            Password
+          </label>
           <input
             type={showPassword ? 'text' : 'password'}
             id="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="Enter your password"
+            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:border-[#f89f1b]"
+            required
           />
-          <span
-            className="text-gray-600 absolute right-0 mr-3 cursor-pointer"
+          <button
+            type="button"
             onClick={togglePasswordVisibility}
+            className="absolute inset-y-0 right-0 px-3 py-2 text-gray-500 focus:outline-none"
           >
             {showPassword ? 'Hide' : 'Show'}
-          </span>
+          </button>
         </div>
 
-
-<div className="mb-4">
-  <label htmlFor="confirm_password" className="block text-gray-700 font-bold mb-2">Confirm Password</label>
-  <input
-    type="password"
-    id="confirm_password"
-    name="confirm_password"
-    value={formData.confirm_password}
-    onChange={handleChange}
-    className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-    placeholder="Confirm your password"
-  />
-</div>
+        <div className="mb-4">
+          <label htmlFor="confirm_password" className="block text-sm font-semibold text-gray-600 flex items-center">
+            <FaLock className="mr-2" />
+            Confirm Password
+          </label>
+          <input
+            type="password"
+            id="confirm_password"
+            name="confirm_password"
+            value={formData.confirm_password}
+            onChange={handleChange}
+            placeholder="Confirm your password"
+            className="w-full mt-1 p-2 border rounded focus:outline-none focus:ring focus:border-[#f89f1b]"
+            required
+          />
+        </div>
 
         <button
           type="submit"
-          className="w-full bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-black hover:bg-gray-800 mt-6"
+          className="bg-[#f89f1b] text-white py-2 px-4 rounded hover:bg-[#d78516] focus:outline-none focus:shadow-outline w-full"
         >
           Register Your Account
         </button>
 
-        <div className="text-center mt-4">
-          <p className="text-sm">
+        <div className="mt-4 text-center">
+          <p>
             Already have an account?{' '}
-            <Link to="/login/driver" className="text-blue-500 hover:underline">
-              Log in here
-            </Link>
+            <Link to="/login/driver" className="text-blue-500 hover:underline">Log in here</Link>
           </p>
         </div>
       </form>
