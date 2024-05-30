@@ -86,7 +86,7 @@ const DriverRegistrationForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-12">
+    <div className="flex items-center justify-center min-h-screen bg-[#404042]">
       <form className="bg-white p-8 shadow-md rounded w-full sm:w-96" onSubmit={handleSubmit}>
         <div className="flex justify-center mb-4">
           <img src={logo} alt="Toota Logo" className="w-24 h-24" />
@@ -107,7 +107,7 @@ const DriverRegistrationForm = () => {
         ))}
 
         <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-semibold text-gray-600 flex items-center">
+          <label htmlFor="email" className="block text-sm font-semibold text-gray-700 flex items-center">
             <FaEnvelope className="mr-2" />
             Email
           </label>
@@ -124,7 +124,7 @@ const DriverRegistrationForm = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="full_name" className="block text-sm font-semibold text-gray-600 flex items-center">
+          <label htmlFor="full_name" className="block text-sm font-semibold text-gray-700 flex items-center">
             <FaUser className="mr-2" />
             Full Name
           </label>
@@ -141,7 +141,7 @@ const DriverRegistrationForm = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="phone_number" className="block text-sm font-semibold text-gray-600 flex items-center">
+          <label htmlFor="phone_number" className="block text-sm font-semibold text-gray-700 flex items-center">
             <FaPhone className="mr-2" />
             Phone Number
           </label>
@@ -158,7 +158,7 @@ const DriverRegistrationForm = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="physical_address" className="block text-sm font-semibold text-gray-600 flex items-center">
+          <label htmlFor="physical_address" className="block text-sm font-semibold text-gray-700 flex items-center">
             <FaHome className="mr-2" />
             Physical Address
           </label>
@@ -175,7 +175,7 @@ const DriverRegistrationForm = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="vehicle_registration_no" className="block text-sm font-semibold text-gray-600 flex items-center">
+          <label htmlFor="vehicle_registration_no" className="block text-sm font-semibold text-gray-700 flex items-center">
             <FaCar className="mr-2" />
             Vehicle Registration Number
           </label>
@@ -192,7 +192,7 @@ const DriverRegistrationForm = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="vehicle_type" className="block text-sm font-semibold text-gray-600 flex items-center">
+          <label htmlFor="vehicle_type" className="block text-sm font-semibold text-gray-700 flex items-center">
             Vehicle Type
           </label>
           <select
@@ -215,7 +215,7 @@ const DriverRegistrationForm = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="licence_no" className="block text-sm font-semibold text-gray-600 flex items-center">
+          <label htmlFor="licence_no" className="block text-sm font-semibold text-gray-700 flex items-center">
             <FaIdCard className="mr-2" />
             Driver's Licence Number
           </label>
@@ -232,7 +232,7 @@ const DriverRegistrationForm = () => {
         </div>
 
         <div className="mb-4 relative">
-          <label htmlFor="password" className="block text-sm font-semibold text-gray-600 flex items-center">
+          <label htmlFor="password" className="block text-sm font-semibold text-gray-700 flex items-center">
             <FaLock className="mr-2" />
             Password
           </label>
@@ -248,15 +248,15 @@ const DriverRegistrationForm = () => {
           />
           <button
             type="button"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
             onClick={togglePasswordVisibility}
-            className="absolute inset-y-0 right-0 px-3 py-2 text-gray-500 focus:outline-none"
           >
             {showPassword ? 'Hide' : 'Show'}
           </button>
         </div>
 
         <div className="mb-4">
-          <label htmlFor="confirm_password" className="block text-sm font-semibold text-gray-600 flex items-center">
+          <label htmlFor="confirm_password" className="block text-sm font-semibold text-gray-700 flex items-center">
             <FaLock className="mr-2" />
             Confirm Password
           </label>
@@ -274,17 +274,17 @@ const DriverRegistrationForm = () => {
 
         <button
           type="submit"
-          className="bg-[#f89f1b] text-white py-2 px-4 rounded hover:bg-[#d78516] focus:outline-none focus:shadow-outline w-full"
+          className="w-full bg-[#f89f1b] text-white py-2 rounded hover:bg-orange-600 transition duration-200"
         >
-          Register Your Account
+          Sign Up
         </button>
 
-        <div className="mt-4 text-center">
-          <p>
-            Already have an account?{' '}
-            <Link to="/login/driver" className="text-blue-500 hover:underline">Log in here</Link>
-          </p>
-        </div>
+        <p className="mt-4 text-sm text-center text-gray-700">
+          Already have an account?{' '}
+          <Link to="/login/driver" className="text-[#f89f1b] hover:underline">
+            Log In
+          </Link>
+        </p>
       </form>
     </div>
   );
