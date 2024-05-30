@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { BellIcon, UserIcon, CogIcon, ClockIcon, CurrencyDollarIcon, ClipboardCheckIcon, QuestionMarkCircleIcon, HomeIcon, LogoutIcon } from '@heroicons/react/outline'; // Import required icons
 import { useNavigate } from 'react-router-dom';
 import LogoutConfirmationForm from './LogoutConfirmationForm'; // Import the LogoutConfirmationForm component

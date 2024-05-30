@@ -10,7 +10,7 @@ const DriverRegistrationForm = () => {
     phone_number: '',
     physical_address: '',
     vehicle_registration_no: '',
-    vehicle_type: 'bike',
+    vehicle_type: 'truck_1',
     licence_no: '',
     password: '',
     confirm_password: '',
@@ -70,7 +70,7 @@ const DriverRegistrationForm = () => {
           phone_number: '',
           physical_address: '',
           vehicle_registration_no: '',
-          vehicle_type: 'bike',
+          vehicle_type: 'truck_1',
           licence_no: '',
           password: '',
           confirm_password: '',
@@ -204,13 +204,10 @@ const DriverRegistrationForm = () => {
             required
           >
             <option value="">Select vehicle type</option>
-            <option value="bike">Bike</option>
-            <option value="car">Car</option>
-            <option value="van">Van</option>
-            <option value="truck_1">Truck 1</option>
-            <option value="truck_1.5">Truck 1.5</option>
-            <option value="truck_2">Truck 2</option>
-            <option value="truck_4">Truck 4</option>
+            <option value="truck_1">1 ton Truck</option>
+            <option value="truck_1.5">1.5 ton Truck</option>
+            <option value="truck_2">2 ton Truck</option>
+            <option value="truck_4">4 ton Truck</option>
           </select>
         </div>
 
