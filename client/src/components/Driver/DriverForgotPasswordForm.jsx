@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Message from './Message';
+import logo from '../../logo.jpg'; // Ensure the path is correct
 
-const DriverForgotPasswordForm = () => { 
+const DriverForgotPasswordForm = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
@@ -32,40 +33,41 @@ const DriverForgotPasswordForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
-      {message && <Message message={message} type={messageType} />}
-
-      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full md:w-2/3 lg:w-1/2 xl:w-1/3" onSubmit={handleResetPassword}>
-        <h2 className="text-2xl mb-6 font-bold text-center">Driver Forgot Password</h2>
-
-        <p className="text-gray-700 text-sm mb-4 text-center">
-          Enter your email and we'll send you a link to reset your password.
-        </p>
-
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-            Email
-          </label>
-          <input
-            className="appearance-none border rounded w-full py-2 px-3"
-            id="email"
-            type="email"
-            placeholder="Email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+    <div className="flex items-center justify-center min-h-screen bg-[#404042] px-4">
+      <div className="bg-white rounded shadow-md w-full max-w-lg p-6">
+        <div className="flex justify-center mb-6">
+          <img src={logo} alt="Toota Logo" className="w-24 h-24" />
         </div>
-
-        <div className="mb-6">
-          <button
-            className="w-full bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-black hover:bg-gray-800"
-            type="submit"
-          >
-            Submit
-          </button>
-        </div>
-      </form>
+        {message && <Message message={message} type={messageType} />}
+        <form className="w-full" onSubmit={handleResetPassword}>
+          <h2 className="text-3xl font-bold mb-6 text-[#f89f1b] text-center">Driver Forgot Password</h2>
+          <p className="text-gray-700 mb-4 text-center">
+            Enter your email and we'll send you a link to reset your password.
+          </p>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold mb-2" htmlFor="email">
+              Email
+            </label>
+            <input
+              className="w-full px-3 py-2 border rounded focus:outline-none focus:ring focus:border-[#f89f1b]"
+              id="email"
+              type="email"
+              placeholder="Email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="mb-6">
+            <button
+              className="w-full bg-[#f89f1b] text-white py-2 px-4 rounded hover:bg-orange-600 transition duration-200 focus:outline-none focus:shadow-outline"
+              type="submit"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
