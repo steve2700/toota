@@ -14,7 +14,6 @@ class DropoffLocationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class TripSerializer(serializers.ModelSerializer):
     pickup_location = PickupLocationSerializer()
     dropoff_location = DropoffLocationSerializer()
@@ -33,20 +32,22 @@ class TripSerializer(serializers.ModelSerializer):
         return trip
 
     def update(self, instance, validated_data):
-        pickup_location_data = validated_data.pop('pickup_location')
-        pickup_location = instance.pickup_location
-        dropoff_location_data = validated_data.pop('dropoff_location')
-        DropoffLocation = instance.dropoff_location
+        pickup_location_data = validated_data.pop('pickup_location', None)
+        dropoff_location_data = validated_data.pop('dropoff_location', None)
 
-        # Update PickupLocation fields
-        pickup_location.location = pickup_location_data.get('location', pickup_location.location)
-        pickup_location.phone_number = pickup_location_data.get('phone_number', pickup_location.phone_number)
-        pickup_location.save()
+        # Update PickupLocation fields if data is present
+        if pickup_location_data:
+            pickup_location = instance.pickup_location
+            pickup_location.location = pickup_location_data.get('location', pickup_location.location)
+            pickup_location.phone_number = pickup_location_data.get('phone_number', pickup_location.phone_number)
+            pickup_location.save()
 
-        # Update DroffLocation fields
-        dropoff_location.location = dropoff_location_data.get('location', dropoff_location.location)
-        dropoff_location.phone_number = dropoff_location_data.get('phone_number', dropoff_location.phone_number)
-        dropoff_location.save()
+        # Update DropoffLocation fields if data is present
+        if dropoff_location_data:
+            dropoff_location = instance.dropoff_location
+            dropoff_location.location = dropoff_location_data.get('location', dropoff_location.location)
+            dropoff_location.phone_number = dropoff_location_data.get('phone_number', dropoff_location.phone_number)
+            dropoff_location.save()
 
         # Update trip fields
         for attr, value in validated_data.items():
@@ -62,24 +63,3 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('id', 'payment_date', 'order_number')
 
-
-
-
-
-
-
-
-
-
-    
-
-
-
-        
-        
-
-
-
-        
-
-                
