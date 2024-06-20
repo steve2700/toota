@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUser, FaPhone, FaEnvelope, FaLock } from 'react-icons/fa'; // Importing required icons
+import Header from '../../pages/Header'; // Adjust the path if necessary
+import Footer from '../../pages/Footer'; // Adjust the path if necessary
 
 const UserRegistrationForm = () => {
   const navigate = useNavigate();
@@ -72,180 +74,184 @@ const UserRegistrationForm = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (validateForm(formData)) {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/user/sign_up/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          full_name: formData.fullName,
-          phone_number: formData.phoneNumber,
-          email: formData.email,
-          password: formData.password,
-          confirm_password: formData.confirmPassword,
-        }),
-      });
-
-      if (response.status === 201) {
-        setSuccessMessage('Registration successful! Please check your email to verify.');
-        setFormData({
-          fullName: '',
-          phoneNumber: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
+    if (validateForm(formData)) {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/user/sign_up/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            full_name: formData.fullName,
+            phone_number: formData.phoneNumber,
+            email: formData.email,
+            password: formData.password,
+            confirm_password: formData.confirmPassword,
+          }),
         });
-      } else if (response.status === 400) {
-        const errorData = await response.json();
-        const newErrors = {};
 
-        if (errorData.email && errorData.email[0] === 'user with this email already exists.') {
-          newErrors.email = 'Email already exists. Please try another one.';
+        if (response.status === 201) {
+          setSuccessMessage('Registration successful! Please check your email to verify.');
+          setFormData({
+            fullName: '',
+            phoneNumber: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+          });
+        } else if (response.status === 400) {
+          const errorData = await response.json();
+          const newErrors = {};
+
+          if (errorData.email && errorData.email[0] === 'user with this email already exists.') {
+            newErrors.email = 'Email already exists. Please try another one.';
+          }
+
+          if (errorData.phone_number && errorData.phone_number[0] === 'user with this phone number already exists.') {
+            newErrors.phoneNumber = 'Phone number already exists. Please try another one.';
+          }
+
+          if (errorData.full_name && errorData.full_name[0] === 'user with this full name already exists.') {
+            newErrors.fullName = 'Full name already exists. Please try another one.';
+          }
+
+          if (errorData.password && errorData.password[0] === 'Password must be at least 8 characters') {
+            newErrors.password = 'Password must be at least 8 characters';
+          }
+
+          setErrors(newErrors);
+        } else if (response.status === 500) {
+          setErrors({ generic: 'Internal Server Error. Please try again later.' });
+        } else {
+          setErrors({ generic: 'Unknown error occurred. Please try again later.' });
         }
-
-        if (errorData.phone_number && errorData.phone_number[0] === 'user with this phone number already exists.') {
-          newErrors.phoneNumber = 'Phone number already exists. Please try another one.';
-        }
-
-        if (errorData.full_name && errorData.full_name[0] === 'user with this full name already exists.') {
-          newErrors.fullName = 'Full name already exists. Please try another one.';
-        }
-
-        if (errorData.password && errorData.password[0] === 'Password must be at least 8 characters') {
-          newErrors.password = 'Password must be at least 8 characters';
-        }
-
-        setErrors(newErrors);
-      } else if (response.status === 500) {
-        setErrors({ generic: 'Internal Server Error. Please try again later.' });
-      } else {
-        setErrors({ generic: 'Unknown error occurred. Please try again later.' });
+      } catch (error) {
+        console.error('Registration error:', error);
+        setErrors({ generic: 'An error occurred. Please try again later.' });
       }
-    } catch (error) {
-      console.error('Registration error:', error);
-      setErrors({ generic: 'An error occurred. Please try again later.' });
     }
-  }
-};
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full md:w-2/3 lg:w-1/2 xl:w-1/3" onSubmit={handleSubmit} method="post">
-        <h2 className="text-2xl mb-6 font-bold text-center">Sign Up</h2>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <div className="flex-grow flex items-center justify-center">
+        <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full md:w-2/3 lg:w-1/2 xl:w-1/3" onSubmit={handleSubmit} method="post">
+          <h2 className="text-2xl mb-6 font-bold text-center">Sign Up</h2>
 
-        {successMessage && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
-            {successMessage}
+          {successMessage && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
+              {successMessage}
+            </div>
+          )}
+
+          {errors.generic && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+              {errors.generic}
+            </div>
+          )}
+
+          <div className="mb-4 flex items-center">
+            <FaUser className="text-gray-500 mr-2" />
+            <input
+              className={`appearance-none border rounded w-full py-2 px-3 ${errors.fullName && 'border-red-500'}`}
+              id="fullName"
+              type="text"
+              placeholder="Full Name"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              autoComplete="current-fullName"
+            />
           </div>
-        )}
+          {errors.fullName && <p className="text-red-500 text-lg italic ml-7">{errors.fullName}</p>}
 
-        {errors.generic && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-            {errors.generic}
+          <div className="mb-4 flex items-center">
+            <FaPhone className="text-gray-500 mr-2" />
+            <input
+              className={`appearance-none border rounded w-full py-2 px-3 ${errors.phoneNumber && 'border-red-500'}`}
+              id="phoneNumber"
+              type="text"
+              placeholder="Phone Number"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              autoComplete="current-phoneNumber"
+            />
           </div>
-        )}
+          {errors.phoneNumber && <p className="text-red-500 text-lg italic ml-7">{errors.phoneNumber}</p>}
 
-        <div className="mb-4 flex items-center">
-          <FaUser className="text-gray-500 mr-2" />
-          <input
-            className={`appearance-none border rounded w-full py-2 px-3 ${errors.fullName && 'border-red-500'}`}
-            id="fullName"
-            type="text"
-            placeholder="Full Name"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            autoComplete="current-fullName"
-          />
-        </div>
-        {errors.fullName && <p className="text-red-500 text-lg italic ml-7">{errors.fullName}</p>}
+          <div className="mb-4 flex items-center">
+            <FaEnvelope className="text-gray-500 mr-2" />
+            <input
+              className={`appearance-none border rounded w-full py-2 px-3 ${errors.email && 'border-red-500'}`}
+              id="email"
+              type="email"
+              placeholder="Email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              autoComplete="current-email"
+            />
+          </div>
+          {errors.email && <p className="text-red-500 text-lg italic ml-7">{errors.email}</p>}
 
-        <div className="mb-4 flex items-center">
-          <FaPhone className="text-gray-500 mr-2" />
-          <input
-            className={`appearance-none border rounded w-full py-2 px-3 ${errors.phoneNumber && 'border-red-500'}`}
-            id="phoneNumber"
-            type="text"
-            placeholder="Phone Number"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            autoComplete="current-phoneNumber"
-          />
-        </div>
-        {errors.phoneNumber && <p className="text-red-500 text-lg italic ml-7">{errors.phoneNumber}</p>}
+          <div className="mb-4 relative flex items-center">
+            <FaLock className="text-gray-500 mr-2" />
+            <input
+              className={`appearance-none border rounded w-full py-2 px-3 ${errors.password && 'border-red-500'}`}
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              autoComplete="current-password"
+            />
+            <span
+              className="text-gray-600 absolute right-0 mr-3 cursor-pointer"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </span>
+          </div>
+          {errors.password && <p className="text-red-500 text-lg italic ml-7">{errors.password}</p>}
 
-        <div className="mb-4 flex items-center">
-          <FaEnvelope className="text-gray-500 mr-2" />
-          <input
-            className={`appearance-none border rounded w-full py-2 px-3 ${errors.email && 'border-red-500'}`}
-            id="email"
-            type="email"
-            placeholder="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            autoComplete="current-email"
-          />
-        </div>
-        {errors.email && <p className="text-red-500 text-lg italic ml-7">{errors.email}</p>}
+          <div className="mb-4 flex items-center">
+            <FaLock className="text-gray-500 mr-2" />
+            <input
+              className={`appearance-none border rounded w-full py-2 px-3 ${errors.confirmPassword && 'border-red-500'}`}
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm Password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              autoComplete="current-password"
+            />
+          </div>
+          {errors.confirmPassword && <p className="text-red-500 text-lg italic ml-7">{errors.confirmPassword}</p>}
 
-        <div className="mb-4 relative flex items-center">
-          <FaLock className="text-gray-500 mr-2" />
-          <input
-            className={`appearance-none border rounded w-full py-2 px-3 ${errors.password && 'border-red-500'}`}
-            id="password"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            autoComplete="current-password"
-          />
-          <span
-            className="text-gray-600 absolute right-0 mr-3 cursor-pointer"
-            onClick={togglePasswordVisibility}
+          <button
+            type="submit"
+            className="w-full bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-black hover:bg-gray-800 mt-6"
           >
-            {showPassword ? 'Hide' : 'Show'}
-          </span>
-        </div>
-        {errors.password && <p className="text-red-500 text-lg italic ml-7">{errors.password}</p>}
+            Register Your Account
+          </button>
 
-        <div className="mb-4 flex items-center">
-          <FaLock className="text-gray-500 mr-2" />
-          <input
-            className={`appearance-none border rounded w-full py-2 px-3 ${errors.confirmPassword && 'border-red-500'}`}
-            id="confirmPassword"
-            type="password"
-            placeholder="Confirm Password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            autoComplete="current-password"
-          />
-        </div>
-        {errors.confirmPassword && <p className="text-red-500 text-lg italic ml-7">{errors.confirmPassword}</p>}
-
-        <button
-          type="submit"
-          className="w-full bg-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-black hover:bg-gray-800 mt-6"
-        >
-          Register Your Account
-        </button>
-
-        <div className="text-center mt-4">
-          <p className="text-sm">
-            Already have an account?{' '}
-            <Link to="/login/user" className="text-blue-500 hover:underline">
-              Log in here
-            </Link>
-          </p>
-        </div>
-      </form>
+          <div className="text-center mt-4">
+            <p className="text-sm">
+              Already have an account?{' '}
+              <Link to="/login/user" className="text-blue-500 hover:underline">
+                Log in here
+              </Link>
+            </p>
+          </div>
+        </form>
+      </div>
+      <Footer />
     </div>
   );
 };

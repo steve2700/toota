@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
+import Header from '../../pages/Header'; // Adjusted the path to the correct location
+import Footer from '../../pages/Footer'; // Adjusted the path to the correct location
 
 const UserLoginForm = () => {
   const navigate = useNavigate();
@@ -25,7 +27,6 @@ const UserLoginForm = () => {
     }, 5000);
   };
 
-  // Function to clear error messages after a certain period of time
   const clearErrors = () => {
     setTimeout(() => {
       setErrors({});
@@ -51,10 +52,7 @@ const UserLoginForm = () => {
         const data = await response.json();
         if (data.access) {
           localStorage.setItem('access_token', data.access);
-          localStorage.setItem('refresh_token', data.refresh)
-          console.log('Token retrieved from server:', data.access);
-          console.log('Token retrieved from server:', data.refresh);
-          console.log('Token stored in localStorage:', localStorage.getItem('access_token'));
+          localStorage.setItem('refresh_token', data.refresh);
           setSuccessMessage('Login successful! Redirecting to the dashboard...');
           setTimeout(() => {
             navigate('/dashboard/user');
@@ -74,93 +72,97 @@ const UserLoginForm = () => {
         } else {
           setErrors(errorData);
         }
-        clearErrors(); // Call clearErrors function
+        clearErrors();
       }
     } catch (error) {
       console.error('Error during login:', error);
       setErrors({ generic: 'An error occurred. Please try again later.' });
-      clearErrors(); // Call clearErrors function
+      clearErrors();
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="bg-white rounded shadow-md p-6 w-full max-w-md mx-auto">
-        {successMessage && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {successMessage}
-          </div>
-        )}
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <div className="flex-grow flex items-center justify-center">
+        <div className="bg-white rounded shadow-md p-6 w-full max-w-md mx-auto">
+          {successMessage && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+              {successMessage}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit}>
-          <h2 className="text-3xl font-bold mb-4 text-center text-gray-900">Login To Toota</h2>
+          <form onSubmit={handleSubmit}>
+            <h2 className="text-3xl font-bold mb-4 text-center text-gray-900">Login To Toota</h2>
 
-          <div className="mb-4 flex items-center">
-            <FaEnvelope className="text-gray-500 mr-2" />
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Enter your email address"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded shadow appearance-none"
-            />
-          </div>
-          {errors.email && <p className="text-red-500 text-lg italic ml-7">{errors.email}</p>}
+            <div className="mb-4 flex items-center">
+              <FaEnvelope className="text-gray-500 mr-2" />
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email address"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded shadow appearance-none"
+              />
+            </div>
+            {errors.email && <p className="text-red-500 text-lg italic ml-7">{errors.email}</p>}
 
-          <div className="mb-4 relative flex items-center">
-            <FaLock className="text-gray-500 mr-2" />
-            <input
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              name="password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded shadow appearance-none"
-            />
-            <span
-              className="absolute right-0 bottom-1.5 mr-3 cursor-pointer"
-              onClick={togglePasswordVisibility}
+            <div className="mb-4 relative flex items-center">
+              <FaLock className="text-gray-500 mr-2" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded shadow appearance-none"
+              />
+              <span
+                className="absolute right-0 bottom-1.5 mr-3 cursor-pointer"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </span>
+            </div>
+            {errors.password && <p className="text-red-500 text-lg italic ml-7">{errors.password}</p>}
+            {errors.invalidCredentials && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {errors.invalidCredentials}
+              </div>
+            )}
+            {errors.generic && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {errors.generic}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline-black w-full"
             >
-              {showPassword ? '👁️' : '👁️‍🗨️'}
-            </span>
-          </div>
-          {errors.password && <p className="text-red-500 text-lg italic ml-7">{errors.password}</p>}
-          {errors.invalidCredentials && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              {errors.invalidCredentials}
-            </div>
-          )}
-          {errors.generic && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              {errors.generic}
-            </div>
-          )}
+              Login
+            </button>
+          </form>
 
-          <button
-            type="submit"
-            className="bg-black text-white py-2 px-4 rounded hover:bg-gray-800 focus:outline-none focus:shadow-outline-black w-full"
-          >
-            Login
-          </button>
-        </form>
+          <p className="mt-4 text-center text-sm text-gray-500">
+            Forgot your password?{' '}
+            <Link to="/forgot-password" className="font-semibold text-indigo-600 hover:text-indigo-500">
+              Reset it here
+            </Link>
+          </p>
 
-        <p className="mt-4 text-center text-sm text-gray-500">
-          Forgot your password?{' '}
-          <Link to="/forgot-password" className="font-semibold text-indigo-600 hover:text-indigo-500">
-            Reset it here
-          </Link>
-        </p>
-
-        <p className="mt-4 text-center text-sm text-gray-500">
-          Don't have an account with Toota?{' '}
-          <Link to="/signup/user" className="font-semibold text-indigo-600 hover:text-indigo-500">
-            Register here
-          </Link>
-        </p>
+          <p className="mt-4 text-center text-sm text-gray-500">
+            Don't have an account with Toota?{' '}
+            <Link to="/signup/user" className="font-semibold text-indigo-600 hover:text-indigo-500">
+              Register here
+            </Link>
+          </p>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 };
