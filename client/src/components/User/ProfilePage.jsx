@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaEnvelope, FaUser, FaPhone } from 'react-icons/fa'; // Import icons from Font Awesome icon pack
-import {jwtDecode} from 'jwt-decode';
-import { getUser } from  '../../services/AuthService';
-import Loader from "react-js-loader";
+import { FaEnvelope, FaUser, FaPhone } from 'react-icons/fa';
+import { jwtDecode } from 'jwt-decode';
+import { getUser } from '../../services/AuthService';
+import Loader from 'react-js-loader';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -14,7 +14,6 @@ const ProfilePage = () => {
     email: '',
     full_name: '',
     phone_number: '',
-    
   });
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -22,16 +21,13 @@ const ProfilePage = () => {
     const fetchUserProfile = async () => {
       try {
         const jwt = localStorage.getItem('access_token');
-        
         if (jwt) {
-          const response =  await getUser()
-          console.log(response)
+          const response = await getUser();
           setUser(response);
           setFormData({
             email: response.email,
             full_name: response.full_name,
             phone_number: response.phone_number,
-
           });
         } else {
           setErrorMessage('No authentication token available');
@@ -61,8 +57,8 @@ const ProfilePage = () => {
 
       const response = await axios.patch(`${import.meta.env.VITE_BASE_URL}/api/user/profile/${user_id}/`, formData, {
         headers: {
-          Authorization: `Bearer ${jwt}`
-        }
+          Authorization: `Bearer ${jwt}`,
+        },
       });
       setUser(response.data);
       setEditMode(false);
@@ -74,7 +70,7 @@ const ProfilePage = () => {
   };
 
   if (loading) {
-    return <p>Loading user profile....</p>;
+    return <Loader type="spinner-default" bgColor={"#333"} title={"Loading user profile..."} color={'#333'} size={100} />;
   }
 
   if (errorMessage) {
@@ -83,7 +79,7 @@ const ProfilePage = () => {
 
   return (
     <div className="container mx-auto mt-8">
-      <h1 className="mb-4 text-3xl font-bold">Profile</h1>
+      <h1 className="mb-4 text-3xl font-bold text-center">Profile</h1>
       {successMessage && (
         <div className="px-4 py-2 mb-4 text-green-800 bg-green-200 rounded">
           {successMessage}
@@ -93,7 +89,6 @@ const ProfilePage = () => {
         <div className="p-6 bg-white rounded-lg shadow-md">
           {editMode ? (
             <form onSubmit={handleSubmit}>
-              {/* Form fields */}
               <div className="mb-4">
                 <label htmlFor="email" className="block mb-2 text-sm font-bold text-gray-700">
                   Email
@@ -141,18 +136,19 @@ const ProfilePage = () => {
               </button>
             </form>
           ) : (
-            <div>
-              {/* Profile information */}
-              <div className="p-4 mb-4 bg-gray-100 rounded-md">
-
+            <div className="flex flex-col items-center">
+              <div className="p-4 mb-4 bg-gray-100 rounded-md w-full max-w-md">
+                <div className="flex items-center justify-center mb-4">
+                  <FaUser className="w-16 h-16 text-gray-500" />
+                </div>
                 <p className="text-lg text-gray-800">
-                  <strong><FaEnvelope /> Email:</strong> {user.email}
+                  <strong className="flex items-center"><FaEnvelope className="mr-2" /> Email:</strong> {user.email}
                 </p>
                 <p className="text-lg text-gray-800">
-                  <strong><FaUser /> Full Name:</strong> {user.full_name}
+                  <strong className="flex items-center"><FaUser className="mr-2" /> Full Name:</strong> {user.full_name}
                 </p>
                 <p className="text-lg text-gray-800">
-                  <strong><FaPhone /> Phone Number:</strong> {user.phone_number}
+                  <strong className="flex items-center"><FaPhone className="mr-2" /> Phone Number:</strong> {user.phone_number}
                 </p>
               </div>
               <button

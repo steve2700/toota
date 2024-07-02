@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {  DASHBOARD_DRIVER_LINKS, DASHBOARD_DRIVER_BOTTOM_LINKS } from '../../../lib/utils/navigation';
+import { DASHBOARD_DRIVER_LINKS, DASHBOARD_DRIVER_BOTTOM_LINKS } from '../../../lib/utils/navigation';
 import { Link, useLocation } from 'react-router-dom';
 import logo from "../../../logo.jpg";
 import classNames from 'classnames';
@@ -12,54 +12,75 @@ export default function SideBarDriver() {
   const toggleSidebar = () => setIsExpanded(!isExpanded); // Function to toggle sidebar
 
   return (
-    <div
-      className={classNames(
-        'bg-[#414043] p-3 text-white flex flex-col transition duration-300 ease-in-out',
-        isExpanded ? 'w-60' : 'w-16' // Conditional width based on expanded state
-      )}
-    >
-      <div className="flex items-center gap-2 px-1 py-2">
-        <img src={logo} className="object-fit mx-auto w-2/4" alt="logo" />
-        <button onClick={toggleSidebar} className="focus:outline-none">
-          {isExpanded ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-          )}
+    <div>
+      <div className="lg:hidden flex items-center justify-between px-4 py-2 bg-[#414043] text-white">
+        <button onClick={toggleSidebar}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
         </button>
+        <img src={logo} className="object-fit h-8" alt="logo" />
       </div>
       <div
         className={classNames(
-          'flex-1 py-8 flex flex-col gap-0.5',
-          !isExpanded && 'text-gray-400' // Dim text on collapse
+          'fixed lg:relative bg-[#414043] p-3 text-white flex flex-col transition duration-300 ease-in-out',
+          isExpanded ? 'w-60' : 'w-16',
+          'lg:w-60', // Always expanded on larger screens
+          isExpanded ? 'left-0' : '-left-60', // Hide on small screens when not expanded
+          'lg:left-0', // Always visible on larger screens
+          'h-full'
         )}
       >
-        {DASHBOARD_DRIVER_LINKS.map((item) => (
-          <SideBarDriverLink key={item.key} item={item} isExpanded={isExpanded} />
-        ))}
-      </div>
-      <div className="flex flex-col gap-0.5 pt-2 border-t border-neutral-700 cursor-pointer">
-        {DASHBOARD_DRIVER_BOTTOM_LINKS.map((item) => (
-          <SideBarDriverLink key={item.key} item={item} isExpanded={isExpanded} />
-        ))}
+        <div className="flex items-center gap-2 px-1 py-2">
+          <img src={logo} className="object-fit mx-auto w-2/4 lg:hidden" alt="logo" />
+          <button onClick={toggleSidebar} className="focus:outline-none">
+            {isExpanded ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            )}
+          </button>
+        </div>
+        <div
+          className={classNames(
+            'flex-1 py-8 flex flex-col gap-0.5',
+            !isExpanded && 'text-gray-400' // Dim text on collapse
+          )}
+        >
+          {DASHBOARD_DRIVER_LINKS.map((item) => (
+            <SideBarDriverLink key={item.key} item={item} isExpanded={isExpanded} />
+          ))}
+        </div>
+        <div className="flex flex-col gap-0.5 pt-2 border-t border-neutral-700 cursor-pointer">
+          {DASHBOARD_DRIVER_BOTTOM_LINKS.map((item) => (
+            <SideBarDriverLink key={item.key} item={item} isExpanded={isExpanded} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -81,3 +102,4 @@ const SideBarDriverLink = ({ item, isExpanded }) => {
     </Link>
   );
 };
+

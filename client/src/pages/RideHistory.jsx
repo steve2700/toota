@@ -1,88 +1,85 @@
 import React, { useState, useEffect } from 'react';
-import { ClockIcon, ClipboardCheckIcon } from '@heroicons/react/outline'; // Import required icons
-import axios from 'axios'; // Import Axios library
-import { getAllTrips } from "../services/TripService"; // Import the getAllTrips function from TripService
-import { format } from 'date-fns'; // Import format function from date-fns library
+import { ClockIcon, ClipboardCheckIcon } from '@heroicons/react/outline';
+import { getAllTrips } from "../services/TripService";
+import { format } from 'date-fns';
 
 const RideHistorySection = () => {
-  // Define state to store ride history data
   const [rideHistory, setRideHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRideHistory = async () => {
       try {
-        // Fetch all trips data from backend
         const response = await getAllTrips();
-        const trips = response.trips; // Assuming `trips` is the property containing the array of trip objects
+        const trips = response.trips;
 
-        // Log the fetched trips data for debugging
-        console.log('Fetched trips data:', trips);
-
-        // Transform and set the ride history data
         setRideHistory(
           trips.map((trip) => {
-            // Log the start time of each trip
-            console.log('Start time:', trip.pickup_time);
+            const pickupLocation = `${trip.pickup_location.location} (${trip.pickup_location.phone_number})`;
+            const dropOffLocation = `${trip.dropoff_location.location} (${trip.dropoff_location.phone_number})`;
 
-            // Check if the start time is a valid date
             if (trip.pickup_time && !isNaN(new Date(trip.pickup_time))) {
               return {
                 id: trip.id,
                 date: format(new Date(trip.pickup_time), 'yyyy-MM-dd'),
-                pickupLocation: trip.pickup_location,
-                dropOffLocation: trip.dropoff_location,
-                fare: parseFloat(trip.bid), // Parse bid as float for the fare
+                pickupLocation,
+                dropOffLocation,
+                fare: parseFloat(trip.bid),
                 status: trip.status,
               };
             } else {
-              // Handle invalid date values
               return {
                 id: trip.id,
                 date: 'Invalid Date',
-                pickupLocation: trip.pickup_location,
-                dropOffLocation: trip.dropoff_location,
-                fare: parseFloat(trip.bid), // Parse bid as float for the fare
+                pickupLocation,
+                dropOffLocation,
+                fare: parseFloat(trip.bid),
                 status: trip.status,
               };
             }
           })
         );
       } catch (error) {
-        // Log any errors that occur during the fetching process
         console.error('Error fetching ride history:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    // Call the fetchRideHistory function
     fetchRideHistory();
-
   }, []);
 
   return (
-    <div>
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">Ride History</h2>
-      {rideHistory.length > 0 ? (
-        <div>
-          {rideHistory.map((ride) => (
-            <div key={ride.id} className="bg-white p-4 rounded-md shadow-md mb-4">
-              <div className="flex items-center space-x-4">
-                <ClockIcon className="h-8 w-8 text-gray-600" />
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800">Date: {ride.date}</h3>
-                  <p className="text-gray-500">Pickup: {ride.pickupLocation}</p>
-                  <p className="text-gray-500">Drop-off: {ride.dropOffLocation}</p>
-                  <p className="text-gray-500">Fare: ${ride.fare.toFixed(2)}</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-4">
-                <ClipboardCheckIcon className="h-8 w-8 text-gray-600" />
-                <p className="text-gray-500">Status: {ride.status}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="container mx-auto mt-8">
+      <h2 className="text-3xl font-bold text-center mb-6">Ride History</h2>
+      {loading ? (
+        <p className="text-blue-500">Loading trips...</p>
       ) : (
-        <p className="text-blue-500">No ride history available</p>
+        <div>
+          {rideHistory.length > 0 ? (
+            <div>
+              {rideHistory.map((ride) => (
+                <div key={ride.id} className="bg-white p-6 rounded-lg shadow-md mb-4">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <ClockIcon className="h-8 w-8 text-blue-600" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-800">Date: {ride.date}</h3>
+                      <p className="text-gray-500">Pickup: {ride.pickupLocation}</p>
+                      <p className="text-gray-500">Drop-off: {ride.dropOffLocation}</p>
+                      <p className="text-gray-500">Fare: R {ride.fare.toFixed(2)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <ClipboardCheckIcon className="h-8 w-8 text-blue-600" />
+                    <p className="text-gray-500">Status: {ride.status}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-blue-500 text-center">No trips found</p>
+          )}
+        </div>
       )}
     </div>
   );

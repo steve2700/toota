@@ -6,10 +6,12 @@ from django.utils import timezone
 from django.conf import settings
 from datetime import datetime
 VEHICLE_TYPES = (
+        ('bakkie', 'bakkie'),
         ('truck_1', '1 ton Truck'),
         ('truck_1.5', '1.5 ton Truck'),
         ('truck_2', '2 ton Truck'),
         ('truck_4', '4 ton Truck'),
+        ('truck_8', '8 ton Truck'),
     )
 
 class DropoffLocation(models.Model):

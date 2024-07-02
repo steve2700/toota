@@ -205,10 +205,12 @@ const DriverRegistrationForm = () => {
               required
             >
               <option value="">Select vehicle type</option>
+	      <option value="bakkie">bakkie</option>
               <option value="truck_1">1 ton Truck</option>
               <option value="truck_1.5">1.5 ton Truck</option>
               <option value="truck_2">2 ton Truck</option>
               <option value="truck_4">4 ton Truck</option>
+	      <option value="truck_8">8 ton Truck</option>
             </select>
           </div>
 
