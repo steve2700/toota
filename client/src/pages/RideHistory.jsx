@@ -11,36 +11,34 @@ const RideHistorySection = () => {
     const fetchRideHistory = async () => {
       try {
         const response = await getAllTrips();
-        const trips = response.trips;
+        const trips = response?.trips ?? [];
 
-        setRideHistory(
-          trips.map((trip) => {
-            const pickupLocation = `${trip.pickup_location.location} (${trip.pickup_location.phone_number})`;
-            const dropOffLocation = `${trip.dropoff_location.location} (${trip.dropoff_location.phone_number})`;
+        if (Array.isArray(trips) && trips.length > 0) {
+          const filteredTrips = trips.filter(trip => trip.user_id === response.user_id);
+          
+          setRideHistory(
+            filteredTrips.map((trip) => {
+              const pickupLocation = `${trip.pickup_location.location} (${trip.pickup_location.phone_number})`;
+              const dropOffLocation = `${trip.dropoff_location.location} (${trip.dropoff_location.phone_number})`;
 
-            if (trip.pickup_time && !isNaN(new Date(trip.pickup_time))) {
               return {
                 id: trip.id,
-                date: format(new Date(trip.pickup_time), 'yyyy-MM-dd'),
+                date: trip.pickup_time && !isNaN(new Date(trip.pickup_time))
+                  ? format(new Date(trip.pickup_time), 'yyyy-MM-dd')
+                  : 'Invalid Date',
                 pickupLocation,
                 dropOffLocation,
                 fare: parseFloat(trip.bid),
                 status: trip.status,
               };
-            } else {
-              return {
-                id: trip.id,
-                date: 'Invalid Date',
-                pickupLocation,
-                dropOffLocation,
-                fare: parseFloat(trip.bid),
-                status: trip.status,
-              };
-            }
-          })
-        );
+            })
+          );
+        } else {
+          setRideHistory([]);
+        }
       } catch (error) {
         console.error('Error fetching ride history:', error);
+        setRideHistory([]);
       } finally {
         setLoading(false);
       }
