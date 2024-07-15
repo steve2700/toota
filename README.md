@@ -115,3 +115,44 @@ This will set up the backend and frontend services in Docker containers.
 
 The Swagger API documentation will be available at `http://localhost:8000/swagger/`.
 
+## Contributing
+We welcome contributions to Toota! If you would like to contribute, please follow these guidelines:
+
+1. **Fork the Repository**: 
+   - Click on the "Fork" button at the top of this repository to create a copy of the repository under your GitHub account.
+
+2. **Clone the Forked Repository**:
+   - Clone your forked repository to your local machine:
+     ```bash
+     git clone https://github.com/MfundoDon/toota.git
+     ```
+
+3. **Create a New Branch**:
+   - Create a new branch for your feature or bug fix:
+     ```bash
+     git checkout -b feature-or-bugfix-name
+     ```
+
+4. **Make Changes**:
+   - Make your changes to the codebase.
+
+5. **Commit Your Changes**:
+   - Commit your changes with a meaningful commit message:
+     ```bash
+     git add .
+     git commit -m "Description of your changes"
+     ```
+
+6. **Push to Your Fork**:
+   - Push your changes to your forked repository:
+     ```bash
+     git push origin feature-or-bugfix-name
+     ```
+
+7. **Create a Pull Request**:
+   - Open a pull request from your forked repository to the original repository.
+
+Please make sure to follow the [Code of Conduct](CODE_OF_CONDUCT.md) and ensure that your code adheres to our coding standards. If you have any questions, feel free to reach out.
+
+Thank you for contributing to Toota!
+
