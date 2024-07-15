@@ -6,6 +6,7 @@
 - [API USAGE](#apiusage)
 - [Docker Setup](#dockersetup)
 - [Contributing](#contributing)
+- [Code of Conduct](#codeofconduct)
 - [License](#license)
 
 ## Introduction
