@@ -4,20 +4,33 @@ import { Link, useLocation } from 'react-router-dom';
 import logo from "../../../logo.jpg";
 import classNames from 'classnames';
 
-const linkStyles = 'flex items-center gap-2 py-2 hover:bg-gray-700 hover:no-underline active:bg-gray-600 rounded-sm text-base';
+const linkStyles = 'flex items-center gap-2 py-2 rounded-sm text-base';
 
 export default function SideBarDriver() {
-  const [isExpanded, setIsExpanded] = useState(false); // Initial expanded state
+  const [isExpanded, setIsExpanded] = useState(true); // Initial expanded state
 
   const toggleSidebar = () => setIsExpanded(!isExpanded); // Function to toggle sidebar
 
   return (
     <div>
-      <div className="lg:hidden flex items-center justify-between px-4 py-2 bg-[#414043] text-white">
+      <div className={classNames(
+        "flex gap-2 justify-start items-center py-2 bg-[#414043] text-white",
+        'lg:flex-col',
+      )}>
+        <Link to='/'>
+          <img src={logo} className={classNames(
+            "object-fit h-12",
+            'lg:w-16 lg:h-16',
+          )} alt="logo" />
+        </Link>
         <button onClick={toggleSidebar}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-white"
+            className={classNames(
+              'h-6 w-6 text-white',
+              'hidden',
+              'lg:block',
+            )}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -25,60 +38,27 @@ export default function SideBarDriver() {
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-        </button>
-        <img src={logo} className="object-fit h-8" alt="logo" />
+        </button>  
       </div>
       <div
         className={classNames(
-          'fixed lg:relative bg-[#414043] p-3 text-white flex flex-col transition duration-300 ease-in-out',
-          isExpanded ? 'w-60' : 'w-16',
-          'lg:w-60', // Always expanded on larger screens
-          isExpanded ? 'left-0' : '-left-60', // Hide on small screens when not expanded
-          'lg:left-0', // Always visible on larger screens
-          'h-full'
+          'text-white flex flex-col transition-all duration-300 ease-in-out',
+          'fixed bottom-0 w-full',
+          `lg:relative lg:h-full lg:bg-[#414043] ${isExpanded ? 'lg:w-28' : 'lg:w-16'}`,
         )}
       >
-        <div className="flex items-center gap-2 px-1 py-2">
-          <img src={logo} className="object-fit mx-auto w-2/4 lg:hidden" alt="logo" />
-          <button onClick={toggleSidebar} className="focus:outline-none">
-            {isExpanded ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-            )}
-          </button>
-        </div>
         <div
           className={classNames(
-            'flex-1 py-8 flex flex-col gap-0.5',
-            !isExpanded && 'text-gray-400' // Dim text on collapse
+            'flex justify-between items-center px-4 py-3',
+            'md:px-8',
+            'lg:flex-1 lg:py-8 lg:flex-col lg:justify-start',
+            !isExpanded && 'text-gray-400', // Dim text on collapse
           )}
         >
           {DASHBOARD_DRIVER_LINKS.map((item) => (
-            <SideBarDriverLink key={item.key} item={item} isExpanded={isExpanded} />
-          ))}
-        </div>
-        <div className="flex flex-col gap-0.5 pt-2 border-t border-neutral-700 cursor-pointer">
-          {DASHBOARD_DRIVER_BOTTOM_LINKS.map((item) => (
-            <SideBarDriverLink key={item.key} item={item} isExpanded={isExpanded} />
+            
+              <SideBarDriverLink key={item.key} item={item} isExpanded={isExpanded} />
+            
           ))}
         </div>
       </div>
@@ -88,12 +68,21 @@ export default function SideBarDriver() {
 
 const SideBarDriverLink = ({ item, isExpanded }) => {
   const { pathname } = useLocation();
+  console.log(pathname, item.path)
 
   return (
     <Link
       to={item.path}
       className={classNames(
-        pathname === item.path ? 'bg-green-100' : 'text-gray-100',
+        'flex flex-col',
+        (
+          // Apply effects to dashboard menu item when the driver visits dashboard
+          (pathname.substring(pathname.lastIndexOf('/') + 1) === 'driver' && item.path === '')
+          ||
+          // Apply effects to apropriate menu item the driver selects
+          pathname.substring(pathname.lastIndexOf('/') + 1 ) === item.path
+        ) ? 'text-black font-bold lg:font-normal transition-all duration-500 lg:text-white'
+        : 'text-gray-500 scale-95 duration-500 lg:text-[#b1a7a6] lg:hover:text-[#d9cdcb]',
         linkStyles
       )}
     >
