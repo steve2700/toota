@@ -34,9 +34,10 @@ class Driver(User):
     licence_no = models.CharField(max_length=100, unique=True, null=False, blank=False, verbose_name=_("Driver's Licence Number"), default='')
     physical_address = models.CharField(max_length=300, null=False, blank=False, default='')
     identity_document = models.FileField(upload_to='static/media/identity_document', null=True, blank=True)
-    driver_licence  = models.FileField(upload_to='static/media/driver_licence', null=True, blank=True)
-    vehicle_registration  = models.FileField(upload_to='static/media/vehicle_registration', null=True, blank=True)
+    driver_licence = models.FileField(upload_to='static/media/driver_licence', null=True, blank=True)
+    vehicle_registration = models.FileField(upload_to='static/media/vehicle_registration', null=True, blank=True)
     criminal_record_check = models.FileField(upload_to='static/media/criminal_record_check', null=True, blank=True)
+    acceptance_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name', 'phone_number', 'physical_address', 'vehicle_registration', 'vehicle_type', 'licence_no', 'driver_licence']
@@ -49,8 +50,15 @@ class Driver(User):
             return self.groups.first().name
         return None
 
-
     def __str__(self):
         return self.full_name
 
+    def update_acceptance_rate(self):
+        total_trips = self.trips_as_driver.count()
+        accepted_trips = self.trips_as_driver.filter(is_accepted=True).count()
+        if total_trips > 0:
+            self.acceptance_rate = (accepted_trips / total_trips) * 100
+        else:
+            self.acceptance_rate = 0.0
+        self.save()
 

@@ -7,12 +7,10 @@ class PickupLocationSerializer(serializers.ModelSerializer):
         model = PickupLocation
         fields = '__all__'
 
-
 class DropoffLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = DropoffLocation
         fields = '__all__'
-
 
 class TripSerializer(serializers.ModelSerializer):
     pickup_location = PickupLocationSerializer()
@@ -54,8 +52,11 @@ class TripSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
-        return instance
+        # Update driver's acceptance rate if status is updated to 'ACCEPTED'
+        if instance.status == 'ACCEPTED' and instance.driver:
+            instance.driver.update_acceptance_rate()
 
+        return instance
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
