@@ -39,6 +39,7 @@ class Driver(User):
     criminal_record_check = models.FileField(upload_to='static/media/criminal_record_check', null=True, blank=True)
     acceptance_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
 
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name', 'phone_number', 'physical_address', 'vehicle_registration', 'vehicle_type', 'licence_no', 'driver_licence']
 
@@ -61,4 +62,8 @@ class Driver(User):
         else:
             self.acceptance_rate = 0.0
         self.save()
+
+   
+
+
 
