@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser, Group, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .utils import VEHICLE_TYPES
@@ -38,7 +38,8 @@ class Driver(User):
     vehicle_registration = models.FileField(upload_to='static/media/vehicle_registration', null=True, blank=True)
     criminal_record_check = models.FileField(upload_to='static/media/criminal_record_check', null=True, blank=True)
     acceptance_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
-
+    total_trips = models.PositiveIntegerField(default=0)
+    accepted_trips = models.PositiveIntegerField(default=0)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name', 'phone_number', 'physical_address', 'vehicle_registration', 'vehicle_type', 'licence_no', 'driver_licence']
@@ -55,15 +56,9 @@ class Driver(User):
         return self.full_name
 
     def update_acceptance_rate(self):
-        total_trips = self.trips_as_driver.count()
-        accepted_trips = self.trips_as_driver.filter(is_accepted=True).count()
-        if total_trips > 0:
-            self.acceptance_rate = (accepted_trips / total_trips) * 100
+        if self.total_trips > 0:
+            self.acceptance_rate = (self.accepted_trips / self.total_trips) * 100
         else:
             self.acceptance_rate = 0.0
         self.save()
-
-   
-
-
 
