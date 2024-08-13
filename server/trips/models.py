@@ -87,20 +87,26 @@ class Payment(models.Model):
     )
    
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4,  editable=False, unique=True)
-    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name='payment')
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name='payments')
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE, related_name='payments')
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    compensation_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    net_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default=PENDING)
     payment_date = models.DateTimeField(auto_now_add=True)
     order_number = models.CharField(max_length=8, unique=True, blank=True)
 
     def save(self, *args, **kwargs):
+        # Generate order number if not provided
         if not self.order_number:
             self.order_number = get_random_string(length=8)
+
+        # Calculate compensation and net amount
+        self.compensation_amount = self.amount_paid * 0.20
+        self.net_amount = self.amount_paid - self.compensation_amount
+
         super().save(*args, **kwargs)
 
-
     def __str__(self):
-          return f"{self.id}"
-
+        return f"Payment {self.order_number} for Trip {self.trip.id}"

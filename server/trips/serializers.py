@@ -7,12 +7,10 @@ class PickupLocationSerializer(serializers.ModelSerializer):
         model = PickupLocation
         fields = '__all__'
 
-
 class DropoffLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = DropoffLocation
         fields = '__all__'
-
 
 class TripSerializer(serializers.ModelSerializer):
     pickup_location = PickupLocationSerializer()
@@ -54,12 +52,43 @@ class TripSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
-        return instance
+        # Update driver's acceptance rate if status is updated to 'ACCEPTED'
+        if instance.status == 'ACCEPTED' and instance.driver:
+            instance.driver.update_acceptance_rate()
 
+        return instance
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = '__all__'
+        fields = [
+            'id', 'trip', 'driver', 'amount_paid', 
+            'compensation_amount', 'net_amount', 
+            'payment_status', 'payment_date', 'order_number'
+        ]
         read_only_fields = ('id', 'payment_date', 'order_number')
 
+    def create(self, validated_data):
+        # Create and save Payment instance with calculated values
+        payment = Payment(
+            trip=validated_data.get('trip'),
+            driver=validated_data.get('driver'),
+            amount_paid=validated_data.get('amount_paid'),
+            payment_status=validated_data.get('payment_status', Payment.PENDING)
+        )
+        payment.save()
+        return payment
+
+    def update(self, instance, validated_data):
+        # Update Payment instance with validated data
+        instance.trip = validated_data.get('trip', instance.trip)
+        instance.driver = validated_data.get('driver', instance.driver)
+        instance.amount_paid = validated_data.get('amount_paid', instance.amount_paid)
+        instance.payment_status = validated_data.get('payment_status', instance.payment_status)
+
+        # Calculate new compensation and net amounts
+        instance.compensation_amount = instance.amount_paid * 0.20
+        instance.net_amount = instance.amount_paid - instance.compensation_amount
+
+        instance.save()
+        return instance
