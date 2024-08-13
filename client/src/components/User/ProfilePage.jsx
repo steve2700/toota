@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaEnvelope, FaUser, FaPhone } from 'react-icons/fa';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // Note: Use the correct import name
 import { getUser } from '../../services/AuthService';
 import Loader from 'react-js-loader';
 
@@ -52,8 +52,11 @@ const ProfilePage = () => {
     e.preventDefault();
     try {
       const jwt = localStorage.getItem('access_token');
-      const new_user = jwtDecode(jwt);
-      const user_id = new_user['user_id'];
+      const decodedToken = jwtDecode(jwt);
+      const user_id = decodedToken['user_id'];
+
+      // Log the user_id to the console
+      console.log('User ID:', user_id);
 
       const response = await axios.patch(`${import.meta.env.VITE_BASE_URL}/api/user/profile/${user_id}/`, formData, {
         headers: {
