@@ -1,14 +1,13 @@
 import React, { useState, useRef, useCallback } from 'react';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode }from 'jwt-decode'; // Fix the import
 import { getAccessToken } from '../../services/AuthService';
 import {
     GoogleMap,
     Marker,
     Autocomplete,
     useJsApiLoader,
-    DirectionsRenderer,
-} from '@react-google-maps/api';
+    DirectionsRenderer} from '@react-google-maps/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faPhone, faClock, faFileAlt, faTruck, faBuilding, faMoneyBillWave, faTimes } from '@fortawesome/free-solid-svg-icons';
 
@@ -270,7 +269,7 @@ const CreateTripForm = () => {
                                     value={formData.pickup_location.phone_number}
                                     onChange={handleChange}
                                     placeholder="Enter pickup contact number"
-                                                                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                                         errors['pickup_location.phone_number']
                                             ? 'border-red-500'
                                             : ''
@@ -280,6 +279,27 @@ const CreateTripForm = () => {
                                 {errors['pickup_location.phone_number'] && (
                                     <p className="text-red-500 text-xs mt-1">
                                         {errors['pickup_location.phone_number']}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    <FontAwesomeIcon icon={faClock} className="mr-2" />
+                                    Pickup Time
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    name="pickup_time"
+                                    value={formData.pickup_time}
+                                    onChange={handleChange}
+                                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                                        errors['pickup_time'] ? 'border-red-500' : ''
+                                    }`}
+                                    required
+                                />
+                                {errors['pickup_time'] && (
+                                    <p className="text-red-500 text-xs mt-1">
+                                        {errors['pickup_time']}
                                     </p>
                                 )}
                             </div>
@@ -352,27 +372,7 @@ const CreateTripForm = () => {
                         </div>
                     </div>
 
-                    {/* Other Form Fields */}
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
-                            <FontAwesomeIcon icon={faClock} className="mr-2" />
-                            Pickup Time
-                        </label>
-                        <input
-                            type="datetime-local"
-                            name="pickup_time"
-                            value={formData.pickup_time}
-                            onChange={handleChange}
-                            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-                                errors['pickup_time'] ? 'border-red-500' : ''
-                            }`}
-                            required
-                        />
-                        {errors['pickup_time'] && (
-                            <p className="text-red-500 text-xs mt-1">{errors['pickup_time']}</p>
-                        )}
-                    </div>
-
+                    {/* Additional Details */}
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">
                             <FontAwesomeIcon icon={faFileAlt} className="mr-2" />
@@ -382,7 +382,7 @@ const CreateTripForm = () => {
                             name="load_description"
                             value={formData.load_description}
                             onChange={handleChange}
-                            placeholder="Enter load description"
+                            placeholder="Describe the load"
                             className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                                 errors['load_description'] ? 'border-red-500' : ''
                             }`}
@@ -394,7 +394,6 @@ const CreateTripForm = () => {
                             </p>
                         )}
                     </div>
-
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">
                             <FontAwesomeIcon icon={faTruck} className="mr-2" />
@@ -409,35 +408,35 @@ const CreateTripForm = () => {
                             }`}
                             required
                         >
-                            <option value="" disabled>
-                                Select vehicle type
-                            </option>
-                             <option value="bakkie">bakkie</option>
-                             <option value="truck_1">1 ton Truck</option>
-                             <option value="truck_1.5">1.5 ton Truck</option>
-                             <option value="truck_2">2 ton Truck</option>
-                             <option value="truck_4">4 ton Truck</option>
-                             <option value="truck_8">8 ton Truck</option>
+                            <option value="">Select a vehicle</option>
+                            <option value="bakkie">bakkie</option>
+                            <option value="truck_1">1 ton Truck</option>
+                            <option value="truck_1.5">1.5 ton Truck</option>
+                            <option value="truck_2">2 ton Truck</option>
+                            <option value="truck_4">4 ton Truck</option>
+                            <option value="truck_8">8 ton Truck</option>
                         </select>
                         {errors['vehicle_type'] && (
-                            <p className="text-red-500 text-xs mt-1">{errors['vehicle_type']}</p>
+                            <p className="text-red-500 text-xs mt-1">
+                                {errors['vehicle_type']}
+                            </p>
                         )}
                     </div>
-
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">
                             <FontAwesomeIcon icon={faBuilding} className="mr-2" />
-                            Number of Floors 
+                            Number of Floors
                         </label>
                         <input
                             type="number"
                             name="number_of_floors"
                             value={formData.number_of_floors}
                             onChange={handleChange}
-                            placeholder="Enter number of floors (if applicable)"
+                            placeholder="Enter number of floors"
                             className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                                 errors['number_of_floors'] ? 'border-red-500' : ''
                             }`}
+                            required
                         />
                         {errors['number_of_floors'] && (
                             <p className="text-red-500 text-xs mt-1">
@@ -445,44 +444,58 @@ const CreateTripForm = () => {
                             </p>
                         )}
                     </div>
-
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2">
                             <FontAwesomeIcon icon={faMoneyBillWave} className="mr-2" />
-                            Bid Amount 
+                            Bid Amount
                         </label>
                         <input
                             type="number"
                             name="bid"
                             value={formData.bid}
                             onChange={handleChange}
-                            placeholder="Enter bid amount (optional)"
+                            placeholder="Enter your bid"
                             className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                                 errors['bid'] ? 'border-red-500' : ''
                             }`}
+                            required
                         />
                         {errors['bid'] && (
-                            <p className="text-red-500 text-xs mt-1">{errors['bid']}</p>
+                            <p className="text-red-500 text-xs mt-1">
+                                {errors['bid']}
+                            </p>
                         )}
                     </div>
 
-                    {/* Submit Button */}
-                    <div className="flex justify-center">
+                    <div className="flex justify-between">
+                        <button
+                            type="button"
+                            onClick={() => setCurrentStep((prev) => (prev === 0 ? 0 : prev - 1))}
+                            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            Previous
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setCurrentStep((prev) => (prev === 1 ? 1 : prev + 1))}
+                            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            Next
+                        </button>
                         <button
                             type="submit"
                             className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg focus:outline-none focus:shadow-outline"
                         >
-                            Create Request
+                            Create Trip
                         </button>
                     </div>
                 </form>
             ) : (
-                <p>Loading Map...</p>
+                <div>Loading...</div>
             )}
         </div>
     );
 };
 
 export default CreateTripForm;
-
 
