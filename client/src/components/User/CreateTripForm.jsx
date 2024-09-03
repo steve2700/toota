@@ -28,6 +28,8 @@ const CreateTripForm = () => {
     const [message, setMessage] = useState(null);
     const [pickupPosition, setPickupPosition] = useState(null);
     const [dropoffPosition, setDropoffPosition] = useState(null);
+    const [currentStep, setCurrentStep] = useState(0); // Add currentStep state
+
     const autocompletePickupRef = useRef(null);
     const autocompleteDropoffRef = useRef(null);
 
@@ -317,7 +319,21 @@ const CreateTripForm = () => {
                                 </div>
                             </div>
 
-                            {/* Additional Details */}
+                            <div className="text-center mt-6">
+                                <button
+                                    type="button"
+                                    onClick={() => setCurrentStep(1)} // Move to the next step
+                                    className="bg-orange-500 text-white font-bold py-2 px-4 rounded hover:bg-orange-600 focus:outline-none"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {currentStep === 1 && (
+                        <div>
+                            {/* Additional fields for the next step */}
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">
                                     <FontAwesomeIcon icon={faClock} className="mr-2" />
@@ -340,7 +356,6 @@ const CreateTripForm = () => {
                                     <p className="text-red-500 text-xs italic">{formik.errors.pickup_time}</p>
                                 ) : null}
                             </div>
-
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">
                                     <FontAwesomeIcon icon={faFileAlt} className="mr-2" />
@@ -363,7 +378,6 @@ const CreateTripForm = () => {
                                     <p className="text-red-500 text-xs italic">{formik.errors.load_description}</p>
                                 ) : null}
                             </div>
-
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">
                                     <FontAwesomeIcon icon={faTruck} className="mr-2" />
@@ -393,7 +407,6 @@ const CreateTripForm = () => {
                                     <p className="text-red-500 text-xs italic">{formik.errors.vehicle_type}</p>
                                 ) : null}
                             </div>
-
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">
                                     <FontAwesomeIcon icon={faBuilding} className="mr-2" />
@@ -417,7 +430,6 @@ const CreateTripForm = () => {
                                     <p className="text-red-500 text-xs italic">{formik.errors.number_of_floors}</p>
                                 ) : null}
                             </div>
-
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">
                                     <FontAwesomeIcon icon={faMoneyBillWave} className="mr-2" />
@@ -429,9 +441,11 @@ const CreateTripForm = () => {
                                     value={formik.values.bid}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    placeholder="Enter bid amount"
+                                    placeholder="Enter your bid"
                                     className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-                                        formik.touched.bid && formik.errors.bid ? 'border-red-500' : ''
+                                        formik.touched.bid && formik.errors.bid
+                                            ? 'border-red-500'
+                                            : ''
                                     }`}
                                     required
                                 />
@@ -439,13 +453,19 @@ const CreateTripForm = () => {
                                     <p className="text-red-500 text-xs italic">{formik.errors.bid}</p>
                                 ) : null}
                             </div>
-
-                            <div className="text-center mt-8">
+                            <div className="text-center mt-6">
+                                <button
+                                    type="button"
+                                    onClick={() => setCurrentStep(0)} // Move to the previous step
+                                    className="bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600 focus:outline-none mr-4"
+                                >
+                                    Back
+                                </button>
                                 <button
                                     type="submit"
-                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                    className="bg-orange-500 text-white font-bold py-2 px-4 rounded hover:bg-orange-600 focus:outline-none"
                                 >
-                                    Create Trip
+                                    Submit
                                 </button>
                             </div>
                         </div>
