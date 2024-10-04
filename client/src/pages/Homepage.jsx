@@ -11,7 +11,9 @@ const Homepage = () => {
       <div className="bg-white-400 text-black h-screen flex items-center justify-center">
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="text-center md:text-left">
-            <h1 className="text-3xl md:text-4xl text-[#f89f1b] font-bold mb-4">Welcome to Toota</h1>
+            {/* Updated with h1 for SEO */}
+            <h1 className="text-5xl font-bold text-[#f89f1b] mb-4">Toota - Your Ultimate Transportation Solution</h1>
+            <h2 className="text-3xl md:text-4xl text-[#f89f1b] font-bold mb-4">Welcome to Toota</h2>
             <p className="text-base md:text-lg mb-8">Your ultimate solution for seamless transportation and logistics services.</p>
             <p className="text-base md:text-lg mb-8">With Toota, you can effortlessly connect with a diverse fleet of vehicles and experienced drivers to meet all your transportation needs. Whether you're moving goods. Toota ensures a reliable, efficient, and hassle-free experience every time.</p>
             <p className="text-base md:text-lg mb-8">Join Toota today and experience the future of transportation!</p>
@@ -32,6 +34,7 @@ const Homepage = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8">Featured Services</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Featured Services */}
             <div className="flex items-center justify-center flex-col">
               <FaTruck className="text-5xl mb-4 text-[#f89f1b]" />
               <h3 className="text-xl font-semibold mb-2">Diverse Fleet</h3>
@@ -84,4 +87,4 @@ const Homepage = () => {
 };
 
 export default Homepage;
-
+                
