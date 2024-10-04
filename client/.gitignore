@@ -1,6 +1,5 @@
 # dependencies
 /node_modules
-.env
 
 /.pnp
 .pnp.js
@@ -28,16 +27,12 @@ yarn-error.log*
 # local env files
 .env
 
-
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-
-
 
 # next-video
 videos/*
