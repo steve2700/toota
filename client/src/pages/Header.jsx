@@ -10,7 +10,7 @@ function Header() {
   };
 
   return (
-    <header className="sticky top-0 bg-[#404042] shadow-lg">
+    <header className="sticky top-0 z-50 bg-[#404042] shadow-lg">
       <div className="container mx-auto px-4">
         <nav className="flex items-center justify-between py-4">
           {/* Logo */}
