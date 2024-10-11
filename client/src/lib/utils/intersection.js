@@ -3,11 +3,11 @@
  * the given effect to provided elements.
  * 
  * @param {MutableRefObject} observerRef The element to observe
- * @param {Array[MutableRefObject|String]} effectRefs An array 
+ * @param {[{element: MutableRefObject, classList: []}]} effectRefs An array 
  * of objects containing the elements to animate
  * and their corresponding utitlity class names.
  * Eg. `[ {element: elementRef, classList: ['w-1', 'h-1']}, {} ]`
- * @param {Object} options An object containing
+ * @param {object} options An object containing
  * the options for controlling the intersection
  * observer API.
  */
