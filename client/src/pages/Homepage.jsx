@@ -1,11 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
-import { motion } from 'framer-motion';
-import { FaBolt, FaTruck, FaFileAlt, FaHandshake, FaUserFriends, FaCalendarAlt, FaMapMarkedAlt } from 'react-icons/fa';
 import registerComponentInObserver from '../lib/utils/intersection';
 import 'swiper/css';
 import 'swiper/css/pagination';

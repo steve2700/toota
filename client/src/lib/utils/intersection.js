@@ -14,7 +14,7 @@
 export default function registerComponentInObserver(observerRef, effectRefs, options) {
     const observerElement = observerRef.current;
 
-    const observer = new IntersectionObserver((items, observer) => {
+    const observer = new IntersectionObserver((items) => {
         for (const item of items) {
             if (item.isIntersecting) {
                 effectRefs.forEach((elementRef) => {
