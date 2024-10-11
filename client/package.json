@@ -45,6 +45,7 @@
     "rxjs": "^7.8.1",
     "safe-buffer": "^5.2.1",
     "socket.io-client": "^4.7.5",
+    "swiper": "^11.1.14",
     "websocket": "^1.0.34",
     "yup": "^1.4.0"
   },
