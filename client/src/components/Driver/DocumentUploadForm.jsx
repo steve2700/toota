@@ -4,7 +4,7 @@ import DocumentVerificationMessageForm from './DocumentVerificationMessageForm';
 import { getDriver, getAccessToken } from "../../services/AuthService";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import logo from '../../logo.jpg'; // Ensure the path is correct
+import logo from '../../logo.png'; // Ensure the path is correct
 
 const DocumentUploadForm = () => {
   const [formData, setFormData] = useState({

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
-import logo from '../../logo.jpg'; // Ensure the path is correct
+import logo from '../../logo.png'; // Ensure the path is correct
 
 const DriverResetPasswordForm = () => {
   const { uidb64, token } = useParams();
